@@ -1,2 +1,5 @@
 obj/
 prepi.depend
+prepi.layout
+bin/prepi.exe
+bin/prepi_d.exe

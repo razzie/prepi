@@ -45,6 +45,7 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-std=c++11" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 			<Add directory="include" />
@@ -59,7 +60,10 @@
 		<Unit filename="src/Element.h" />
 		<Unit filename="src/EventListener.cpp" />
 		<Unit filename="src/EventListener.h" />
-		<Unit filename="src/globals.h" />
+		<Unit filename="src/Globals.cpp" />
+		<Unit filename="src/Globals.h" />
+		<Unit filename="src/Level.cpp" />
+		<Unit filename="src/Level.h" />
 		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />

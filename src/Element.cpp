@@ -1,14 +1,15 @@
 #include "Element.h"
+#include "Level.h"
 
-Element::Element(gameGlobals* globals)
+Element::Element(Level* level)
 {
-    m_globals = globals;
-    m_globals->elements.insert(this);
+    m_level = level;
+    m_level->addElement(this);
 }
 
 Element::~Element()
 {
-    m_globals->elements.erase(this);
+    m_level->removeElement(this);
 }
 
 irr::core::vector2di Element::getPosition() const

@@ -3,19 +3,22 @@
 
 #include "irrlicht.h"
 #include "Box2D\Box2D.h"
-#include "EventListener.h"
-#include <set>
+//#include "EventListener.h"
 
-class Element;
+class EventListener;
 
-struct gameGlobals
+class Globals
 {
-    irr::IrrlichtDevice *device;
-    irr::video::IVideoDriver* driver;
-    irr::scene::ISceneManager* smgr;
-    EventListener* eventListener;
-    b2World *world;
-    std::set<Element*> elements;
+public:
+    irr::IrrlichtDevice* const device;
+    irr::video::IVideoDriver* const driver;
+    irr::scene::ISceneManager* const smgr;
+    EventListener* const eventListener;
+    b2World* const world;
+
+    Globals();
+    Globals(const Globals&) = delete;
+    ~Globals();
 };
 
 #endif // GLOBALS_H_INCLUDED

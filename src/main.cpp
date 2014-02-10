@@ -1,31 +1,14 @@
 #include <iostream>
-#include "globals.h"
+#include "Globals.h"
 #include "SFML\Audio.hpp"
 
 using namespace std;
 using namespace irr;
 using namespace sf;
 
-gameGlobals g;
-
 int main()
 {
-    // create device
-    g.device = createDevice(video::EDT_OPENGL, core::dimension2du(800, 600), 16, false);
-    if (g.device == 0)
-        return 1; // could not create selected driver.
-
-    g.driver = g.device->getVideoDriver();
-    g.smgr = g.device->getSceneManager();
-    g.eventListener = new EventListener();
-
-    // create engine and camera
-    g.device->setWindowCaption(L"Custom Scene Node - Irrlicht Engine Demo");
-    g.smgr->addCameraSceneNode(0, core::vector3df(0,-40,0), core::vector3df(0,0,0));
-    g.device->setEventReceiver(g.eventListener);
-
-    b2Vec2 gravity(0.0f, -1.0f);
-    g.world = new b2World(gravity);
+    Globals g;
 
     SoundBuffer rofiBuf;
     rofiBuf.loadFromFile("../media/rofoges.wav");
@@ -61,8 +44,6 @@ int main()
             frames=0;
         }
     }
-
-    g.device->drop();
 
     return 0;
 }
