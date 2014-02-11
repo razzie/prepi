@@ -1,5 +1,7 @@
 #include <iostream>
 #include "Globals.h"
+#include "Element.h"
+#include "Level.h"
 #include "SFML\Audio.hpp"
 
 using namespace std;
@@ -10,10 +12,12 @@ int main()
 {
     Globals g;
 
-    SoundBuffer rofiBuf;
+    /*SoundBuffer rofiBuf;
     rofiBuf.loadFromFile("../media/rofoges.wav");
     Sound rofi(rofiBuf);
-    rofi.play();
+    rofi.play();*/
+
+    Level level1(&g, "../levels/mentes.txt");
 
     float32 timeStep = 1.0f / 60.0f;
     int32 velocityIterations = 6;
@@ -29,7 +33,7 @@ int main()
         //g.smgr->drawAll();
 
 
-
+        level1.update();
 
 
         g.driver->endScene();
