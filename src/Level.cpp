@@ -132,18 +132,21 @@ void Level::update()
         destRect -= viewOffset; // moving the background starting position according to the view
         levelRect -= viewOffset;
 
+        auto clipRect = levelRect;
+        clipRect.clipAgainst(m_view);
+
         unsigned xr, yr;
         for (xr = 0; xr < xRepeats; ++xr) // column repeats
         {
             for (yr = 0; yr < yRepeats; ++yr) // row repeats
             {
-                m_globals->driver->draw2DImage(m_bg, destRect, srcRect);
+                m_globals->driver->draw2DImage(m_bg, destRect, srcRect, &clipRect);
                 destRect += {0, destRect.getHeight()};
             }
             destRect += {destRect.getWidth(),
                 (s32)(-yr * destRect.getHeight())}; // restore previous Y position
         }
-        m_globals->driver->draw2DRectangleOutline(levelRect);
+        //m_globals->driver->draw2DRectangleOutline(levelRect);
     }
 
     for (Element* element : m_elements) element->update();
