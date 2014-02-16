@@ -58,12 +58,23 @@
 		</Linker>
 		<Unit filename="src/Element.cpp" />
 		<Unit filename="src/Element.h" />
+		<Unit filename="src/EnemyElement.cpp" />
+		<Unit filename="src/EnemyElement.h" />
 		<Unit filename="src/EventListener.cpp" />
 		<Unit filename="src/EventListener.h" />
+		<Unit filename="src/FinishElement.cpp" />
+		<Unit filename="src/FinishElement.h" />
 		<Unit filename="src/Globals.cpp" />
 		<Unit filename="src/Globals.h" />
+		<Unit filename="src/GroundElement.cpp" />
+		<Unit filename="src/GroundElement.h" />
 		<Unit filename="src/Level.cpp" />
 		<Unit filename="src/Level.h" />
+		<Unit filename="src/Motion.h" />
+		<Unit filename="src/PlayerElement.cpp" />
+		<Unit filename="src/PlayerElement.h" />
+		<Unit filename="src/RewardElement.cpp" />
+		<Unit filename="src/RewardElement.h" />
 		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />
