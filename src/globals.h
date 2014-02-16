@@ -6,6 +6,7 @@
 //#include "EventListener.h"
 
 class EventListener;
+namespace gg { class application; }
 
 class Globals
 {
@@ -15,6 +16,7 @@ public:
     irr::scene::ISceneManager* const smgr;
     EventListener* const eventListener;
     b2World* const world;
+    gg::application* const app;
 
     Globals();
     Globals(const Globals&) = delete;

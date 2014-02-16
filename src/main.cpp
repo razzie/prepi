@@ -3,6 +3,7 @@
 #include "Element.h"
 #include "Level.h"
 #include "SFML\Audio.hpp"
+#include "gglib.hpp"
 
 using namespace std;
 using namespace irr;
@@ -18,6 +19,16 @@ int main()
     rofi.play();*/
 
     Level level1(&g, "../levels/mentes.txt");
+
+    gg::script_engine* se = g.app->get_script_engine();
+    se->add_function("setBackground", [&](unsigned id, unsigned mode)
+                     { level1.setBackground(id, static_cast<Level::bgDrawingMethod>(mode)); });
+    se->add_function("setDimension", [&](unsigned columns, unsigned rows)
+                     { level1.setDimension(columns, rows); });
+
+    gg::console* con = g.app->create_console();
+    con->open();
+    con->drop();
 
     float32 timeStep = 1.0f / 60.0f;
     int32 velocityIterations = 6;

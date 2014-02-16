@@ -1,5 +1,6 @@
 #include "Globals.h"
 #include "EventListener.h"
+#include "gg/application.hpp"
 
 using namespace std;
 using namespace irr;
@@ -13,6 +14,7 @@ Globals::Globals()
  , smgr(device->getSceneManager())
  , eventListener(new EventListener())
  , world(new b2World(gravity))
+ , app(gg::application::create("prepi"))
 {
     // create engine and camera
     device->setWindowCaption(L"Custom Scene Node - Irrlicht Engine Demo");
@@ -23,6 +25,7 @@ Globals::Globals()
 Globals::~Globals()
 {
     device->drop();
+    app->drop();
     delete world;
     delete eventListener;
 }
