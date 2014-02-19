@@ -62,6 +62,45 @@ namespace util
 
 
     template<class T>
+    int strcmpi(std::basic_string<T> s1, std::basic_string<T> s2,
+                std::locale loc = std::locale())
+    {
+        if (s1.size() != s2.size()) return (s1.size() - s2.size());
+
+        for (size_t i = 0; i < s1.size(); ++i)
+        {
+            int c1 = std::tolower(s1[i], loc);
+            int c2 = std::tolower(s2[i], loc);
+            if (c1 != c2) return (c1 - c2);
+        }
+
+        return 0;
+    }
+
+    extern template int strcmpi(std::basic_string<char>, std::basic_string<char>, std::locale);
+    extern template int strcmpi(std::basic_string<wchar_t>, std::basic_string<wchar_t>, std::locale);
+
+    template<class T>
+    int strncmpi(std::basic_string<T> s1, std::basic_string<T> s2, size_t n,
+                 std::locale loc = std::locale())
+    {
+        if (s1.size() < n || s2.size() < n) return (s1.size() - s2.size());
+
+        for (size_t i = 0; i < n; ++i)
+        {
+            int c1 = std::tolower(s1[i], loc);
+            int c2 = std::tolower(s2[i], loc);
+            if (c1 != c2) return (c1 - c2);
+        }
+
+        return 0;
+    }
+
+    extern template int strncmpi(std::basic_string<char>, std::basic_string<char>, size_t, std::locale);
+    extern template int strncmpi(std::basic_string<wchar_t>, std::basic_string<wchar_t>, size_t, std::locale);
+
+
+    template<class T>
     std::basic_string<T> trim(std::basic_string<T> s,
                               std::locale loc = std::locale())
     {
