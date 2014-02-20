@@ -127,7 +127,7 @@ namespace gg
             virtual enumerator_impl_base* clone() const = 0;
             virtual void next() = 0;
             virtual void advance(size_t) = 0;
-            virtual bool is_finished() const = 0;
+            virtual bool has_next() const = 0;
             virtual void reset() = 0;
             virtual void erase() = 0;
             virtual void insert(const T&) = 0;
@@ -152,16 +152,16 @@ namespace gg
             enumerator_impl(container_type cont) : m_cont(cont), m_current(m_cont.begin()), m_next(std::next(m_current, 1)) {}
             enumerator_impl(const enumerator_impl* e) : m_cont(e.m_cont), m_current(e.m_current), m_next(e.m_next) {}
             enumerator_impl_base* clone() const { return new enumerator_impl(*this); }
-            void next() { if (!is_finished()) { m_current = m_next; std::advance(m_next, 1); } }
+            void next() { if (has_next()) { m_current = m_next; std::advance(m_next, 1); } }
             void advance(size_t n) { std::advance(m_current, n); m_next = std::next(m_current, 1); }
-            bool is_finished() const { return (m_current == m_cont.end()); }
+            bool has_next() const { return (m_current != m_cont.end()); }
             void reset() { m_current = m_cont.begin(); m_next = std::next(m_current, 1); }
-            void erase() { if (!is_finished()) { m_current = m_next = m_cont.erase(m_current); } }
+            void erase() { if (has_next()) { m_current = m_next = m_cont.erase(m_current); } }
             void insert(const T& t) { m_next = m_cont.insert(m_next, t); }
             void insert(T&& t) { m_next = m_cont.insert(m_next, t); }
             size_t count() const { return m_cont.size(); }
-            optional<T> get() { if (!is_finished() && m_current != m_next) return *m_current; else return {}; }
-            optional<T> get() const { if (!is_finished() && m_current != m_next) return *m_current; else return {}; }
+            optional<T> get() { if (has_next() && m_current != m_next) return *m_current; else return {}; }
+            optional<T> get() const { if (has_next() && m_current != m_next) return *m_current; else return {}; }
         };
 
         enumerator_impl_base* m_enum;
@@ -183,7 +183,7 @@ namespace gg
 
         void next() { if (m_enum != nullptr) m_enum->next(); else throw std::runtime_error("empty enumerator"); }
         void advance(size_t n) { if (m_enum != nullptr) m_enum->advance(n); else throw std::runtime_error("empty enumerator"); }
-        bool is_finished() const { if (m_enum != nullptr) return m_enum->is_finished(); else throw std::runtime_error("empty enumerator"); }
+        bool has_next() const { if (m_enum != nullptr) return m_enum->has_next(); else throw std::runtime_error("empty enumerator"); }
         void reset() { if (m_enum != nullptr) m_enum->reset(); else throw std::runtime_error("empty enumerator"); }
         void erase() { if (this->m_enum != nullptr) this->m_enum->erase(); else throw std::runtime_error("empty enumerator"); }
         void insert(const T& t) { if (this->m_enum != nullptr) this->m_enum->insert(t); else throw std::runtime_error("empty enumerator"); }

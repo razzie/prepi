@@ -38,6 +38,7 @@ namespace gg
             virtual void align_left() = 0;
             virtual void align_center() = 0;
             virtual void align_right() = 0;
+            virtual void print(std::string) = 0;
             virtual bool is_empty() const = 0;
             virtual std::string to_string() const = 0;
         };
@@ -66,6 +67,8 @@ namespace gg
         virtual void set_controller(controller* ctrl) = 0;
         virtual void enable_input() = 0;
         virtual void disable_input() = 0;
+        virtual void enable_argument_fill_helper() = 0;
+        virtual void disable_argument_fill_helper() = 0;
         virtual void open() = 0;
         virtual void close() = 0;
         virtual bool is_opened() const = 0;

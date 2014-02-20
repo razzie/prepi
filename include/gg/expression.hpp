@@ -10,16 +10,17 @@ namespace gg
 {
     class expression : public reference_counted
     {
+    protected:
+        virtual ~expression() {};
+
     public:
         static expression* create(std::string expr, bool auto_complete = false);
 
-        virtual ~expression() {};
         virtual void set_name(std::string name) = 0;
         virtual std::string get_name() const = 0;
         virtual std::string get_expression() const = 0;
         virtual bool is_root() const = 0;
         virtual bool is_leaf() const = 0;
-        virtual bool is_empty() const = 0;
         virtual enumerator<expression*> get_children() = 0;
         virtual enumerator<expression*> get_children() const = 0;
         virtual void for_each(std::function<void(expression&)>) = 0;

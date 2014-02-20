@@ -29,12 +29,6 @@ namespace gg
         virtual void log_to_file(std::string) = 0;
         virtual void log_to_console(console*) = 0;
     };
-
-    template<class T>
-    logger& operator<< (logger* l, const T& t)
-    {
-        return (*l << t);
-    }
 };
 
 #endif // GG_LOGGER_HPP_INCLUDED
