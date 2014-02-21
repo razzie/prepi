@@ -108,7 +108,7 @@ void Level::update()
             break;
 
         case bgDrawingMethod::VERTICAL:
-            destRect = {0, 0, levelRect.getWidth(), (s32)(levelRect.getHeight() * ratio)};
+            destRect = {0, 0, levelRect.getWidth(), (s32)(levelRect.getWidth() / ratio)};
             yRepeats = levelRect.getHeight() / destRect.getHeight() + 1;
             break;
 
