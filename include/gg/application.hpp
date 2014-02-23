@@ -21,6 +21,16 @@ namespace gg
         ~remote_application() {}
 
     public:
+        class connection_handler : public reference_counted
+        {
+        protected:
+            virtual ~connection_handler() {}
+
+        public:
+            virtual void handle_connection_open(remote_application*) = 0;
+            virtual void handle_connection_close(remote_application*) = 0;
+        };
+
         class request_handler : public reference_counted
         {
         protected:
@@ -38,6 +48,9 @@ namespace gg
         virtual bool connect() = 0;
         virtual void disconnect() = 0;
         virtual bool is_connected() const = 0;
+        virtual void set_connection_handler(connection_handler*) = 0;
+        virtual void set_connection_handler(std::function<void(remote_application*, bool is_connection)>) = 0;
+        virtual connection_handler* get_connection_handler() const = 0;
         virtual void add_request_handler(typeinfo, request_handler*) = 0;
         virtual void add_request_handler(typeinfo, std::function<bool(var&)>) = 0;
         virtual void remove_request_handler(typeinfo) = 0;
