@@ -32,7 +32,6 @@ public:
     irr::core::vector2di getPosition() const;
     irr::core::vector2df getRealCoord() const;
     void setRealCoord(irr::core::vector2df);
-
     virtual void update() = 0;
 
 protected:

@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Globals.h"
 #include "Element.h"
+#include "Background.h"
 #include "Level.h"
 #include "SFML\Audio.hpp"
 #include "gglib.hpp"
@@ -22,9 +23,13 @@ int main()
 
     gg::script_engine* se = g.app->get_script_engine();
     se->add_function("setBackground", [&](unsigned id, unsigned mode)
-                     { level1.setBackground(id, static_cast<Level::bgDrawingMethod>(mode)); });
+                     {
+                         //level1.setBackground(id, static_cast<Level::bgDrawingMethod>(mode));
+                         level1.getBackground()->setId(id);
+                         level1.getBackground()->setDrawingMethod(static_cast<Background::DrawingMethod>(mode));
+                     });
     se->add_function("setDimension", [&](unsigned columns, unsigned rows)
-                     { level1.setDimension(columns, rows); });
+                     { level1.setDimension({columns, rows}); });
     se->add_function("color", [](unsigned R, unsigned G, unsigned B)
                      {
                          gg::console* c = gg::console::get_invoker_console();

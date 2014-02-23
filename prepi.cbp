@@ -59,6 +59,8 @@
 			<Add library="tthread" />
 			<Add directory="lib" />
 		</Linker>
+		<Unit filename="src/Background.cpp" />
+		<Unit filename="src/Background.h" />
 		<Unit filename="src/Element.cpp" />
 		<Unit filename="src/Element.h" />
 		<Unit filename="src/EnemyElement.cpp" />

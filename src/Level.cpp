@@ -1,34 +1,32 @@
 #include <iostream>
 #include <fstream>
 #include <cstdio>
-#include <map>
 #include "Level.h"
 #include "Element.h"
+#include "Background.h"
 #include "Globals.h"
 
 using namespace irr;
-
-static std::map<unsigned, io::path> bgs = {
-    {1, "../media/tilesets/background/01_Fantasy.jpg"},
-    {2, "../media/tilesets/background/02_Magic.jpg"},
-    {3, "../media/tilesets/background/03_Clear_sky.png"},
-    {4, "../media/tilesets/background/04_Dark.png"}};
 
 Level::Level(Globals* globals, std::string url)
  : m_globals(globals)
  , m_view({0,0,800,600})
  , m_unit(64)
- , m_bg(nullptr)
+ , m_bg(new Background(this))
 {
     std::fstream file(url);
     char buffer[1024];
 
     // background
-    file.getline(buffer, sizeof(buffer)-1);
     unsigned bgId, bgDrawM, columns, rows;
+
+    file.getline(buffer, sizeof(buffer)-1);
     std::sscanf(buffer, "%d,%d,%d,%d", &bgId, &bgDrawM, &columns, &rows);
-    setBackground(bgId, static_cast<bgDrawingMethod>(bgDrawM));
-    setDimension(columns, rows);
+
+    //setBackground(bgId, static_cast<bgDrawingMethod>(bgDrawM));
+    m_bg->setId(bgId);
+    m_bg->setDrawingMethod(static_cast<Background::DrawingMethod>(bgDrawM));
+    setDimension({columns, rows});
 
     // elements
     /*while (file.getline(buffer, sizeof(buffer)-1))
@@ -51,37 +49,41 @@ Globals* Level::getGlobals()
 
 void Level::addElement(Element* element)
 {
+    tthread::lock_guard<tthread::mutex> guard(m_mutex);
     m_elements.insert(element);
 }
 
 void Level::removeElement(Element* element)
 {
+    tthread::lock_guard<tthread::mutex> guard(m_mutex);
     m_elements.erase(element);
 }
 
-void Level::setBackground(unsigned id, bgDrawingMethod drawingMethod)
+Background* Level::getBackground()
 {
-    //if (m_bg) m_bg->drop();
-    m_bg = m_globals->driver->getTexture(bgs[id]);
-
-    /*video::ITexture* texture = m_globals->driver->getTexture(bgs[id]);
-    m_bg = m_globals->driver->createImage(texture, {0,0}, {800,600});
-    texture->drop();*/
-
-    //m_bgId = id;
-    m_bgDrawingMethod = drawingMethod;
-
+    return m_bg;
 }
 
-void Level::setDimension(unsigned columns, unsigned rows)
+void Level::setDimension(core::dimension2du dim)
 {
-    m_columns = columns;
-    m_rows = rows;
+    tthread::lock_guard<tthread::mutex> guard(m_mutex);
+    m_dimension = dim;
     //m_unit = (m_columns*m_unit) / m_columns;
+}
+
+core::dimension2du Level::getDimension() const
+{
+    return m_dimension;
+}
+
+unsigned Level::getUnitSize() const
+{
+    return m_unit;
 }
 
 void Level::setView(core::rect<s32> view)
 {
+    tthread::lock_guard<tthread::mutex> guard(m_mutex);
     m_view = view;
 }
 
@@ -92,62 +94,9 @@ core::rect<s32> Level::getView() const
 
 void Level::update()
 {
-    if (m_bg)
-    {
-        core::dimension2du dim = m_bg->getOriginalSize();
-        core::rect<s32> srcRect = {{0,0}, dim};
-        core::rect<s32> destRect = {0,0,0,0};
-        core::rect<s32> levelRect = {0, 0, (s32)(m_columns*m_unit), (s32)(m_rows*m_unit)};
-        double ratio = (double)dim.Width / (double)dim.Height;
-        unsigned xRepeats = 1, yRepeats = 1;
+    tthread::lock_guard<tthread::mutex> guard(m_mutex);
 
-        switch (m_bgDrawingMethod)
-        {
-        case bgDrawingMethod::STRETCH:
-            destRect = levelRect;
-            break;
-
-        case bgDrawingMethod::VERTICAL:
-            destRect = {0, 0, levelRect.getWidth(), (s32)(levelRect.getWidth() / ratio)};
-            yRepeats = levelRect.getHeight() / destRect.getHeight() + 1;
-            break;
-
-        case bgDrawingMethod::HORIZONTAL:
-            destRect = {0, 0, (s32)(levelRect.getHeight() * ratio), levelRect.getHeight()};
-            xRepeats = levelRect.getWidth() / destRect.getWidth() + 1;
-            break;
-
-        case bgDrawingMethod::TILE:
-            destRect = srcRect;
-            xRepeats = levelRect.getWidth() / dim.Width + 1;
-            yRepeats = levelRect.getHeight() / dim.Height + 1;
-            break;
-
-        default:
-            destRect = srcRect;
-            break;
-        }
-
-        core::position2d<s32> viewOffset = {m_view.UpperLeftCorner.X % destRect.getWidth(), m_view.UpperLeftCorner.Y % destRect.getHeight()};
-        destRect -= viewOffset; // moving the background starting position according to the view
-        levelRect -= viewOffset;
-
-        auto clipRect = levelRect;
-        clipRect.clipAgainst(m_view);
-
-        unsigned xr, yr;
-        for (xr = 0; xr < xRepeats; ++xr) // column repeats
-        {
-            for (yr = 0; yr < yRepeats; ++yr) // row repeats
-            {
-                m_globals->driver->draw2DImage(m_bg, destRect, srcRect, &clipRect);
-                destRect += {0, destRect.getHeight()};
-            }
-            destRect += {destRect.getWidth(),
-                (s32)(-yr * destRect.getHeight())}; // restore previous Y position
-        }
-        //m_globals->driver->draw2DRectangleOutline(levelRect);
-    }
+    m_bg->update();
 
     for (Element* element : m_elements) element->update();
 }

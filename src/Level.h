@@ -4,8 +4,10 @@
 #include <set>
 #include <string>
 #include "irrlicht.h"
+#include "tinythread.h"
 
 class Globals;
+class Background;
 class Element;
 
 class Level
@@ -15,39 +17,25 @@ public:
     Level(const Level&) = delete;
     ~Level();
 
-    enum class bgDrawingMethod : unsigned
-    {
-        STRETCH = 0,
-        VERTICAL = 1,
-        HORIZONTAL = 2,
-        TILE = 3
-    };
-
     Globals* getGlobals();
     void addElement(Element*);
     void removeElement(Element*);
-    void setBackground(unsigned id, bgDrawingMethod);
-    void setDimension(unsigned columns, unsigned rows);
+    Background* getBackground();
+    void setDimension(irr::core::dimension2du);
+    irr::core::dimension2du getDimension() const;
+    unsigned getUnitSize() const;
     void setView(irr::core::rect<irr::s32>);
     irr::core::rect<irr::s32> getView() const;
     void update();
 
-protected:
-    void drawBackground();
-
 private:
-    // displaying related stuff
+    mutable tthread::mutex m_mutex;
     Globals* m_globals;
-    std::set<Element*> m_elements;
     irr::core::rect<irr::s32> m_view;
+    irr::core::dimension2du m_dimension;
     unsigned m_unit;
-    // level dimensions
-    unsigned m_columns, m_rows;
-    // background related stuff
-    irr::video::ITexture* m_bg;
-    //irr::core::rect<irr::s32> m_bgSrcRect, m_bgDestRect;
-    //unsigned m_bgXRepeats, m_bgYRepeats;
-    bgDrawingMethod m_bgDrawingMethod;
+    std::set<Element*> m_elements;
+    Background* m_bg;
 };
 
 #endif // LEVEL_H_INCLUDED
