@@ -1,8 +1,10 @@
 #include <iostream>
+#include <sstream>
 #include "Globals.h"
 #include "Element.h"
 #include "Background.h"
 #include "Level.h"
+#include "Parser.h"
 #include "SFML\Audio.hpp"
 #include "gglib.hpp"
 
@@ -18,6 +20,13 @@ int main()
     rofiBuf.loadFromFile("../media/rofoges.wav");
     Sound rofi(rofiBuf);
     rofi.play();*/
+
+    std::stringstream ss;
+    ss.str("123;456;-1.23");
+
+    Parser p(ss);
+    auto args = p.getArgs<int,int,float>();
+    std::cout << std::get<0>(args) << "; " << std::get<1>(args) << "; " << std::get<2>(args) << std::endl;
 
     Level level1(&g, "../levels/mentes.txt");
 

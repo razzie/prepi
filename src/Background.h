@@ -1,6 +1,7 @@
 #ifndef BACKGROUND_H_INCLUDED
 #define BACKGROUND_H_INCLUDED
 
+#include <iostream>
 #include "irrlicht.h"
 #include "tinythread.h"
 
@@ -30,5 +31,7 @@ private:
     irr::video::ITexture* m_bg;
     DrawingMethod m_drawingMethod;
 };
+
+std::istream& operator>> (std::istream&, Background::DrawingMethod&);
 
 #endif // BACKGROUND_H_INCLUDED

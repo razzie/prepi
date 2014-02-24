@@ -1,6 +1,8 @@
 #ifndef MOTION_H_INCLUDED
 #define MOTION_H_INCLUDED
 
+#include <iostream>
+
 enum class Motion : unsigned
 {
 	STATIC = 0,
@@ -9,5 +11,7 @@ enum class Motion : unsigned
     SRAIGHT = 3,
     CIRCULAR = 4
 };
+
+std::istream& operator>> (std::istream&, Motion&);
 
 #endif // MOTION_H_INCLUDED

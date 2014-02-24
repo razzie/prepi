@@ -11,6 +11,15 @@ static std::map<unsigned, io::path> bgs = {
     {3, "../media/tilesets/background/03_Clear_sky.png"},
     {4, "../media/tilesets/background/04_Dark.png"}};
 
+std::istream& operator>> (std::istream& i, Background::DrawingMethod& dm)
+{
+    unsigned drawingMethod;
+    i >> drawingMethod;
+    dm = static_cast<Background::DrawingMethod>(drawingMethod);
+    return i;
+}
+
+
 Background::Background(Level* level)
  : m_level(level)
  , m_bg(nullptr)
