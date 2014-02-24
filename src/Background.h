@@ -28,6 +28,7 @@ public:
 private:
     mutable tthread::mutex m_mutex;
     Level* m_level;
+    unsigned m_bgId;
     irr::video::ITexture* m_bg;
     DrawingMethod m_drawingMethod;
 };

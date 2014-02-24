@@ -34,7 +34,8 @@ Background::~Background()
 void Background::setId(unsigned id)
 {
     tthread::lock_guard<tthread::mutex> guard(m_mutex);
-    m_bg = m_level->getGlobals()->driver->getTexture(bgs[id]);
+    m_bgId = id;
+    m_bg = nullptr;
 }
 
 void Background::setDrawingMethod(DrawingMethod dm)
@@ -46,6 +47,11 @@ void Background::setDrawingMethod(DrawingMethod dm)
 void Background::update()
 {
     tthread::lock_guard<tthread::mutex> guard(m_mutex);
+
+    if (m_bgId && m_bg == nullptr)
+    {
+        m_bg = m_level->getGlobals()->driver->getTexture(bgs[m_bgId]);
+    }
 
     if (m_bg)
     {

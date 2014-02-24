@@ -40,3 +40,20 @@ void Element::setRealCoord(irr::core::vector2df realCoord)
 {
     m_realCoord = realCoord;
 }
+
+
+std::istream& operator>> (std::istream& i, Element::Type& t)
+{
+    unsigned type;
+    i >> type;
+    t = static_cast<Element::Type>(type);
+    return i;
+}
+
+std::istream& operator>> (std::istream& i, Element::Visibility& v)
+{
+    unsigned visibility;
+    i >> visibility;
+    v = static_cast<Element::Visibility>(visibility);
+    return i;
+}
