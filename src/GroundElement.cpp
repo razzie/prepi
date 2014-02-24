@@ -1,5 +1,15 @@
 #include "GroundElement.h"
 
+GroundElement::GroundElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion> data)
+ : GroundElement(level,
+    std::get<0>(data),
+    std::get<1>(data),
+    std::get<2>(data),
+    std::get<3>(data),
+    std::get<4>(data))
+{
+}
+
 GroundElement::GroundElement(Level* level, unsigned id,
                              irr::core::vector2di position, irr::core::vector2df realCoord,
                              Visibility visibility, Motion motion)

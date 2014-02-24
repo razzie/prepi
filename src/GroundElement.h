@@ -7,6 +7,7 @@
 class GroundElement : public Element
 {
 public:
+    GroundElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion>);
     GroundElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion);
     ~GroundElement();
 

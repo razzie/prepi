@@ -14,8 +14,10 @@ public:
     Parser(const Parser&) = delete;
     ~Parser();
 
+    // jump to next line
     bool nextLine();
 
+    // get one argument
     template<class T>
     T getArg()
     {
@@ -24,10 +26,18 @@ public:
         return t;
     }
 
-    template<class... Args>
-    std::tuple<Args...> getArgs()
+    // get multiple arguments (recursive template)
+    template<class Arg>
+    std::tuple<Arg> getArgs()
     {
-        //return std::make_tuple( getArg<Args>()... );
-        return std::tuple<Args...> { getArg<Args>()... };
+        return std::make_tuple(getArg<Arg>());
+    }
+
+    template<class Arg1, class Arg2, class... Args>
+    std::tuple<Arg1, Arg2, Args...> getArgs()
+    {
+        auto a = getArgs<Arg1>();
+        auto b = getArgs<Arg2, Args...>();
+        return std::tuple_cat(a,b);
     }
 };

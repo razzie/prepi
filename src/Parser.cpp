@@ -24,6 +24,7 @@ Parser::Parser(std::istream& stream)
 Parser::Parser(std::string str)
  : m_stream(nullptr)
 {
+    m_line.imbue(std::locale(m_line.getloc(), new colon_is_space));
     m_line.str(str);
 }
 
@@ -39,4 +40,3 @@ bool Parser::nextLine()
     std::streambuf* buf = m_line.rdbuf();
     return m_stream->get(*buf);
 }
-

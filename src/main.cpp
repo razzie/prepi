@@ -21,11 +21,8 @@ int main()
     Sound rofi(rofiBuf);
     rofi.play();*/
 
-    std::stringstream ss;
-    ss.str("123;456;-1.23");
-
-    Parser p(ss);
-    auto args = p.getArgs<int,int,float>();
+    Parser p("123;456;-1.23");
+    auto args = p.getArgs<float,float,float>();
     std::cout << std::get<0>(args) << "; " << std::get<1>(args) << "; " << std::get<2>(args) << std::endl;
 
     Level level1(&g, "../levels/mentes.txt");
