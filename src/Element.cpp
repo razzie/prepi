@@ -57,3 +57,23 @@ std::istream& operator>> (std::istream& i, Element::Visibility& v)
     v = static_cast<Element::Visibility>(visibility);
     return i;
 }
+
+std::istream& operator>> (std::istream& i, irr::core::vector2di& v)
+{
+    int x,y;
+    char c;
+    i >> x >> c >> y;
+    v.X = x;
+    v.Y = y;
+    return i;
+}
+
+std::istream& operator>> (std::istream& i, irr::core::vector2df& v)
+{
+    float x,y;
+    char c;
+    i >> x >> c >> y;
+    v.X = x;
+    v.Y = y;
+    return i;
+}

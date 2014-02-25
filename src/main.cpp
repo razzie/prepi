@@ -21,7 +21,7 @@ int main()
     Sound rofi(rofiBuf);
     rofi.play();*/
 
-    Parser p("123;456;-1.23");
+    Parser p("123,456,-1.23");
     auto args = p.getArgs<float,float,float>();
     std::cout << std::get<0>(args) << "; " << std::get<1>(args) << "; " << std::get<2>(args) << std::endl;
 

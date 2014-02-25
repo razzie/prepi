@@ -7,6 +7,7 @@
 class RewardElement : public Element
 {
 public:
+    RewardElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned>);
     RewardElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned value);
     ~RewardElement();
 

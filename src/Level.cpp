@@ -1,10 +1,16 @@
 #include <iostream>
 #include <fstream>
-#include <cstdio>
-#include "Level.h"
-#include "Element.h"
-#include "Background.h"
+//#include <cstdio>
 #include "Globals.h"
+#include "Parser.h"
+#include "Level.h"
+#include "Background.h"
+#include "Element.h"
+#include "GroundElement.h"
+#include "EnemyElement.h"
+#include "RewardElement.h"
+#include "PlayerElement.h"
+#include "FinishElement.h"
 
 using namespace irr;
 
@@ -15,26 +21,45 @@ Level::Level(Globals* globals, std::string url)
  , m_bg(new Background(this))
 {
     std::fstream file(url);
-    char buffer[1024];
+    Parser p(file);
 
     // background
     unsigned bgId, bgDrawM, columns, rows;
+    auto bgArgs = p.getArgs<unsigned, unsigned, unsigned, unsigned>();
+    std::tie(bgId, bgDrawM, columns, rows) = bgArgs;
 
-    file.getline(buffer, sizeof(buffer)-1);
-    std::sscanf(buffer, "%d,%d,%d,%d", &bgId, &bgDrawM, &columns, &rows);
-
-    //setBackground(bgId, static_cast<bgDrawingMethod>(bgDrawM));
     m_bg->setId(bgId);
     m_bg->setDrawingMethod(static_cast<Background::DrawingMethod>(bgDrawM));
     setDimension({columns, rows});
 
     // elements
-    /*while (file.getline(buffer, sizeof(buffer)-1))
+    while(p.nextLine())
     {
-        std::cout << buffer;
+        Element::Type type = p.getArg<Element::Type>();
 
+        switch(type)
+        {
+            case Element::Type::GROUND:
+                new GroundElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Element::Visibility, Motion>());
+                break;
 
-    }*/
+            case Element::Type::ENEMY:
+                new EnemyElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Element::Visibility, Motion, unsigned>());
+                break;
+
+            case Element::Type::REWARD:
+                new RewardElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned>());
+                break;
+
+            case Element::Type::PLAYER:
+                new PlayerElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df>());
+                break;
+
+            case Element::Type::FINISH:
+                new FinishElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df>());
+                break;
+        }
+    }
 }
 
 Level::~Level()

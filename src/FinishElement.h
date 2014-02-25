@@ -6,6 +6,7 @@
 class FinishElement : public Element
 {
 public:
+    FinishElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df>);
     FinishElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df);
     ~FinishElement();
 

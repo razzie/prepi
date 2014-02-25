@@ -1,5 +1,16 @@
 #include "EnemyElement.h"
 
+EnemyElement::EnemyElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion, unsigned> data)
+ : EnemyElement(level,
+    std::get<0>(data),
+    std::get<1>(data),
+    std::get<2>(data),
+    std::get<3>(data),
+    std::get<4>(data),
+    std::get<5>(data))
+{
+}
+
 EnemyElement::EnemyElement(Level* level, unsigned id,
                            irr::core::vector2di position, irr::core::vector2df realCoord,
                            Visibility visibility, Motion motion, unsigned damage)

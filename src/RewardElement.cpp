@@ -1,5 +1,15 @@
 #include "RewardElement.h"
 
+RewardElement::RewardElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned> data)
+ : RewardElement(level,
+    std::get<0>(data),
+    std::get<1>(data),
+    std::get<2>(data),
+    std::get<3>(data),
+    std::get<4>(data))
+{
+}
+
 RewardElement::RewardElement(Level* level, unsigned id,
                              irr::core::vector2di position, irr::core::vector2df realCoord,
                              Motion motion, unsigned value)

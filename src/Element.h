@@ -46,5 +46,7 @@ protected:
 
 std::istream& operator>> (std::istream&, Element::Type&);
 std::istream& operator>> (std::istream&, Element::Visibility&);
+std::istream& operator>> (std::istream&, irr::core::vector2di&);
+std::istream& operator>> (std::istream&, irr::core::vector2df&);
 
 #endif // ELEMENT_H
