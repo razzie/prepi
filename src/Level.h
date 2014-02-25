@@ -7,17 +7,19 @@
 #include "tinythread.h"
 
 class Globals;
+class TileSet;
 class Background;
 class Element;
 
 class Level
 {
 public:
-    Level(Globals*, std::string url);
+    Level(Globals*, std::string tileset, std::string url);
     Level(const Level&) = delete;
     ~Level();
 
     Globals* getGlobals();
+    TileSet* getTileSet();
     void addElement(Element*);
     void removeElement(Element*);
     Background* getBackground();
@@ -31,6 +33,7 @@ public:
 private:
     mutable tthread::mutex m_mutex;
     Globals* m_globals;
+    TileSet* m_tileset;
     irr::core::rect<irr::s32> m_view;
     irr::core::dimension2du m_dimension;
     unsigned m_unit;

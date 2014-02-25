@@ -21,11 +21,11 @@ int main()
     Sound rofi(rofiBuf);
     rofi.play();*/
 
-    /*Parser p("123,456,-1.23");
+    Parser p("123,456,-1.23");
     auto args = p.getArgs<float,float,float>();
-    std::cout << std::get<0>(args) << "; " << std::get<1>(args) << "; " << std::get<2>(args) << std::endl;*/
+    std::cout << std::get<0>(args) << "; " << std::get<1>(args) << "; " << std::get<2>(args) << std::endl;
 
-    Level level1(&g, "../levels/load_test.txt");
+    Level level1(&g, "tale", "../levels/load_test.txt");
 
     gg::script_engine* se = g.app->get_script_engine();
     se->add_function("setBackground", [&](unsigned id, unsigned mode)

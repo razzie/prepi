@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
-//#include <cstdio>
 #include "Globals.h"
+#include "TileSet.h"
 #include "Parser.h"
 #include "Level.h"
 #include "Background.h"
@@ -14,8 +14,9 @@
 
 using namespace irr;
 
-Level::Level(Globals* globals, std::string url)
+Level::Level(Globals* globals, std::string tileset, std::string url)
  : m_globals(globals)
+ , m_tileset(new TileSet(globals, tileset))
  , m_view({0,0,800,600})
  , m_unit(32)
  , m_bg(new Background(this))
@@ -75,6 +76,11 @@ Level::~Level()
 Globals* Level::getGlobals()
 {
     return m_globals;
+}
+
+TileSet* Level::getTileSet()
+{
+    return m_tileset;
 }
 
 void Level::addElement(Element* element)

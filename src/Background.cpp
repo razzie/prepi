@@ -1,15 +1,10 @@
 #include <map>
-#include "Background.h"
-#include "Level.h"
 #include "Globals.h"
+#include "TileSet.h"
+#include "Level.h"
+#include "Background.h"
 
 using namespace irr;
-
-static std::map<unsigned, io::path> bgs = {
-    {1, "../media/tilesets/background/01_Clear sky.png"},
-    {2, "../media/tilesets/background/02_Dark.png"},
-    {3, "../media/tilesets/background/03_Fantasy.jpg"},
-    {4, "../media/tilesets/background/04_Magic.jpg"}};
 
 std::istream& operator>> (std::istream& i, Background::DrawingMethod& dm)
 {
@@ -50,7 +45,8 @@ void Background::update()
 
     if (m_bgId && m_bg == nullptr)
     {
-        m_bg = m_level->getGlobals()->driver->getTexture(bgs[m_bgId]);
+        //m_bg = m_level->getGlobals()->driver->getTexture(bgs[m_bgId]);
+        m_bg = m_level->getTileSet()->getBackground(m_bgId);
     }
 
     if (m_bg)
