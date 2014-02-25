@@ -6,10 +6,10 @@
 using namespace irr;
 
 static std::map<unsigned, io::path> bgs = {
-    {1, "../media/tilesets/background/01_Fantasy.jpg"},
-    {2, "../media/tilesets/background/02_Magic.jpg"},
-    {3, "../media/tilesets/background/03_Clear_sky.png"},
-    {4, "../media/tilesets/background/04_Dark.png"}};
+    {1, "../media/tilesets/background/01_Clear sky.png"},
+    {2, "../media/tilesets/background/02_Dark.png"},
+    {3, "../media/tilesets/background/03_Fantasy.jpg"},
+    {4, "../media/tilesets/background/04_Magic.jpg"}};
 
 std::istream& operator>> (std::istream& i, Background::DrawingMethod& dm)
 {

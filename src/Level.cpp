@@ -17,7 +17,7 @@ using namespace irr;
 Level::Level(Globals* globals, std::string url)
  : m_globals(globals)
  , m_view({0,0,800,600})
- , m_unit(64)
+ , m_unit(32)
  , m_bg(new Background(this))
 {
     std::fstream file(url);
@@ -25,8 +25,7 @@ Level::Level(Globals* globals, std::string url)
 
     // background
     unsigned bgId, bgDrawM, columns, rows;
-    auto bgArgs = p.getArgs<unsigned, unsigned, unsigned, unsigned>();
-    std::tie(bgId, bgDrawM, columns, rows) = bgArgs;
+    std::tie(bgId, bgDrawM, columns, rows) = p.getArgs<unsigned, unsigned, unsigned, unsigned>();
 
     m_bg->setId(bgId);
     m_bg->setDrawingMethod(static_cast<Background::DrawingMethod>(bgDrawM));
@@ -35,7 +34,13 @@ Level::Level(Globals* globals, std::string url)
     // elements
     while(p.nextLine())
     {
-        Element::Type type = p.getArg<Element::Type>();
+        Element::Type type;
+
+        try
+        {
+            type = p.getArg<Element::Type>();
+        }
+        catch (...) { break; }
 
         switch(type)
         {

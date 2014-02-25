@@ -1,4 +1,8 @@
+#include "Globals.h"
+#include "Level.h"
 #include "RewardElement.h"
+
+using namespace irr;
 
 RewardElement::RewardElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned> data)
  : RewardElement(level,
@@ -17,6 +21,7 @@ RewardElement::RewardElement(Level* level, unsigned id,
  , m_motion(motion)
  , m_value(value)
 {
+    std::cout << "new RewardElement" << std::endl;
 }
 
 RewardElement::~RewardElement()
@@ -35,5 +40,9 @@ unsigned RewardElement::getValue() const
 
 void RewardElement::update()
 {
+    unsigned unit = m_level->getUnitSize();
+    core::recti box = {m_realCoord.X*unit, m_realCoord.Y*unit, m_realCoord.X*unit+unit, m_realCoord.Y*unit+unit};
+    box -= m_level->getView().UpperLeftCorner;
 
+    m_level->getGlobals()->driver->draw2DRectangle({255,255,255,0}, box);
 }

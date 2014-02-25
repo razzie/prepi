@@ -1,4 +1,8 @@
+#include "Globals.h"
+#include "Level.h"
 #include "EnemyElement.h"
+
+using namespace irr;
 
 EnemyElement::EnemyElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion, unsigned> data)
  : EnemyElement(level,
@@ -19,6 +23,7 @@ EnemyElement::EnemyElement(Level* level, unsigned id,
  , m_motion(motion)
  , m_damage(damage)
 {
+    std::cout << "new EnemyElement" << std::endl;
 }
 
 EnemyElement::~EnemyElement()
@@ -42,5 +47,9 @@ unsigned EnemyElement::getDamage() const
 
 void EnemyElement::update()
 {
+    unsigned unit = m_level->getUnitSize();
+    core::recti box = {m_realCoord.X*unit, m_realCoord.Y*unit, m_realCoord.X*unit+unit, m_realCoord.Y*unit+unit};
+    box -= m_level->getView().UpperLeftCorner;
 
+    m_level->getGlobals()->driver->draw2DRectangle({255,255,0,0}, box);
 }
