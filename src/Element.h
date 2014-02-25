@@ -31,17 +31,20 @@ public:
 
     Type getType() const;
     unsigned getId() const;
-    irr::core::vector2di getPosition() const;
-    irr::core::vector2df getRealCoord() const;
-    void setRealCoord(irr::core::vector2df);
-    virtual void update() = 0;
+    irr::core::vector2di getImagePosition() const;
+    irr::core::vector2df getPosition() const;
+    void setPosition(irr::core::vector2df);
+    irr::core::recti getBoundingBox() const;
+    virtual void update();
+    virtual void draw() = 0;
 
 protected:
     Level* m_level;
     Type m_type;
     unsigned m_id;
-    irr::core::vector2di m_position;
-    irr::core::vector2df m_realCoord;
+    irr::core::vector2di m_imgPosition;
+    irr::core::vector2df m_position;
+    irr::core::recti m_boudingBox;
 };
 
 std::istream& operator>> (std::istream&, Element::Type&);

@@ -21,7 +21,6 @@ RewardElement::RewardElement(Level* level, unsigned id,
  , m_motion(motion)
  , m_value(value)
 {
-    std::cout << "new RewardElement" << std::endl;
 }
 
 RewardElement::~RewardElement()
@@ -38,10 +37,9 @@ unsigned RewardElement::getValue() const
     return m_value;
 }
 
-void RewardElement::update()
+void RewardElement::draw()
 {
-    unsigned unit = m_level->getUnitSize();
-    core::recti box = {m_realCoord.X*unit, m_realCoord.Y*unit, m_realCoord.X*unit+unit, m_realCoord.Y*unit+unit};
+    core::recti box = getBoundingBox();
     box -= m_level->getView().UpperLeftCorner;
 
     m_level->getGlobals()->driver->draw2DRectangle({255,255,255,0}, box);

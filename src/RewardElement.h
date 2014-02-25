@@ -14,7 +14,8 @@ public:
     Motion getMotion() const;
     unsigned getValue() const;
 
-    void update();
+    //void update();
+    void draw();
 
 private:
     Motion m_motion;

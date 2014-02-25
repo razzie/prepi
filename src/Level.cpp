@@ -128,5 +128,18 @@ void Level::update()
 
     m_bg->update();
 
-    for (Element* element : m_elements) element->update();
+    for (Element* element : m_elements)
+    {
+        auto box = element->getBoundingBox();
+        box += core::position2di(element->getPosition().X * m_unit, element->getPosition().Y * m_unit);
+        box -= m_view.UpperLeftCorner;
+
+        // do not draw if outside of screen
+        if (box.isRectCollided(m_view))
+        {
+            element->draw();
+        }
+
+        element->update();
+    }
 }

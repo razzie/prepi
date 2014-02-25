@@ -16,17 +16,15 @@ FinishElement::FinishElement(Level* level, unsigned id,
                              irr::core::vector2di position, irr::core::vector2df realCoord)
  : Element(level, Type::FINISH, id, position, realCoord)
 {
-    std::cout << "new FinishElement" << std::endl;
 }
 
 FinishElement::~FinishElement()
 {
 }
 
-void FinishElement::update()
+void FinishElement::draw()
 {
-    unsigned unit = m_level->getUnitSize();
-    core::recti box = {m_realCoord.X*unit, m_realCoord.Y*unit, m_realCoord.X*unit+unit, m_realCoord.Y*unit+unit};
+    core::recti box = getBoundingBox();
     box -= m_level->getView().UpperLeftCorner;
 
     m_level->getGlobals()->driver->draw2DRectangle({255,255,255,255}, box);

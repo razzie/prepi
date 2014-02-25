@@ -15,7 +15,8 @@ public:
     Motion getMotion() const;
     unsigned getDamage() const;
 
-    void update();
+    //void update();
+    void draw();
 
 private:
     Visibility m_visibility;

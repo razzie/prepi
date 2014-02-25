@@ -10,7 +10,8 @@ public:
     FinishElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df);
     ~FinishElement();
 
-    void update();
+    //void update();
+    void draw();
 };
 
 #endif // FINISHELEMENT_H_INCLUDED

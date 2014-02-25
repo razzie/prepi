@@ -1,13 +1,16 @@
 #include "Element.h"
 #include "Level.h"
 
-Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di position, irr::core::vector2df realCoord)
+Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgPosition, irr::core::vector2df position)
  : m_level(level)
  , m_type(type)
  , m_id(id)
+ , m_imgPosition(imgPosition)
  , m_position(position)
- , m_realCoord(realCoord)
 {
+    irr::s32 unit = (irr::s32)m_level->getUnitSize();
+    m_boudingBox = {m_position.X * unit, m_position.Y * unit, m_position.X * unit + unit, m_position.Y * unit + unit};
+
     m_level->addElement(this);
 }
 
@@ -26,19 +29,28 @@ unsigned Element::getId() const
     return m_id;
 }
 
-irr::core::vector2di Element::getPosition() const
+irr::core::vector2di Element::getImagePosition() const
+{
+    return m_imgPosition;
+}
+
+irr::core::vector2df Element::getPosition() const
 {
     return m_position;
 }
 
-irr::core::vector2df Element::getRealCoord() const
+void Element::setPosition(irr::core::vector2df position)
 {
-    return m_realCoord;
+    m_position = position;
 }
 
-void Element::setRealCoord(irr::core::vector2df realCoord)
+irr::core::recti Element::getBoundingBox() const
 {
-    m_realCoord = realCoord;
+    return m_boudingBox;
+}
+
+void Element::update()
+{
 }
 
 

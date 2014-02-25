@@ -21,7 +21,6 @@ GroundElement::GroundElement(Level* level, unsigned id,
  , m_visibility(visibility)
  , m_motion(motion)
 {
-    std::cout << "new GroundElement" << std::endl;
 }
 
 GroundElement::~GroundElement()
@@ -38,10 +37,9 @@ Motion GroundElement::getMotion() const
     return m_motion;
 }
 
-void GroundElement::update()
+void GroundElement::draw()
 {
-    unsigned unit = m_level->getUnitSize();
-    core::recti box = {m_realCoord.X*unit, m_realCoord.Y*unit, m_realCoord.X*unit+unit, m_realCoord.Y*unit+unit};
+    core::recti box = getBoundingBox();
     box -= m_level->getView().UpperLeftCorner;
 
     m_level->getGlobals()->driver->draw2DRectangle({255,0,255,0}, box);
