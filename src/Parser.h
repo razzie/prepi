@@ -1,12 +1,14 @@
 #include <iostream>
 #include <sstream>
+#include <locale>
 #include <tuple>
 #include <stdexcept>
 
 class Parser
 {
     std::istream* m_stream;
-    std::stringstream m_line;
+    std::stringstream m_string;
+    std::locale m_origLoc;
 
 public:
     Parser(std::istream&);
@@ -22,7 +24,7 @@ public:
     T getArg()
     {
         T t;
-        if ( !(m_line >> t) ) throw std::runtime_error("out of args");
+        if ( !(*m_stream >> t) ) throw std::runtime_error("out of args");
         return t;
     }
 
