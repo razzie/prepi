@@ -8,7 +8,7 @@
 #include <typeinfo>
 #include <type_traits>
 #include <stdexcept>
-#include "gg/cast.hpp"
+#include "gg/streamops.hpp"
 
 namespace gg
 {

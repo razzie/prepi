@@ -83,10 +83,40 @@ namespace gg
     public:
         virtual application* get_app() const = 0;
         virtual std::string get_hostname() const = 0;
+        virtual bool is_big_endian() const = 0;
+        virtual bool is_little_endian() const = 0;
         virtual listener* create_tcp_listener(uint16_t port) const = 0;
         virtual listener* create_udp_listener(uint16_t port) const = 0;
         virtual connection* create_tcp_connection(std::string address, uint16_t port) const = 0;
         virtual connection* create_udp_connection(std::string address, uint16_t port) const = 0;
+
+        template<class T, size_t N = sizeof(T)>
+        T& swap_byte_order(T& t) const
+        {
+            uint8_t buf[N];
+            size_t i;
+            for (i = 0; i < N; ++i) buf[i] = reinterpret_cast<uint8_t*>(&t)[i];
+            for (i = N; i > 0; --i) reinterpret_cast<uint8_t*>(&t)[i] = buf[i];
+            return t;
+        }
+
+        template<class T, size_t N = sizeof(T)>
+        T& to_host_byte_order(T& t) const
+        {
+            if (!is_big_endian())
+                return swap_byte_order<T, N>(t);
+            else
+                return t;
+        }
+
+        template<class T, size_t N = sizeof(T)>
+        T& to_network_byte_order(T& t) const
+        {
+            if (!is_big_endian())
+                return swap_byte_order<T, N>(t);
+            else
+                return t;
+        }
     };
 };
 

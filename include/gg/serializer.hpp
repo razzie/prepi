@@ -46,10 +46,10 @@ namespace gg
         {
             optional<var> data = this->deserialize(buf);
 
-            if (!data.is_valid() || data->get_type() != typeid(T))
+            if (!data || data->get_type() != typeid(T))
                 return {};
             return
-                std::move(data->get<T>());
+                std::move(*data);
         }
 
         template<class T>

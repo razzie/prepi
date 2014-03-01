@@ -69,22 +69,28 @@ namespace gg
             return m_val.get<T>();
         }
 
-        operator T&() { return get(); }
-        operator const T&() const { return get(); }
-
         T& operator* () { return get(); }
         const T& operator* () const { return get(); }
 
         T* operator-> () { return &get(); }
         const T* operator-> () const { return &get(); }
 
+        operator bool() const { return m_valid; }
         bool is_valid() const { return m_valid; }
         void invalidate() { m_val.clear(); m_valid = false; }
 
         friend std::ostream& operator<< (std::ostream& o, const optional& opt)
         {
-            if (opt.is_valid()) return (o << opt->to_stream());
+            if (opt) return (o << opt->to_stream());
             else return (o << "(invalid)");
+        }
+
+        friend std::istream& operator>> (std::istream& i, optional& opt)
+        {
+            if (opt.m_val.is_empty()) opt.m_val.construct();
+            opt.m_valid = istream_extract(i, *opt);
+            if (!opt.m_valid) opt.m_val.clear();
+            return i;
         }
     };
 

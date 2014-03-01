@@ -28,6 +28,7 @@ namespace gg
         virtual void log_to_stream(std::ostream& = std::cout) = 0;
         virtual void log_to_file(std::string) = 0;
         virtual void log_to_console(console*) = 0;
+        virtual std::ostream& get_nullstream() const = 0;
     };
 };
 

@@ -1,7 +1,7 @@
 #ifndef GGLIB_HPP_INCLUDED
 #define GGLIB_HPP_INCLUDED
 
-#include "gg/cast.hpp"
+#include "gg/streamops.hpp"
 #include "gg/var.hpp"
 #include "gg/atomic.hpp"
 #include "gg/refcounted.hpp"

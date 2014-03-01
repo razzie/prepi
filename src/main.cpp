@@ -38,11 +38,9 @@ int main()
                      { level1.setDimension({columns, rows}); });
     se->add_function("color", [](unsigned R, unsigned G, unsigned B)
                      {
-                         gg::console* c = gg::console::get_invoker_console();
-                         gg::console::output* o = c->create_output();
+                         gg::console::output* o = gg::console::get_invoker_output();
                          o->set_color( {(uint8_t)R, (uint8_t)G, (uint8_t)B} );
-                         *o << "(R: " << R << ", G: " << G << ", B: " << B << ")";
-                         o->drop();
+                         std::cout << "(R: " << R << ", G: " << G << ", B: " << B << ")";
                      });
 
     gg::console* con = g.app->create_console();

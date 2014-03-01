@@ -1,14 +1,19 @@
 #ifndef GG_UTIL_HPP_INCLUDED
 #define GG_UTIL_HPP_INCLUDED
 
-#include <assert.h>
+#include <cassert>
 #include <cstdint>
+#include <iostream>
+#include <sstream>
 #include <locale>
 #include <string>
 #include <vector>
+#include <tuple>
 #include <functional>
 #include <type_traits>
 #include <stdexcept>
+#include "gg/optional.hpp"
+#include "gg/streamops.hpp"
 
 namespace gg
 {
@@ -20,44 +25,70 @@ namespace util
 
     public:
         scope_callback();
-        scope_callback(std::function<void()> func);
+        scope_callback(std::function<void()>);
         scope_callback(const scope_callback&) = delete;
         scope_callback(scope_callback&&) = delete;
         ~scope_callback();
-        scope_callback& operator= (std::function<void()> func);
+        scope_callback& operator= (std::function<void()>);
         void reset();
     };
 
 
-    bool is_big_endian();
-    bool is_little_endian();
+    ostream_manipulator<const char*> format(const char*);
+    istream_manipulator<char> delimiter(char);
 
-    template<class T, size_t N = sizeof(T)>
-    T& swap_byte_order(T& t)
+
+    template<class Arg>
+    std::tuple<Arg> parse(std::istream& i, optional<char> d = {})
     {
-        uint8_t buf[N];
-        size_t i;
-        for (i = 0; i < N; ++i) buf[i] = reinterpret_cast<uint8_t*>(&t)[i];
-        for (i = N; i > 0; --i) reinterpret_cast<uint8_t*>(&t)[i] = buf[i];
-        return t;
+        Arg a;
+        if (d) i << delimiter(*d);
+        if (!istream_extract(i, a)) throw std::runtime_error("can't extract arg");
+        return std::tuple<Arg> { a };
     }
 
-    template<class T, size_t N = sizeof(T)>
-    T& to_host_byte_order(T& t)
+    template<class Arg1, class Arg2, class... Args>
+    std::tuple<Arg1, Arg2, Args...> parse(std::istream& i, optional<char> d = {})
     {
-        if (!is_big_endian())
-            return swap_byte_order<T, N>(t);
-        else
-            return t;
+        if (d) i << delimiter(*d);
+        auto a = parse<Arg1>(i);
+        auto b = parse<Arg2, Args...>(i);
+        return std::tuple_cat(a,b);
     }
 
-    template<class T, size_t N = sizeof(T)>
-    T& to_network_byte_order(T& t)
+    template<class... Args>
+    std::tuple<Args...> parse(std::string str, optional<char> d = {})
     {
-        if (!is_big_endian())
-            return swap_byte_order<T, N>(t);
-        else
-            return t;
+        std::stringstream ss(str);
+        if (d) ss << delimiter(*d);
+        return parse<Args...>(ss);
+    }
+
+
+    template<class From, class To>
+    typename std::enable_if<std::is_convertible<From, To>::value, To>::type
+    cast(const From& from)
+    {
+        return To(from);
+    }
+
+    template<class From, class To>
+    typename std::enable_if<!std::is_convertible<From, To>::value, To>::type
+    cast(const From& from)
+    {
+        if (!meta::has_insert_op<From>::value
+            || !meta::has_extract_op<To>::value)
+        {
+            throw std::runtime_error("unable to cast");
+        }
+
+        To result;
+        std::stringstream ss;
+
+        ostream_insert(ss, from);
+        istream_extract(ss, result);
+
+        return result;
     }
 
 

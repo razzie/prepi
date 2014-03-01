@@ -17,8 +17,6 @@ namespace gg
         virtual ~console() {};
 
     public:
-        static console* get_invoker_console();
-
         class output : public reference_counted, public virtual std::ostream
         {
         protected:
@@ -59,6 +57,9 @@ namespace gg
             virtual exec_result exec(std::string& cmd, output&) = 0;
             virtual void complete(std::string& cmd, output&) = 0;
         };
+
+        static console* get_invoker_console();
+        static output* get_invoker_output();
 
         virtual application* get_app() const = 0;
         virtual std::string get_name() const = 0;
