@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <exception>
 #include "Globals.h"
 #include "TileSet.h"
 #include "Parser.h"
@@ -24,46 +25,54 @@ Level::Level(Globals* globals, std::string tileset, std::string url)
     std::fstream file(url);
     Parser p(file);
 
-    // background
-    unsigned bgId, bgDrawM, columns, rows;
-    std::tie(bgId, bgDrawM, columns, rows) = p.getArgs<unsigned, unsigned, unsigned, unsigned>();
+    try
+    {
+        // background
+        unsigned bgId, bgDrawM, columns, rows;
+        std::tie(bgId, bgDrawM, columns, rows) = p.getArgs<unsigned, unsigned, unsigned, unsigned>();
 
-    m_bg->setId(bgId);
-    m_bg->setDrawingMethod(static_cast<Background::DrawingMethod>(bgDrawM));
-    setDimension({columns, rows});
+        m_bg->setId(bgId);
+        m_bg->setDrawingMethod(static_cast<Background::DrawingMethod>(bgDrawM));
+        setDimension({columns, rows});
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << "Failed to set background (" << e.what() << ")" << std::endl;
+    }
 
     // elements
     while(p.nextLine())
     {
-        Element::Type type;
-
         try
         {
-            type = p.getArg<Element::Type>();
+            Element::Type type = p.getArg<Element::Type>();
+
+            switch(type)
+            {
+                case Element::Type::GROUND:
+                    new GroundElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Element::Visibility, Motion>());
+                    break;
+
+                case Element::Type::ENEMY:
+                    new EnemyElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Element::Visibility, Motion, unsigned>());
+                    break;
+
+                case Element::Type::REWARD:
+                    new RewardElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned>());
+                    break;
+
+                case Element::Type::PLAYER:
+                    new PlayerElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df>());
+                    break;
+
+                case Element::Type::FINISH:
+                    new FinishElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df>());
+                    break;
+            }
         }
-        catch (...) { break; }
-
-        switch(type)
+        catch (const std::exception& e)
         {
-            case Element::Type::GROUND:
-                new GroundElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Element::Visibility, Motion>());
-                break;
-
-            case Element::Type::ENEMY:
-                new EnemyElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Element::Visibility, Motion, unsigned>());
-                break;
-
-            case Element::Type::REWARD:
-                new RewardElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned>());
-                break;
-
-            case Element::Type::PLAYER:
-                new PlayerElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df>());
-                break;
-
-            case Element::Type::FINISH:
-                new FinishElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df>());
-                break;
+            std::cout << "Failed to add element to level (" << e.what() << ")" << std::endl;
         }
     }
 }

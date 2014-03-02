@@ -17,6 +17,7 @@ std::istream& operator>> (std::istream& i, Background::DrawingMethod& dm)
 
 Background::Background(Level* level)
  : m_level(level)
+ , m_bgId(0)
  , m_bg(nullptr)
  , m_drawingMethod(DrawingMethod::STRETCH)
 {

@@ -14,11 +14,19 @@ public:
     TileSet(Globals*, std::string name);
     ~TileSet();
 
+    struct BackgroundData
+    {
+        std::string fileName;
+        mutable irr::video::ITexture* texture;
+    };
+
     struct TileSetData
     {
-        unsigned unitPixelCount;
-        irr::core::position2di position;
-        irr::video::ITexture* picture;
+        std::string fileName;
+        mutable irr::video::ITexture* texture;
+        unsigned tileSize;
+        irr::core::vector2di tileDimension;
+        unsigned tileCount;
     };
 
     std::string getName() const;
@@ -33,12 +41,17 @@ public:
 private:
     Globals* m_globals;
     std::string m_name;
-    std::map<unsigned, irr::video::ITexture*> m_backgrouns;
+    std::map<unsigned, BackgroundData> m_backgrouns;
     std::map<unsigned, TileSetData> m_grounds;
     std::map<unsigned, TileSetData> m_enemies;
     std::map<unsigned, TileSetData> m_rewards;
     std::map<unsigned, TileSetData> m_players;
     std::map<unsigned, TileSetData> m_finishes;
+
+    bool fillTileSetData(std::string dirName, std::string fileName, unsigned& id, TileSetData&) const;
+    void findTileSetData(std::string dirName, std::map<unsigned, TileSetData>&) const;
+    bool fillBackgroundData(std::string dirName, std::string fileName, unsigned& id, BackgroundData&) const;
+    void findBackgroundData(std::string dirName, std::map<unsigned, BackgroundData>&) const;
 };
 
 #endif // TILESET_H_INCLUDED
