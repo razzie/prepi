@@ -30,6 +30,7 @@ Globals::Globals()
  , app(gg::application::create("prepi"))
 {
     device->setEventReceiver(eventListener);
+    device->setResizable(true);
     device->setWindowCaption(L"Custom Scene Node - Irrlicht Engine Demo");
     smgr->addCameraSceneNode(0, core::vector3df(0,-40,0), core::vector3df(0,0,0));
 
