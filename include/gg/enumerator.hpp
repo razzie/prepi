@@ -204,9 +204,7 @@ namespace gg
     template<class T, class container>
     enumerator<T> make_ref_enumerator(container& cont, typename container_wrapper<container, T>::extractor extr = {})
     {
-        static_assert(std::is_const<container>::value || !std::is_lvalue_reference<container>::value,
-                      "container is const or not lvalue reference");
-
+        static_assert(!std::is_const<container>::value, "container is const");
         container_wrapper<container, T, true> cw(cont, extr);
         return std::move(cw);
     }
@@ -215,6 +213,13 @@ namespace gg
     enumerator<T> make_const_enumerator(container cont, typename container_wrapper<container, T>::extractor extr = {})
     {
         container_wrapper<container, T, false, true> cw(cont, extr);
+        return std::move(cw);
+    }
+
+    template<class T, class container>
+    enumerator<T> make_const_ref_enumerator(container& cont, typename container_wrapper<container, T>::extractor extr = {})
+    {
+        container_wrapper<container, T, true, true> cw(cont, extr);
         return std::move(cw);
     }
 };

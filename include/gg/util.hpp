@@ -36,6 +36,8 @@ namespace util
 
     ostream_manipulator<const char*> format(const char*);
     istream_manipulator<char> delimiter(char);
+    istream_manipulator<char> next(char);
+    std::istream& next_line(std::istream&);
 
 
     template<class Arg>

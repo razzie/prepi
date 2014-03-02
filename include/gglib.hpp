@@ -22,6 +22,7 @@
 #include "gg/serializer.hpp"
 #include "gg/scripteng.hpp"
 #include "gg/netmgr.hpp"
+#include "gg/filesystem.hpp"
 #include "gg/application.hpp"
 
 #endif // GGLIB_HPP_INCLUDED
