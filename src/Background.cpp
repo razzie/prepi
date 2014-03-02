@@ -40,13 +40,12 @@ void Background::setDrawingMethod(DrawingMethod dm)
     m_drawingMethod = dm;
 }
 
-void Background::update()
+void Background::draw()
 {
     tthread::lock_guard<tthread::mutex> guard(m_mutex);
 
     if (m_bgId && m_bg == nullptr)
     {
-        //m_bg = m_level->getGlobals()->driver->getTexture(bgs[m_bgId]);
         m_bg = m_level->getTileSet()->getBackground(m_bgId);
     }
 

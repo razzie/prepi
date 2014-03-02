@@ -23,7 +23,7 @@ public:
 
     void setId(unsigned);
     void setDrawingMethod(DrawingMethod);
-    void update();
+    void draw();
 
 private:
     mutable tthread::mutex m_mutex;

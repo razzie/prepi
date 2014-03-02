@@ -11,7 +11,7 @@ public:
     ~PlayerElement();
 
     //void update();
-    void draw();
+    //void draw();
 };
 
 #endif // PLAYERELEMENT_H_INCLUDED

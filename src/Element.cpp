@@ -1,15 +1,22 @@
-#include "Element.h"
+#include "Globals.h"
 #include "Level.h"
+#include "TileSet.h"
+#include "Element.h"
 
-Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgPosition, irr::core::vector2df position)
+using namespace irr;
+
+Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgPosition, core::vector2df position)
  : m_level(level)
  , m_type(type)
  , m_id(id)
  , m_imgPosition(imgPosition)
  , m_position(position)
+ , m_tileData(level->getTileSet()->getData(type, id))
 {
-    irr::s32 unit = (irr::s32)m_level->getUnitSize();
-    m_boudingBox = {m_position.X * unit, m_position.Y * unit, m_position.X * unit + unit, m_position.Y * unit + unit};
+    s32 unit = (s32)m_level->getUnitSize();
+    m_boudingBox =
+        {(s32)(m_position.X * unit), (s32)(m_position.Y * unit),
+        (s32)((m_position.X + 1) * unit), (s32)((m_position.Y + 1) * unit)};
 
     m_level->addElement(this);
 }
@@ -29,28 +36,48 @@ unsigned Element::getId() const
     return m_id;
 }
 
-irr::core::vector2di Element::getImagePosition() const
+core::vector2di Element::getImagePosition() const
 {
     return m_imgPosition;
 }
 
-irr::core::vector2df Element::getPosition() const
+core::vector2df Element::getPosition() const
 {
     return m_position;
 }
 
-void Element::setPosition(irr::core::vector2df position)
+void Element::setPosition(core::vector2df position)
 {
     m_position = position;
 }
 
-irr::core::recti Element::getBoundingBox() const
+core::recti Element::getBoundingBox() const
 {
     return m_boudingBox;
 }
 
 void Element::update()
 {
+}
+
+void Element::draw()
+{
+    drawTile(m_level, m_tileData, m_imgPosition, m_position);
+}
+
+void Element::drawTile(Level* level, const TileData* td, core::vector2di imgPos, core::vector2df pos)
+{
+    unsigned unit = level->getUnitSize();
+    core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
+
+    core::rect<s32> srcRect =
+        {(s32)(imgPos.X * td->tileSize), (s32)(imgPos.Y * td->tileSize),
+        (s32)((imgPos.X + 1) * td->tileSize), (s32)((imgPos.Y + 1) * td->tileSize)};
+    core::rect<s32> destRect = {0, 0, (s32)unit, (s32)unit};
+    destRect -= level->getView().UpperLeftCorner;
+    destRect += calcPos;
+
+    level->getGlobals()->driver->draw2DImage(td->texture, destRect, srcRect, 0, 0, true);
 }
 
 
@@ -70,7 +97,7 @@ std::istream& operator>> (std::istream& i, Element::Visibility& v)
     return i;
 }
 
-std::istream& operator>> (std::istream& i, irr::core::vector2di& v)
+std::istream& operator>> (std::istream& i, core::vector2di& v)
 {
     int x,y;
     char c;
@@ -80,7 +107,7 @@ std::istream& operator>> (std::istream& i, irr::core::vector2di& v)
     return i;
 }
 
-std::istream& operator>> (std::istream& i, irr::core::vector2df& v)
+std::istream& operator>> (std::istream& i, core::vector2df& v)
 {
     float x,y;
     char c;

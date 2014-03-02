@@ -21,11 +21,3 @@ FinishElement::FinishElement(Level* level, unsigned id,
 FinishElement::~FinishElement()
 {
 }
-
-void FinishElement::draw()
-{
-    core::recti box = getBoundingBox();
-    box -= m_level->getView().UpperLeftCorner;
-
-    m_level->getGlobals()->driver->draw2DRectangle({255,255,255,255}, box);
-}

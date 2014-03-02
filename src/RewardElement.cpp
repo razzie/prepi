@@ -36,11 +36,3 @@ unsigned RewardElement::getValue() const
 {
     return m_value;
 }
-
-void RewardElement::draw()
-{
-    core::recti box = getBoundingBox();
-    box -= m_level->getView().UpperLeftCorner;
-
-    m_level->getGlobals()->driver->draw2DRectangle({255,255,255,0}, box);
-}

@@ -6,6 +6,7 @@
 #include "irrlicht.h"
 
 class Level;
+struct TileData;
 
 class Element
 {
@@ -36,7 +37,7 @@ public:
     void setPosition(irr::core::vector2df);
     irr::core::recti getBoundingBox() const;
     virtual void update();
-    virtual void draw() = 0;
+    virtual void draw();
 
 protected:
     Level* m_level;
@@ -45,6 +46,9 @@ protected:
     irr::core::vector2di m_imgPosition;
     irr::core::vector2df m_position;
     irr::core::recti m_boudingBox;
+    const TileData* m_tileData;
+
+    static void drawTile(Level*, const TileData*, irr::core::vector2di imgPos, irr::core::vector2df pos);
 };
 
 std::istream& operator>> (std::istream&, Element::Type&);

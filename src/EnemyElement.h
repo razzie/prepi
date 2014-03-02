@@ -16,7 +16,7 @@ public:
     unsigned getDamage() const;
 
     //void update();
-    void draw();
+    //void draw();
 
 private:
     Visibility m_visibility;

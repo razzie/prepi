@@ -11,7 +11,7 @@ public:
     ~FinishElement();
 
     //void update();
-    void draw();
+    //void draw();
 };
 
 #endif // FINISHELEMENT_H_INCLUDED

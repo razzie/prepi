@@ -36,11 +36,3 @@ Motion GroundElement::getMotion() const
 {
     return m_motion;
 }
-
-void GroundElement::draw()
-{
-    core::recti box = getBoundingBox();
-    box -= m_level->getView().UpperLeftCorner;
-
-    m_level->getGlobals()->driver->draw2DRectangle({255,0,255,0}, box);
-}

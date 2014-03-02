@@ -14,11 +14,11 @@ TileSet::TileSet(Globals* globals, std::string name)
     basedir += "/";
 
     findBackgroundData(basedir + "background/", m_backgrouns);
-    findTileSetData(basedir + "ground/", m_grounds);
-    findTileSetData(basedir + "enemy/", m_enemies);
-    findTileSetData(basedir + "reward/", m_rewards);
-    findTileSetData(basedir + "player/", m_players);
-    findTileSetData(basedir + "finish/", m_finishes);
+    findTileData(basedir + "ground/", m_grounds);
+    findTileData(basedir + "enemy/", m_enemies);
+    findTileData(basedir + "reward/", m_rewards);
+    findTileData(basedir + "player/", m_players);
+    findTileData(basedir + "finish/", m_finishes);
 }
 
 TileSet::~TileSet()
@@ -35,7 +35,7 @@ irr::video::ITexture* TileSet::getBackground(unsigned id) const
     auto it = m_backgrouns.find(id);
     if (it != m_backgrouns.end())
     {
-        const BackgroundData* data = &(it->second);
+        BackgroundData* data = &(it->second);
         if (data->texture == nullptr)
             data->texture = m_globals->driver->getTexture(data->fileName.c_str());
         return data->texture;
@@ -44,12 +44,12 @@ irr::video::ITexture* TileSet::getBackground(unsigned id) const
         return nullptr;
 }
 
-const TileSet::TileSetData* TileSet::getGroundData(unsigned id) const
+const TileData* TileSet::getGroundData(unsigned id) const
 {
     auto it = m_grounds.find(id);
     if (it != m_grounds.end())
     {
-        const TileSetData* data = &(it->second);
+        TileData* data = &(it->second);
         if (data->texture == nullptr)
             data->texture = m_globals->driver->getTexture(data->fileName.c_str());
         return data;
@@ -58,12 +58,12 @@ const TileSet::TileSetData* TileSet::getGroundData(unsigned id) const
         return nullptr;
 }
 
-const TileSet::TileSetData* TileSet::getEnemyData(unsigned id) const
+const TileData* TileSet::getEnemyData(unsigned id) const
 {
     auto it = m_enemies.find(id);
     if (it != m_enemies.end())
     {
-        const TileSetData* data = &(it->second);
+        TileData* data = &(it->second);
         if (data->texture == nullptr)
             data->texture = m_globals->driver->getTexture(data->fileName.c_str());
         return data;
@@ -72,12 +72,12 @@ const TileSet::TileSetData* TileSet::getEnemyData(unsigned id) const
         return nullptr;
 }
 
-const TileSet::TileSetData* TileSet::getRewardData(unsigned id) const
+const TileData* TileSet::getRewardData(unsigned id) const
 {
     auto it = m_rewards.find(id);
     if (it != m_rewards.end())
     {
-        const TileSetData* data = &(it->second);
+        TileData* data = &(it->second);
         if (data->texture == nullptr)
             data->texture = m_globals->driver->getTexture(data->fileName.c_str());
         return data;
@@ -86,12 +86,12 @@ const TileSet::TileSetData* TileSet::getRewardData(unsigned id) const
         return nullptr;
 }
 
-const TileSet::TileSetData* TileSet::getPlayerData(unsigned id) const
+const TileData* TileSet::getPlayerData(unsigned id) const
 {
     auto it = m_players.find(id);
     if (it != m_players.end())
     {
-        const TileSetData* data = &(it->second);
+        TileData* data = &(it->second);
         if (data->texture == nullptr)
             data->texture = m_globals->driver->getTexture(data->fileName.c_str());
         return data;
@@ -100,12 +100,12 @@ const TileSet::TileSetData* TileSet::getPlayerData(unsigned id) const
         return nullptr;
 }
 
-const TileSet::TileSetData* TileSet::getFinishData(unsigned id) const
+const TileData* TileSet::getFinishData(unsigned id) const
 {
     auto it = m_finishes.find(id);
     if (it != m_finishes.end())
     {
-        const TileSetData* data = &(it->second);
+        TileData* data = &(it->second);
         if (data->texture == nullptr)
             data->texture = m_globals->driver->getTexture(data->fileName.c_str());
         return data;
@@ -114,7 +114,7 @@ const TileSet::TileSetData* TileSet::getFinishData(unsigned id) const
         return nullptr;
 }
 
-const TileSet::TileSetData* TileSet::getData(Element::Type type, unsigned id) const
+const TileData* TileSet::getData(Element::Type type, unsigned id) const
 {
     switch (type)
     {
@@ -138,7 +138,7 @@ const TileSet::TileSetData* TileSet::getData(Element::Type type, unsigned id) co
     }
 }
 
-bool TileSet::fillTileSetData(std::string dirName, std::string fileName, unsigned& id, TileSetData& data) const
+bool TileSet::fillTileData(std::string dirName, std::string fileName, unsigned& id, TileData& data) const
 {
     try
     {
@@ -153,17 +153,17 @@ bool TileSet::fillTileSetData(std::string dirName, std::string fileName, unsigne
     }
     catch (const std::exception& e)
     {
-        std::cout << "TileSetData error: " << fileName << " (" << e.what() << ")" << std::endl;
+        std::cout << "TileData error: " << fileName << " (" << e.what() << ")" << std::endl;
         return false;
     }
 }
 
-void TileSet::findTileSetData(std::string dirName, std::map<unsigned, TileSetData>& data) const
+void TileSet::findTileData(std::string dirName, std::map<unsigned, TileData>& data) const
 {
     DIR *dir;
     struct dirent *ent;
     unsigned id;
-    TileSetData tsd;
+    TileData td;
 
     if ((dir = opendir( dirName.c_str() )) != NULL)
     {
@@ -172,9 +172,9 @@ void TileSet::findTileSetData(std::string dirName, std::map<unsigned, TileSetDat
             if (ent->d_name[0] == '.')
                 continue;
 
-            if (fillTileSetData(dirName, ent->d_name, id, tsd))
+            if (fillTileData(dirName, ent->d_name, id, td))
             {
-                data[id] = tsd;
+                data[id] = td;
             }
         }
         closedir(dir);

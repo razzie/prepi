@@ -15,7 +15,7 @@ public:
     unsigned getValue() const;
 
     //void update();
-    void draw();
+    //void draw();
 
 private:
     Motion m_motion;

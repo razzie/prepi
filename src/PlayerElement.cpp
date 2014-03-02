@@ -21,11 +21,3 @@ PlayerElement::PlayerElement(Level* level, unsigned id,
 PlayerElement::~PlayerElement()
 {
 }
-
-void PlayerElement::draw()
-{
-    core::recti box = getBoundingBox();
-    box -= m_level->getView().UpperLeftCorner;
-
-    m_level->getGlobals()->driver->draw2DRectangle({255,0,0,0}, box);
-}

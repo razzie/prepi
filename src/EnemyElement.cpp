@@ -43,11 +43,3 @@ unsigned EnemyElement::getDamage() const
 {
     return m_damage;
 }
-
-void EnemyElement::draw()
-{
-    core::recti box = getBoundingBox();
-    box -= m_level->getView().UpperLeftCorner;
-
-    m_level->getGlobals()->driver->draw2DRectangle({255,255,0,0}, box);
-}

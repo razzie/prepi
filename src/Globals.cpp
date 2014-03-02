@@ -16,7 +16,7 @@ Globals::Globals()
  , world(new b2World(gravity))
  , app(gg::application::create("prepi"))
 {
-    // create engine and camera
+    driver->setTextureCreationFlag(video::ETCF_OPTIMIZED_FOR_QUALITY);
     device->setWindowCaption(L"Custom Scene Node - Irrlicht Engine Demo");
     smgr->addCameraSceneNode(0, core::vector3df(0,-40,0), core::vector3df(0,0,0));
     device->setEventReceiver(eventListener);

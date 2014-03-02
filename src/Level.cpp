@@ -141,7 +141,7 @@ void Level::update()
 {
     tthread::lock_guard<tthread::mutex> guard(m_mutex);
 
-    m_bg->update();
+    m_bg->draw();
 
     for (Element* element : m_elements)
     {
