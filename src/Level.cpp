@@ -123,6 +123,7 @@ core::dimension2du Level::getDimension() const
 
 void Level::setUnitSize(unsigned unit)
 {
+    tthread::lock_guard<tthread::mutex> guard(m_mutex);
     m_unit = unit;
 }
 

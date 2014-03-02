@@ -8,18 +8,35 @@ using namespace irr;
 
 static const b2Vec2 gravity(0.0f, -1.0f);
 
+static IrrlichtDevice* createIrrlichtDevice()
+{
+    SIrrlichtCreationParameters params; // constructor sets the defaults
+    params.AntiAlias = 16;
+    params.Bits = 32;
+    params.DriverType = video::EDT_OPENGL;
+    params.Fullscreen = false;
+    params.WindowSize = core::dimension2d<u32>(800, 600);
+    params.WithAlphaChannel = true;
+
+    return createDeviceEx(params);
+}
+
 Globals::Globals()
- : device(createDevice(video::EDT_OPENGL, core::dimension2du(800, 600), 16, false))
+ : device(createIrrlichtDevice())
  , driver(device->getVideoDriver())
  , smgr(device->getSceneManager())
  , eventListener(new EventListener())
  , world(new b2World(gravity))
  , app(gg::application::create("prepi"))
 {
-    driver->setTextureCreationFlag(video::ETCF_OPTIMIZED_FOR_QUALITY);
+    device->setEventReceiver(eventListener);
     device->setWindowCaption(L"Custom Scene Node - Irrlicht Engine Demo");
     smgr->addCameraSceneNode(0, core::vector3df(0,-40,0), core::vector3df(0,0,0));
-    device->setEventReceiver(eventListener);
+
+    driver->setTextureCreationFlag(video::ETCF_OPTIMIZED_FOR_QUALITY);
+    driver->enableMaterial2D(true);
+    driver->getMaterial2D().TextureLayer[0].BilinearFilter = true;
+    driver->getMaterial2D().AntiAliasing = video::EAAM_FULL_BASIC;
 }
 
 Globals::~Globals()
