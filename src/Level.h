@@ -25,6 +25,7 @@ public:
     Background* getBackground();
     void setDimension(irr::core::dimension2du);
     irr::core::dimension2du getDimension() const;
+    void setUnitSize(unsigned);
     unsigned getUnitSize() const;
     void setView(irr::core::rect<irr::s32>);
     irr::core::rect<irr::s32> getView() const;

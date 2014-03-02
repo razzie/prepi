@@ -121,6 +121,11 @@ core::dimension2du Level::getDimension() const
     return m_dimension;
 }
 
+void Level::setUnitSize(unsigned unit)
+{
+    m_unit = unit;
+}
+
 unsigned Level::getUnitSize() const
 {
     return m_unit;

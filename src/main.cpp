@@ -21,10 +21,6 @@ int main()
     Sound rofi(rofiBuf);
     rofi.play();*/
 
-    Parser p("123,456,-1.23");
-    auto args = p.getArgs<float,float,float>();
-    std::cout << std::get<0>(args) << "; " << std::get<1>(args) << "; " << std::get<2>(args) << std::endl;
-
     Level level1(&g, "tale", "../levels/load_test.txt");
 
     gg::script_engine* se = g.app->get_script_engine();
@@ -36,6 +32,8 @@ int main()
                      });
     se->add_function("setDimension", [&](unsigned columns, unsigned rows)
                      { level1.setDimension({columns, rows}); });
+    se->add_function("setUnitSize", [&](unsigned unit)
+                     { level1.setUnitSize(unit); });
     se->add_function("color", [](unsigned R, unsigned G, unsigned B)
                      {
                          gg::console::output* o = gg::console::get_invoker_output();
