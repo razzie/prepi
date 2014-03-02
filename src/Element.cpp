@@ -14,10 +14,7 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
  , m_tileData(level->getTileSet()->getData(type, id))
 {
     s32 unit = (s32)m_level->getUnitSize();
-    m_boudingBox =
-        {(s32)(m_position.X * unit), (s32)(m_position.Y * unit),
-        (s32)((m_position.X + 1) * unit), (s32)((m_position.Y + 1) * unit)};
-
+    m_boudingBox = {0, 0, unit, unit};
     m_level->addElement(this);
 }
 
@@ -67,15 +64,16 @@ void Element::draw()
 
 void Element::drawTile(Level* level, const TileData* td, core::vector2di imgPos, core::vector2df pos)
 {
-    unsigned unit = level->getUnitSize();
-    core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
-
     core::rect<s32> srcRect =
         {(s32)(imgPos.X * td->tileSize), (s32)(imgPos.Y * td->tileSize),
         (s32)((imgPos.X + 1) * td->tileSize), (s32)((imgPos.Y + 1) * td->tileSize)};
+
+    unsigned unit = level->getUnitSize();
+    core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
+
     core::rect<s32> destRect = {0, 0, (s32)unit, (s32)unit};
-    destRect -= level->getView().UpperLeftCorner;
     destRect += calcPos;
+    destRect -= level->getViewOffset();
 
     level->getGlobals()->driver->draw2DImage(td->texture, destRect, srcRect, 0, 0, true);
 }

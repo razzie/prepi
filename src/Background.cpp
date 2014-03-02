@@ -89,12 +89,13 @@ void Background::draw()
         }
 
         irr::core::rect<irr::s32> view = m_level->getView();
-        core::position2d<s32> viewOffset = {view.UpperLeftCorner.X % destRect.getWidth(), view.UpperLeftCorner.Y % destRect.getHeight()};
-        destRect -= viewOffset; // moving the background starting position according to the view
-        levelRect -= viewOffset;
+        //core::position2d<s32> viewOffset = {view.UpperLeftCorner.X % destRect.getWidth(), view.UpperLeftCorner.Y % destRect.getHeight()};
+        //destRect -= viewOffset; // moving the background starting position according to the view
+        destRect -= view.UpperLeftCorner;
+        levelRect -= view.UpperLeftCorner;
 
         auto clipRect = levelRect;
-        clipRect.clipAgainst(view);
+        clipRect.clipAgainst( {{0,0},view.getSize()} );
 
         unsigned xr, yr;
         for (xr = 0; xr < xRepeats; ++xr) // column repeats
@@ -107,6 +108,5 @@ void Background::draw()
             destRect += {destRect.getWidth(),
                 (s32)(-yr * destRect.getHeight())}; // restore previous Y position
         }
-        //globals->driver->draw2DRectangleOutline(levelRect);
     }
 }
