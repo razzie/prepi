@@ -157,39 +157,46 @@ void Level::update()
     core::dimension2du screenSize = m_globals->driver->getScreenSize();
     core::dimension2du levelSize = {m_dimension.Width * m_unit, m_dimension.Height * m_unit};
 
-    if (m_player)
-    {
-        core::rect<s32> plBox = m_player->getBoundingBox();
-        plBox += core::position2di(m_player->getPosition().X * m_unit, m_player->getPosition().Y * m_unit);
-        plBox -= {(s32)screenSize.Width / 2, (s32)screenSize.Height / 2};
-        m_offset.X = plBox.UpperLeftCorner.X + (plBox.getWidth() / 2);
-        m_offset.Y = plBox.UpperLeftCorner.Y + (plBox.getHeight() / 2);
-    }
-
+    // if level width is small enough, positioning it to center
     if (levelSize.Width < screenSize.Width)
     {
         int delta = (screenSize.Width - levelSize.Width) / 2;
         m_offset.X = -delta;
     }
-    else
-    {
-        int left_delta = m_offset.X;
-        int right_delta = (s32)screenSize.Width - (levelSize.Width - m_offset.X);
-        if (ABS(left_delta) < ABS(right_delta)) m_offset.X = 0;
-        else m_offset.X = levelSize.Width - screenSize.Width;
-    }
 
+    // if level height is small enough, positioning it to center
     if (levelSize.Height < screenSize.Height)
     {
         int delta = (screenSize.Height - levelSize.Height) / 2;
         m_offset.Y = -delta;
     }
-    else
+
+    if (m_player)
     {
-        int top_delta = m_offset.Y;
-        int bottom_delta = (s32)screenSize.Height - (levelSize.Height - m_offset.Y);
-        if (ABS(top_delta) < ABS(bottom_delta)) m_offset.Y = 0;
-        else m_offset.Y = levelSize.Height - screenSize.Height;
+        // calculating player's position
+        core::rect<s32> plBox = m_player->getBoundingBox();
+        plBox += core::position2di(m_player->getPosition().X * m_unit, m_player->getPosition().Y * m_unit);
+        plBox -= {(s32)screenSize.Width / 2, (s32)screenSize.Height / 2};
+
+        if (levelSize.Width >= screenSize.Width)
+        {
+            // moving player to the horizontal center of the screen
+            m_offset.X = plBox.UpperLeftCorner.X + (plBox.getWidth() / 2);
+
+            // align the level if an edge is out of the screen
+            if (m_offset.X < 0) m_offset.X = 0;
+            else if (m_offset.X > (s32)levelSize.Width) m_offset.X = levelSize.Width;
+        }
+
+        if (levelSize.Height >= screenSize.Height)
+        {
+            // moving player to the vertical center of the screen
+            m_offset.Y = plBox.UpperLeftCorner.Y + (plBox.getHeight() / 2);
+
+            // align the level if an edge is out of the screen
+            if (m_offset.Y < 0) m_offset.Y = 0;
+            else if (m_offset.Y > (s32)levelSize.Height) m_offset.Y = levelSize.Height;
+        }
     }
 
     m_bg->draw();
