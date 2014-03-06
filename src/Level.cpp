@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <exception>
+#include "Box2D\Box2D.h"
 #include "Globals.h"
 #include "TileSet.h"
 #include "Parser.h"
@@ -17,9 +18,15 @@
 
 using namespace irr;
 
+static const b2Vec2 gravity(0.0f, 5.0f);
+static float32 timeStep = 1.0f / 60.0f;
+static int32 velocityIterations = 6;
+static int32 positionIterations = 2;
+
 Level::Level(Globals* globals, std::string tileset, std::string url)
  : m_globals(globals)
  , m_tileset(new TileSet(globals, tileset))
+ , m_physics(new b2World(gravity))
  , m_offset(0,0)
  , m_unit(32)
  , m_bg(new Background(this))
@@ -82,7 +89,9 @@ Level::Level(Globals* globals, std::string tileset, std::string url)
 
 Level::~Level()
 {
-
+    delete m_physics;
+    delete m_bg;
+    delete m_tileset;
 }
 
 Globals* Level::getGlobals()
@@ -93,6 +102,11 @@ Globals* Level::getGlobals()
 TileSet* Level::getTileSet()
 {
     return m_tileset;
+}
+
+b2World* Level::getPhysics()
+{
+    return m_physics;
 }
 
 void Level::addElement(Element* element)
@@ -154,6 +168,9 @@ void Level::update()
 {
     tthread::lock_guard<tthread::mutex> guard(m_mutex);
 
+    // updating physics
+    m_physics->Step(timeStep, velocityIterations, positionIterations);
+
     core::dimension2du screenSize = m_globals->driver->getScreenSize();
     core::dimension2du levelSize = {m_dimension.Width * m_unit, m_dimension.Height * m_unit};
 
@@ -203,6 +220,8 @@ void Level::update()
 
     for (Element* element : m_elements)
     {
+        element->update();
+
         core::rect<s32> box = element->getBoundingBox();
         box += core::position2di(element->getPosition().X * m_unit, element->getPosition().Y * m_unit);
         box -= m_offset;
@@ -212,7 +231,5 @@ void Level::update()
         {
             element->draw();
         }
-
-        element->update();
     }
 }

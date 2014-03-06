@@ -1,4 +1,6 @@
+#include "Box2D\Box2D.h"
 #include "Globals.h"
+#include "EventListener.h"
 #include "Level.h"
 #include "PlayerElement.h"
 
@@ -20,4 +22,30 @@ PlayerElement::PlayerElement(Level* level, unsigned id,
 
 PlayerElement::~PlayerElement()
 {
+}
+
+void PlayerElement::update()
+{
+    Element::update();
+
+    const f32 speed = 3.f;
+    EventListener* l = m_level->getGlobals()->eventListener;
+
+    if (l->IsKeyDown(KEY_KEY_W) && m_body->GetLinearVelocity().y == 0)
+    {
+        setMovementY(-speed * 2);
+    }
+    else if (l->IsKeyDown(KEY_KEY_S))
+    {
+        setMovementY(speed);
+    }
+
+    if (l->IsKeyDown(KEY_KEY_A))
+    {
+        setMovementX(-speed);
+    }
+    else if (l->IsKeyDown(KEY_KEY_D))
+    {
+        setMovementX(speed);
+    }
 }

@@ -4,9 +4,11 @@
 #include <iostream>
 #include <tuple>
 #include "irrlicht.h"
+#include "tinythread.h"
 
 class Level;
-struct TileData;
+class TileData;
+class b2Body;
 
 class Element
 {
@@ -35,11 +37,15 @@ public:
     irr::core::vector2di getImagePosition() const;
     irr::core::vector2df getPosition() const;
     void setPosition(irr::core::vector2df);
+    void setMovementX(irr::f32);
+    void setMovementY(irr::f32);
     irr::core::recti getBoundingBox() const;
+    //b2Body* getBody();
     virtual void update();
     virtual void draw();
 
 protected:
+    mutable tthread::mutex m_mutex;
     Level* m_level;
     Type m_type;
     unsigned m_id;
@@ -47,6 +53,7 @@ protected:
     irr::core::vector2df m_position;
     irr::core::recti m_boudingBox;
     const TileData* m_tileData;
+    b2Body* m_body;
 
     static void drawTile(Level*, const TileData*, irr::core::vector2di imgPos, irr::core::vector2df pos);
 };

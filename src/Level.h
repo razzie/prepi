@@ -8,6 +8,7 @@
 
 class Globals;
 class TileSet;
+class b2World;
 class Background;
 class Element;
 class PlayerElement;
@@ -21,6 +22,7 @@ public:
 
     Globals* getGlobals();
     TileSet* getTileSet();
+    b2World* getPhysics();
     void addElement(Element*);
     void removeElement(Element*);
     Background* getBackground();
@@ -37,6 +39,7 @@ private:
     mutable tthread::mutex m_mutex;
     Globals* m_globals;
     TileSet* m_tileset;
+    b2World* m_physics;
     irr::core::vector2di m_offset;
     irr::core::dimension2du m_dimension;
     unsigned m_unit;

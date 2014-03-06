@@ -1,13 +1,14 @@
 #include <iostream>
 #include <sstream>
+#include "Box2D\Box2D.h"
+#include "SFML\Audio.hpp"
+#include "gglib.hpp"
 #include "Globals.h"
 #include "Element.h"
 #include "PlayerElement.h"
 #include "Background.h"
 #include "Level.h"
 #include "Parser.h"
-#include "SFML\Audio.hpp"
-#include "gglib.hpp"
 
 using namespace std;
 using namespace irr;
@@ -23,7 +24,7 @@ int main()
     Sound rofi(rofiBuf);
     rofi.play();*/
 
-    Level level1(&g, "tale", "../levels/load_test.txt");
+    Level level1(&g, "tale", "../levels/palya.txt");
 
     gg::script_engine* se = g.app->get_script_engine();
     se->add_function("setBackground", [&](unsigned id, unsigned mode)
@@ -52,15 +53,10 @@ int main()
     con->open();
     con->drop();
 
-    float32 timeStep = 1.0f / 60.0f;
-    int32 velocityIterations = 6;
-    int32 positionIterations = 2;
     u32 frames=0;
 
     while(g.device->run() && !quit)
     {
-        g.world->Step(timeStep, velocityIterations, positionIterations);
-
         g.driver->beginScene(true, true, video::SColor(0,100,100,100));
 
         //g.smgr->drawAll();

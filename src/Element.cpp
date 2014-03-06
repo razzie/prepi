@@ -1,3 +1,4 @@
+#include "Box2D\Box2D.h"
 #include "Globals.h"
 #include "Level.h"
 #include "TileSet.h"
@@ -15,12 +16,32 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
 {
     s32 unit = (s32)m_level->getUnitSize();
     m_boudingBox = {0, 0, unit, unit};
+
+    b2BodyDef bodyDef;
+    bodyDef.type = (type == Type::GROUND) ? b2_staticBody : b2_dynamicBody; //TEMPORARY! Motion is not known here yet..
+    bodyDef.position.Set(position.X, position.Y);
+    bodyDef.fixedRotation = true; // do not rotate!
+    bodyDef.userData = this;
+    m_body = level->getPhysics()->CreateBody(&bodyDef);
+
+    b2PolygonShape boxShape;
+    boxShape.SetAsBox(0.5f, 0.5f, {-0.5f, -0.5f}, 0.f);
+
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &boxShape;
+    fixtureDef.density = 1.0f;
+    fixtureDef.friction = 0.3f;
+    m_body->CreateFixture(&fixtureDef);
+
     m_level->addElement(this);
 }
 
 Element::~Element()
 {
     m_level->removeElement(this);
+
+    m_level->getPhysics()->DestroyBody(m_body);
+    m_body = nullptr;
 }
 
 Element::Type Element::getType() const
@@ -45,7 +66,22 @@ core::vector2df Element::getPosition() const
 
 void Element::setPosition(core::vector2df position)
 {
+    tthread::lock_guard<tthread::mutex> guard(m_mutex);
     m_position = position;
+}
+
+void Element::setMovementX(f32 xMov)
+{
+    tthread::lock_guard<tthread::mutex> guard(m_mutex);
+    f32 y = m_body->GetLinearVelocity().y;
+    m_body->SetLinearVelocity({xMov, y});
+}
+
+void Element::setMovementY(f32 yMov)
+{
+    tthread::lock_guard<tthread::mutex> guard(m_mutex);
+    f32 x = m_body->GetLinearVelocity().x;
+    m_body->SetLinearVelocity({x, yMov});
 }
 
 core::recti Element::getBoundingBox() const
@@ -55,10 +91,15 @@ core::recti Element::getBoundingBox() const
 
 void Element::update()
 {
+    tthread::lock_guard<tthread::mutex> guard(m_mutex);
+    b2Vec2 pos = m_body->GetPosition();
+    m_position.X = pos.x;
+    m_position.Y = pos.y;
 }
 
 void Element::draw()
 {
+    tthread::lock_guard<tthread::mutex> guard(m_mutex);
     drawTile(m_level, m_tileData, m_imgPosition, m_position);
 }
 

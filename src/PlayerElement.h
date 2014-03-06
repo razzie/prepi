@@ -10,7 +10,7 @@ public:
     PlayerElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df);
     ~PlayerElement();
 
-    //void update();
+    void update();
     //void draw();
 };
 

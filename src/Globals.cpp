@@ -6,8 +6,6 @@ using namespace std;
 using namespace irr;
 //using namespace sf;
 
-static const b2Vec2 gravity(0.0f, -1.0f);
-
 static IrrlichtDevice* createIrrlichtDevice()
 {
     SIrrlichtCreationParameters params; // constructor sets the defaults
@@ -26,7 +24,6 @@ Globals::Globals()
  , driver(device->getVideoDriver())
  , smgr(device->getSceneManager())
  , eventListener(new EventListener())
- , world(new b2World(gravity))
  , app(gg::application::create("prepi"))
 {
     device->setEventReceiver(eventListener);
@@ -44,6 +41,5 @@ Globals::~Globals()
 {
     device->drop();
     app->drop();
-    delete world;
     delete eventListener;
 }
