@@ -13,7 +13,7 @@ static IrrlichtDevice* createIrrlichtDevice()
     params.Bits = 32;
     params.DriverType = video::EDT_OPENGL;
     params.Fullscreen = false;
-    params.WindowSize = core::dimension2d<u32>(800, 600);
+    params.WindowSize = core::dimension2d<u32>(1366, 768);
     params.WithAlphaChannel = true;
 
     return createDeviceEx(params);

@@ -25,12 +25,12 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
     m_body = level->getPhysics()->CreateBody(&bodyDef);
 
     b2PolygonShape boxShape;
-    boxShape.SetAsBox(0.5f, 0.5f, {-0.5f, -0.5f}, 0.f);
+    boxShape.SetAsBox(0.49f, 0.49f, {-0.5f, -0.5f}, 0.f);
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &boxShape;
     fixtureDef.density = 1.0f;
-    fixtureDef.friction = 0.3f;
+    fixtureDef.friction = 1.f;
     m_body->CreateFixture(&fixtureDef);
 
     m_level->addElement(this);
@@ -68,6 +68,8 @@ void Element::setPosition(core::vector2df position)
 {
     tthread::lock_guard<tthread::mutex> guard(m_mutex);
     m_position = position;
+    m_body->SetTransform({position.X, position.Y}, 0.f);
+    m_body->SetLinearVelocity({0.f, 0.f});
 }
 
 void Element::setMovementX(f32 xMov)

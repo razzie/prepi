@@ -18,8 +18,8 @@
 
 using namespace irr;
 
-static const b2Vec2 gravity(0.0f, 5.0f);
-static float32 timeStep = 1.0f / 60.0f;
+static const b2Vec2 gravity(0.0f, 1.0f);
+static float32 timeStep = 1.0f / 45.0f;
 static int32 velocityIterations = 6;
 static int32 positionIterations = 2;
 
@@ -28,7 +28,7 @@ Level::Level(Globals* globals, std::string tileset, std::string url)
  , m_tileset(new TileSet(globals, tileset))
  , m_physics(new b2World(gravity))
  , m_offset(0,0)
- , m_unit(32)
+ , m_unit(64)
  , m_bg(new Background(this))
  , m_player(nullptr)
 {

@@ -27,26 +27,49 @@ int main()
     Level level1(&g, "tale", "../levels/palya.txt");
 
     gg::script_engine* se = g.app->get_script_engine();
+
     se->add_function("setBackground", [&](unsigned id, unsigned mode)
                      {
                          level1.getBackground()->setId(id);
                          level1.getBackground()->setDrawingMethod(static_cast<Background::DrawingMethod>(mode));
                      });
+
     se->add_function("setDimension", [&](unsigned columns, unsigned rows)
                      { level1.setDimension({columns, rows}); });
+
     se->add_function("setUnitSize", [&](unsigned unit)
                      { level1.setUnitSize(unit); });
+
     se->add_function("movePlayer", [&](float x, float y)
                      {
                          Element* player = level1.getPlayerElement();
                          if (player) player->setPosition({x,y});
                      });
+
     se->add_function("color", [](unsigned R, unsigned G, unsigned B)
                      {
                          gg::console::output* o = gg::console::get_invoker_output();
                          o->set_color( {(uint8_t)R, (uint8_t)G, (uint8_t)B} );
                          std::cout << "(R: " << R << ", G: " << G << ", B: " << B << ")";
                      });
+
+    se->add_function("setSpeed", [&](float speed)
+                     {
+                         PlayerElement* player = level1.getPlayerElement();
+                         if (player) player->setSpeed(speed);
+                     });
+
+    se->add_function("setClimbingMode", [&](irr::f32 climbTreshold)
+                     {
+                        if (climbTreshold>=1.f || climbTreshold<=-1.0f)
+                        {
+                            std::cout << "Szarjál sünt!";
+                            return;
+                        }
+                        PlayerElement* player = level1.getPlayerElement();
+                        if (player) player->setClimbingMode(climbTreshold);
+                     });
+
     se->add_function("exit", [&]{ quit = true; });
 
     gg::console* con = g.app->create_console();

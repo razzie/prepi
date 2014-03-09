@@ -17,6 +17,8 @@ PlayerElement::PlayerElement(Level* level, std::tuple<unsigned, irr::core::vecto
 PlayerElement::PlayerElement(Level* level, unsigned id,
                              irr::core::vector2di position, irr::core::vector2df realCoord)
  : Element(level, Type::PLAYER, id, position, realCoord)
+ , m_speed(1.2f)
+ , m_climbTreshold(NO_CLIMBING)
 {
 }
 
@@ -24,28 +26,64 @@ PlayerElement::~PlayerElement()
 {
 }
 
+void PlayerElement::setSpeed(f32 speed)
+{
+    m_speed = speed;
+}
+
+void PlayerElement::setClimbingMode(irr::f32 climbTreshold)
+{
+    m_climbTreshold = climbTreshold;
+}
+
 void PlayerElement::update()
 {
     Element::update();
 
-    const f32 speed = 3.f;
-    EventListener* l = m_level->getGlobals()->eventListener;
+    bool isContactUnder = false;
+    bool isContactLeft = false;
+    bool isContactRight = false;
 
-    if (l->IsKeyDown(KEY_KEY_W) && m_body->GetLinearVelocity().y == 0)
+    b2ContactEdge* edges = m_body->GetContactList();
+    for (b2ContactEdge* edge = edges; edge != NULL; edge = edge->next)
     {
-        setMovementY(-speed * 2);
+        Element* contactElem = static_cast<Element*>(edge->other->GetUserData());
+
+        //if (contactElem->getType() == Element::Type::GROUND)
+        {
+            if (contactElem->getPosition().Y  > m_position.Y - m_climbTreshold)
+                isContactUnder = true;
+
+            if (contactElem->getPosition().X > m_position.X)
+                isContactRight = true;
+            else if (contactElem->getPosition().X < m_position.X)
+                isContactLeft = true;
+
+        }
+    }
+
+
+
+    EventListener* l = m_level->getGlobals()->eventListener;
+    b2Vec2 movement = m_body->GetLinearVelocity();
+
+    if (l->IsKeyDown(KEY_KEY_W) && isContactUnder)
+    {
+        movement.y = -m_speed * 2;
     }
     else if (l->IsKeyDown(KEY_KEY_S))
     {
-        setMovementY(speed);
+        movement.y = m_speed;
     }
 
-    if (l->IsKeyDown(KEY_KEY_A))
+    if (l->IsKeyDown(KEY_KEY_A) && (isContactUnder || !isContactLeft))
     {
-        setMovementX(-speed);
+        movement.x = -m_speed;
     }
-    else if (l->IsKeyDown(KEY_KEY_D))
+    else if (l->IsKeyDown(KEY_KEY_D) && (isContactUnder || !isContactRight))
     {
-        setMovementX(speed);
+        movement.x = m_speed;
     }
+
+    m_body->SetLinearVelocity(movement);
 }
