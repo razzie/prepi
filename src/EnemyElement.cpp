@@ -1,8 +1,14 @@
 #include "Globals.h"
+#include "Parser.h"
 #include "Level.h"
 #include "EnemyElement.h"
 
 using namespace irr;
+
+EnemyElement::EnemyElement(Level* level, std::istream& stream)
+ : EnemyElement(level, Parser(stream).getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion, unsigned>())
+{
+}
 
 EnemyElement::EnemyElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion, unsigned> data)
  : EnemyElement(level,

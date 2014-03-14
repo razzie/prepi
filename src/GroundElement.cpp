@@ -1,8 +1,14 @@
 #include "Globals.h"
+#include "Parser.h"
 #include "Level.h"
 #include "GroundElement.h"
 
 using namespace irr;
+
+GroundElement::GroundElement(Level* level, std::istream& stream)
+ : GroundElement(level, Parser(stream).getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion>())
+{
+}
 
 GroundElement::GroundElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion> data)
  : GroundElement(level,

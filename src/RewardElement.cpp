@@ -1,8 +1,14 @@
 #include "Globals.h"
+#include "Parser.h"
 #include "Level.h"
 #include "RewardElement.h"
 
 using namespace irr;
+
+RewardElement::RewardElement(Level* level, std::istream& stream)
+ : RewardElement(level, Parser(stream).getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned>())
+{
+}
 
 RewardElement::RewardElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned> data)
  : RewardElement(level,

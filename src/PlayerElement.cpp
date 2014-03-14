@@ -1,10 +1,16 @@
 #include "Box2D\Box2D.h"
 #include "Globals.h"
+#include "Parser.h"
 #include "EventListener.h"
 #include "Level.h"
 #include "PlayerElement.h"
 
 using namespace irr;
+
+PlayerElement::PlayerElement(Level* level, std::istream& stream)
+ : PlayerElement(level, Parser(stream).getArgs<unsigned, irr::core::vector2di, irr::core::vector2df>())
+{
+}
 
 PlayerElement::PlayerElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df> data)
  : PlayerElement(level,

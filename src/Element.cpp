@@ -1,10 +1,42 @@
 #include "Box2D\Box2D.h"
 #include "Globals.h"
+#include "Parser.h"
 #include "Level.h"
 #include "TileSet.h"
 #include "Element.h"
+#include "GroundElement.h"
+#include "EnemyElement.h"
+#include "RewardElement.h"
+#include "PlayerElement.h"
+#include "FinishElement.h"
 
 using namespace irr;
+
+Element* CreateElement(Level* level, std::istream& stream)
+{
+    Element::Type type = Parser(stream).getArg<Element::Type>();
+
+    switch (type)
+    {
+        case Element::Type::GROUND:
+            return new GroundElement(level, stream);
+
+        case Element::Type::ENEMY:
+            return new EnemyElement(level, stream);
+
+        case Element::Type::REWARD:
+            return new RewardElement(level, stream);
+
+        case Element::Type::PLAYER:
+            return new PlayerElement(level, stream);
+
+        case Element::Type::FINISH:
+            return new FinishElement(level, stream);
+
+        default:
+            return nullptr;
+    }
+}
 
 Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgPosition, core::vector2df position)
  : m_level(level)

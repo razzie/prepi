@@ -7,6 +7,7 @@
 class EnemyElement : public Element
 {
 public:
+    EnemyElement(Level*, std::istream&);
     EnemyElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion, unsigned>);
     EnemyElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion, unsigned damage);
     ~EnemyElement();

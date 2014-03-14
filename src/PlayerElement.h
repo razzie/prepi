@@ -10,6 +10,7 @@ public:
     static constexpr irr::f32 HALF_CLIMBING = 0.0f;
     static constexpr irr::f32 FULL_CLIMBING = 0.99f;
 
+    PlayerElement(Level*, std::istream&);
     PlayerElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df>);
     PlayerElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df);
     ~PlayerElement();

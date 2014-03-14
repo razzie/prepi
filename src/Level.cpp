@@ -55,30 +55,10 @@ Level::Level(Globals* globals, std::string tileset, std::string url)
     {
         try
         {
-            Element::Type type = p.getArg<Element::Type>();
+            Element* elem = CreateElement(this, file);
 
-            switch(type)
-            {
-                case Element::Type::GROUND:
-                    new GroundElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Element::Visibility, Motion>());
-                    break;
-
-                case Element::Type::ENEMY:
-                    new EnemyElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Element::Visibility, Motion, unsigned>());
-                    break;
-
-                case Element::Type::REWARD:
-                    new RewardElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned>());
-                    break;
-
-                case Element::Type::PLAYER:
-                    m_player = new PlayerElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df>());
-                    break;
-
-                case Element::Type::FINISH:
-                    new FinishElement(this, p.getArgs<unsigned, irr::core::vector2di, irr::core::vector2df>());
-                    break;
-            }
+            if (elem->getType() == Element::Type::PLAYER)
+                m_player = static_cast<PlayerElement*>(elem);
         }
         catch (const std::exception& e)
         {

@@ -1,8 +1,14 @@
 #include "Globals.h"
+#include "Parser.h"
 #include "Level.h"
 #include "FinishElement.h"
 
 using namespace irr;
+
+FinishElement::FinishElement(Level* level, std::istream& stream)
+ : FinishElement(level, Parser(stream).getArgs<unsigned, irr::core::vector2di, irr::core::vector2df>())
+{
+}
 
 FinishElement::FinishElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df> data)
  : FinishElement(level,

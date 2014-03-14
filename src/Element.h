@@ -29,6 +29,7 @@ public:
         FORE = 2
     };
 
+    Element(Level*, std::istream&);
     Element(Level*, Type, unsigned, irr::core::vector2di, irr::core::vector2df);
     virtual ~Element();
 
@@ -57,6 +58,8 @@ protected:
 
     static void drawTile(Level*, const TileData*, irr::core::vector2di imgPos, irr::core::vector2df pos);
 };
+
+Element* CreateElement(Level*, std::istream&);
 
 std::istream& operator>> (std::istream&, Element::Type&);
 std::istream& operator>> (std::istream&, Element::Visibility&);
