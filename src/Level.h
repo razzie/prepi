@@ -1,7 +1,7 @@
 #ifndef LEVEL_H_INCLUDED
 #define LEVEL_H_INCLUDED
 
-#include <set>
+#include <list>
 #include <string>
 #include "irrlicht.h"
 #include "tinythread.h"
@@ -16,6 +16,8 @@ class PlayerElement;
 class Level
 {
 public:
+    friend class Element;
+
     Level(Globals*, std::string tileset, std::string url);
     Level(const Level&) = delete;
     ~Level();
@@ -23,8 +25,6 @@ public:
     Globals* getGlobals();
     TileSet* getTileSet();
     b2World* getPhysics();
-    void addElement(Element*);
-    void removeElement(Element*);
     Background* getBackground();
     PlayerElement* getPlayerElement();
     void setDimension(irr::core::dimension2du);
@@ -35,8 +35,12 @@ public:
     irr::core::rect<irr::s32> getView() const;
     void update();
 
+protected:
+    void addElement(Element*);
+    void removeElement(Element*);
+
 private:
-    mutable tthread::mutex m_mutex;
+    mutable tthread::recursive_mutex m_mutex;
     Globals* m_globals;
     TileSet* m_tileset;
     b2World* m_physics;
@@ -44,7 +48,8 @@ private:
     irr::core::dimension2du m_dimension;
     unsigned m_unit;
     Background* m_bg;
-    std::set<Element*> m_elements;
+    std::list<Element*> m_elements;
+    std::list<Element*> m_elemDeletionQueue;
     PlayerElement* m_player;
 };
 

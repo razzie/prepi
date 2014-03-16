@@ -91,14 +91,14 @@ b2World* Level::getPhysics()
 
 void Level::addElement(Element* element)
 {
-    tthread::lock_guard<tthread::mutex> guard(m_mutex);
-    m_elements.insert(element);
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+    m_elements.push_back(element);
 }
 
 void Level::removeElement(Element* element)
 {
-    tthread::lock_guard<tthread::mutex> guard(m_mutex);
-    m_elements.erase(element);
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+    m_elemDeletionQueue.push_back(element);
 }
 
 Background* Level::getBackground()
@@ -113,7 +113,7 @@ PlayerElement* Level::getPlayerElement()
 
 void Level::setDimension(core::dimension2du dim)
 {
-    tthread::lock_guard<tthread::mutex> guard(m_mutex);
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
     m_dimension = dim;
     //m_unit = (m_columns*m_unit) / m_columns;
 }
@@ -125,7 +125,7 @@ core::dimension2du Level::getDimension() const
 
 void Level::setUnitSize(unsigned unit)
 {
-    tthread::lock_guard<tthread::mutex> guard(m_mutex);
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
     m_unit = unit;
 }
 
@@ -146,7 +146,7 @@ core::rect<s32> Level::getView() const
 
 void Level::update()
 {
-    tthread::lock_guard<tthread::mutex> guard(m_mutex);
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
 
     // updating physics
     m_physics->Step(timeStep, velocityIterations, positionIterations);
@@ -196,12 +196,15 @@ void Level::update()
         }
     }
 
+    // drawing background
     m_bg->draw();
 
     for (Element* element : m_elements)
     {
+        // first update the elements (position sync, player moving, etc)
         element->update();
 
+        // calculating translated bounding box
         core::rect<s32> box = element->getBoundingBox();
         box += core::position2di(element->getPosition().X * m_unit, element->getPosition().Y * m_unit);
         box -= m_offset;
@@ -212,4 +215,20 @@ void Level::update()
             element->draw();
         }
     }
+
+    // remove elements queued for deletion
+    for (Element* element : m_elemDeletionQueue)
+    {
+        // a nice inner loop to find the actual elements to delete
+        for (auto it = m_elements.begin(); it != m_elements.end(); ++it)
+        {
+            if (*it == element)
+            {
+                delete *it;
+                m_elements.erase(it);
+                break;
+            }
+        }
+    }
+    m_elemDeletionQueue.clear();
 }

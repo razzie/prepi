@@ -22,7 +22,7 @@ PlayerElement::PlayerElement(Level* level, std::tuple<unsigned, irr::core::vecto
 
 PlayerElement::PlayerElement(Level* level, unsigned id,
                              irr::core::vector2di position, irr::core::vector2df realCoord)
- : Element(level, Type::PLAYER, id, position, realCoord)
+ : Element(level, Type::PLAYER, id, position, realCoord, Motion::DYNAMIC)
  , m_speed(1.2f)
  , m_climbTreshold(FULL_CLIMBING)
 {

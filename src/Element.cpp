@@ -38,12 +38,13 @@ Element* CreateElement(Level* level, std::istream& stream)
     }
 }
 
-Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgPosition, core::vector2df position)
+Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgPosition, core::vector2df position, Motion motion)
  : m_level(level)
  , m_type(type)
  , m_id(id)
  , m_imgPosition(imgPosition)
  , m_position(position)
+ , m_motion(motion)
  , m_tileData(level->getTileSet()->getData(type, id))
 {
     s32 unit = (s32)m_level->getUnitSize();
@@ -52,8 +53,26 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
         (s32)(tileBBox.UpperLeftCorner.X * unit), (s32)(tileBBox.UpperLeftCorner.Y * unit),
         (s32)(tileBBox.LowerRightCorner.X * unit), (s32)(tileBBox.LowerRightCorner.Y * unit)};
 
+    if (m_type != Type::GROUND) m_motion = Motion::DYNAMIC; // why do everything have static motion??
+
     b2BodyDef bodyDef;
-    bodyDef.type = (type == Type::GROUND) ? b2_staticBody : b2_dynamicBody; //TEMPORARY! Motion is not known here yet..
+    switch (m_motion)
+    {
+        case Motion::DYNAMIC:
+            bodyDef.type = b2_dynamicBody;
+            break;
+
+        case Motion::AUTO:
+        case Motion::STRAIGHT:
+        case Motion::CIRCULAR:
+            bodyDef.type = b2_kinematicBody;
+            break;
+
+        case Motion::STATIC:
+        default:
+            bodyDef.type = b2_staticBody;
+            break;
+    }
     bodyDef.position.Set(position.X, position.Y);
     bodyDef.fixedRotation = true; // do not rotate!
     bodyDef.userData = this;
@@ -75,8 +94,6 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
 
 Element::~Element()
 {
-    m_level->removeElement(this);
-
     m_level->getPhysics()->DestroyBody(m_body);
     m_body = nullptr;
 }
@@ -107,6 +124,11 @@ void Element::setPosition(core::vector2df position)
     m_position = position;
     m_body->SetTransform({position.X, position.Y}, 0.f);
     m_body->SetLinearVelocity({0.f, 0.f});
+}
+
+Motion Element::getMotion() const
+{
+    return m_motion;
 }
 
 void Element::setMovementX(f32 xMov)
