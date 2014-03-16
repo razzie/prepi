@@ -6,6 +6,17 @@
 
 using namespace irr;
 
+core::rectf TileData::getBoundingBox(core::vector2di imgPosition) const
+{
+    unsigned tileId = (tileDimension.X * imgPosition.Y) + imgPosition.X;
+    auto it = boundingBoxes.find(tileId);
+    if (it == boundingBoxes.end())
+        return {0.f, 0.f, 1.f, 1.f};
+    else
+        return it->second;
+}
+
+
 TileSet::TileSet(Globals* globals, std::string name)
  : m_globals(globals)
  , m_name(name)
@@ -153,8 +164,8 @@ bool TileSet::fillTileData(std::string dirName, std::string fileName, unsigned& 
             tileParser.getArgs<unsigned, unsigned, int, int, unsigned>();
 
         // set up default bounding boxes
-        for (unsigned i = 0; i < data.tileCount; ++i)
-            data.boundingBoxes.insert( std::make_pair(i, core::rectf(0.f, 0.f, 1.f, 1.f)) );
+        /*for (unsigned i = 0; i < data.tileCount; ++i)
+            data.boundingBoxes.insert( std::make_pair(i, core::rectf(0.f, 0.f, 1.f, 1.f)) );*/
 
         std::string txtname = dirName + fileName;
         txtname.replace(txtname.end()-3, txtname.end(), "txt");

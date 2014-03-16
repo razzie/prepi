@@ -22,6 +22,8 @@ struct TileData
     irr::core::vector2di tileDimension;
     unsigned tileCount;
     std::map<unsigned, irr::core::rectf> boundingBoxes;
+
+    irr::core::rectf getBoundingBox(irr::core::vector2di imgPosition) const;
 };
 
 class TileSet

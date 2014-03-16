@@ -47,21 +47,10 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
  , m_tileData(level->getTileSet()->getData(type, id))
 {
     s32 unit = (s32)m_level->getUnitSize();
-    core::rectf tileBBox;
-    unsigned tileId = (m_tileData->tileDimension.X * imgPosition.Y) + imgPosition.X;
-    auto it = m_tileData->boundingBoxes.find(tileId);
-    if (it == m_tileData->boundingBoxes.end())
-    {
-        tileBBox = {0.f, 0.f, 1.f, 1.f};
-        m_boundingBox = {0, 0, unit, unit};
-    }
-    else
-    {
-        tileBBox = it->second;
-        m_boundingBox = {
-            (s32)(tileBBox.UpperLeftCorner.X * unit), (s32)(tileBBox.UpperLeftCorner.Y * unit),
-            (s32)(tileBBox.LowerRightCorner.X * unit), (s32)(tileBBox.LowerRightCorner.Y * unit)};
-    }
+    core::rectf tileBBox = m_tileData->getBoundingBox(imgPosition);
+    m_boundingBox = {
+        (s32)(tileBBox.UpperLeftCorner.X * unit), (s32)(tileBBox.UpperLeftCorner.Y * unit),
+        (s32)(tileBBox.LowerRightCorner.X * unit), (s32)(tileBBox.LowerRightCorner.Y * unit)};
 
     b2BodyDef bodyDef;
     bodyDef.type = (type == Type::GROUND) ? b2_staticBody : b2_dynamicBody; //TEMPORARY! Motion is not known here yet..
