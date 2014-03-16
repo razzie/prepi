@@ -47,7 +47,21 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
  , m_tileData(level->getTileSet()->getData(type, id))
 {
     s32 unit = (s32)m_level->getUnitSize();
-    m_boudingBox = {0, 0, unit, unit};
+    core::rectf tileBBox;
+    unsigned tileId = (m_tileData->tileDimension.X * imgPosition.Y) + imgPosition.X;
+    auto it = m_tileData->boundingBoxes.find(tileId);
+    if (it == m_tileData->boundingBoxes.end())
+    {
+        tileBBox = {0.f, 0.f, 1.f, 1.f};
+        m_boundingBox = {0, 0, unit, unit};
+    }
+    else
+    {
+        tileBBox = it->second;
+        m_boundingBox = {
+            (s32)(tileBBox.UpperLeftCorner.X * unit), (s32)(tileBBox.UpperLeftCorner.Y * unit),
+            (s32)(tileBBox.LowerRightCorner.X * unit), (s32)(tileBBox.LowerRightCorner.Y * unit)};
+    }
 
     b2BodyDef bodyDef;
     bodyDef.type = (type == Type::GROUND) ? b2_staticBody : b2_dynamicBody; //TEMPORARY! Motion is not known here yet..
@@ -57,12 +71,14 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
     m_body = level->getPhysics()->CreateBody(&bodyDef);
 
     b2PolygonShape boxShape;
-    boxShape.SetAsBox(0.49f, 0.49f, {-0.5f, -0.5f}, 0.f);
+    boxShape.SetAsBox(tileBBox.getWidth()/2, tileBBox.getHeight()/2,
+                      {+tileBBox.getWidth()/2 - (1.f - tileBBox.UpperLeftCorner.X), +tileBBox.getHeight()/2 - (1.f - tileBBox.UpperLeftCorner.Y)},
+                      0.f);
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &boxShape;
     fixtureDef.density = 1.0f;
-    fixtureDef.friction = 1.f;
+    fixtureDef.friction = 0.5f;
     m_body->CreateFixture(&fixtureDef);
 
     m_level->addElement(this);
@@ -120,7 +136,7 @@ void Element::setMovementY(f32 yMov)
 
 core::recti Element::getBoundingBox() const
 {
-    return m_boudingBox;
+    return m_boundingBox;
 }
 
 void Element::update()

@@ -6,9 +6,9 @@
 class PlayerElement : public Element
 {
 public:
-    static constexpr irr::f32 NO_CLIMBING = -0.99f;
+    static constexpr irr::f32 NO_CLIMBING   = -1.f;
     static constexpr irr::f32 HALF_CLIMBING = 0.0f;
-    static constexpr irr::f32 FULL_CLIMBING = 0.99f;
+    static constexpr irr::f32 FULL_CLIMBING = 1.f;
 
     PlayerElement(Level*, std::istream&);
     PlayerElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df>);

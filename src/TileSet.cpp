@@ -1,4 +1,5 @@
 #include <dirent.h>
+#include <fstream>
 #include "Globals.h"
 #include "TileSet.h"
 #include "Parser.h"
@@ -140,14 +141,40 @@ const TileData* TileSet::getData(Element::Type type, unsigned id) const
 
 bool TileSet::fillTileData(std::string dirName, std::string fileName, unsigned& id, TileData& data) const
 {
+    if (fileName.rfind(".png") == std::string::npos) return false; // not png
+
     try
     {
-        Parser p(fileName, '_');
-
         data.fileName = dirName + fileName;
         data.texture = nullptr;
+
+        Parser tileParser(fileName, '_');
         std::tie(id, data.tileSize, data.tileDimension.X, data.tileDimension.Y, data.tileCount) =
-            p.getArgs<unsigned, unsigned, int, int, unsigned>();
+            tileParser.getArgs<unsigned, unsigned, int, int, unsigned>();
+
+        // set up default bounding boxes
+        for (unsigned i = 0; i < data.tileCount; ++i)
+            data.boundingBoxes.insert( std::make_pair(i, core::rectf(0.f, 0.f, 1.f, 1.f)) );
+
+        std::string txtname = dirName + fileName;
+        txtname.replace(txtname.end()-3, txtname.end(), "txt");
+
+        std::fstream f(txtname);
+        Parser bbParser(f, ',');
+
+        try
+        {
+            // set up special bounding boxes
+            do {
+                unsigned id;
+                core::vector2df upperLeft;
+                core::vector2df lowerRight;
+                std::tie(id, upperLeft, lowerRight) = bbParser.getArgs<unsigned, core::vector2df, core::vector2df>();
+                data.boundingBoxes[id] = {upperLeft, lowerRight};
+            }
+            while (bbParser.nextLine());
+        }
+        catch (...) {}
 
         return true;
     }
@@ -162,8 +189,6 @@ void TileSet::findTileData(std::string dirName, std::map<unsigned, TileData>& da
 {
     DIR *dir;
     struct dirent *ent;
-    unsigned id;
-    TileData td;
 
     if ((dir = opendir( dirName.c_str() )) != NULL)
     {
@@ -172,9 +197,13 @@ void TileSet::findTileData(std::string dirName, std::map<unsigned, TileData>& da
             if (ent->d_name[0] == '.')
                 continue;
 
+            unsigned id;
+            TileData td;
             if (fillTileData(dirName, ent->d_name, id, td))
             {
-                data[id] = td;
+                TileData& savedtd = data[id];
+                savedtd = td;
+                for (auto& it : td.boundingBoxes) savedtd.boundingBoxes.insert(it);
             }
         }
         closedir(dir);

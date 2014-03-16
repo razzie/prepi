@@ -21,6 +21,7 @@ struct TileData
     unsigned tileSize;
     irr::core::vector2di tileDimension;
     unsigned tileCount;
+    std::map<unsigned, irr::core::rectf> boundingBoxes;
 };
 
 class TileSet

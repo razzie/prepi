@@ -24,7 +24,7 @@ PlayerElement::PlayerElement(Level* level, unsigned id,
                              irr::core::vector2di position, irr::core::vector2df realCoord)
  : Element(level, Type::PLAYER, id, position, realCoord)
  , m_speed(1.2f)
- , m_climbTreshold(NO_CLIMBING)
+ , m_climbTreshold(FULL_CLIMBING)
 {
     m_level->getPhysics()->DestroyBody(m_body);
     m_body = nullptr;
@@ -39,7 +39,7 @@ PlayerElement::PlayerElement(Level* level, unsigned id,
 
     b2CircleShape circleShape;
     circleShape.m_p.Set(-0.5f, -0.5f);
-    circleShape.m_radius = 0.5f;
+    circleShape.m_radius = 0.48f;
 
     b2FixtureDef fixtureDef;
     fixtureDef.shape = &circleShape;
@@ -109,6 +109,10 @@ void PlayerElement::update()
     else if (l->IsKeyDown(KEY_KEY_D) && (isContactUnder || !isContactRight))
     {
         movement.x = m_speed;
+    }
+    else
+    {
+        movement.x = 0.f;
     }
 
     m_body->SetLinearVelocity(movement);

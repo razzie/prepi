@@ -52,7 +52,7 @@ protected:
     unsigned m_id;
     irr::core::vector2di m_imgPosition;
     irr::core::vector2df m_position;
-    irr::core::recti m_boudingBox;
+    irr::core::recti m_boundingBox;
     const TileData* m_tileData;
     b2Body* m_body;
 
