@@ -40,6 +40,10 @@ protected:
     void addElement(Element*);
     void removeElement(Element*);
     PlayerElement* findPlayer();
+    void processInsertionQueue();
+    void processDeletionQueue();
+    void updateView();
+    bool isElementOnScreen(Element*);
 
 private:
     mutable tthread::recursive_mutex m_mutex;
@@ -51,6 +55,7 @@ private:
     unsigned m_unit;
     Background* m_bg;
     std::list<Element*> m_elements;
+    std::list<Element*> m_elemInsertionQueue;
     std::list<Element*> m_elemDeletionQueue;
     PlayerElement* m_player;
     unsigned m_rewardSum;

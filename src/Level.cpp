@@ -90,13 +90,7 @@ b2World* Level::getPhysics()
 void Level::addElement(Element* element)
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
-    m_elements.push_back(element);
-
-    if (element->getType() == Element::Type::PLAYER)
-        m_player = static_cast<PlayerElement*>(element);
-
-    if (element->getType() == Element::Type::REWARD)
-        m_rewardSum += (static_cast<RewardElement*>(element))->getValue();
+    m_elemInsertionQueue.push_back(element);
 }
 
 void Level::removeElement(Element* element)
@@ -133,46 +127,43 @@ unsigned Level::getRewardSum() const
     return m_rewardSum;
 }
 
-void Level::setDimension(core::dimension2du dim)
+void Level::processInsertionQueue()
 {
-    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
-    m_dimension = dim;
-    //m_unit = (m_columns*m_unit) / m_columns;
+    for (Element* element : m_elemInsertionQueue)
+    {
+        m_elements.push_back(element);
+
+        if (element->getType() == Element::Type::PLAYER)
+            m_player = static_cast<PlayerElement*>(element);
+
+        if (element->getType() == Element::Type::REWARD)
+            m_rewardSum += (static_cast<RewardElement*>(element))->getValue();
+    }
+    m_elemInsertionQueue.clear();
 }
 
-core::dimension2du Level::getDimension() const
+void Level::processDeletionQueue()
 {
-    return m_dimension;
+    for (Element* element : m_elemDeletionQueue)
+    {
+        // a nice inner loop to find the actual elements to delete
+        for (auto it = m_elements.begin(); it != m_elements.end(); ++it)
+        {
+            if (*it == element)
+            {
+                if (*it == m_player) m_player = findPlayer();
+
+                delete *it;
+                m_elements.erase(it);
+                break;
+            }
+        }
+    }
+    m_elemDeletionQueue.clear();
 }
 
-void Level::setUnitSize(unsigned unit)
+void Level::updateView()
 {
-    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
-    m_unit = unit;
-}
-
-unsigned Level::getUnitSize() const
-{
-    return m_unit;
-}
-
-core::vector2di Level::getViewOffset() const
-{
-    return m_offset;
-}
-
-core::rect<s32> Level::getView() const
-{
-    return {m_offset, m_globals->driver->getScreenSize()};
-}
-
-void Level::update()
-{
-    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
-
-    // updating physics
-    m_physics->Step(timeStep, velocityIterations, positionIterations);
-
     core::dimension2du screenSize = m_globals->driver->getScreenSize();
     core::dimension2du levelSize = {m_dimension.Width * m_unit, m_dimension.Height * m_unit};
 
@@ -217,6 +208,66 @@ void Level::update()
             else if (m_offset.Y > (s32)levelSize.Height) m_offset.Y = levelSize.Height;
         }
     }
+}
+
+bool Level::isElementOnScreen(Element* element)
+{
+    core::dimension2du screenSize = m_globals->driver->getScreenSize();
+
+    // calculating translated bounding box
+    core::rect<s32> box = element->getBoundingBox();
+    box += core::position2di(element->getPosition().X * m_unit, element->getPosition().Y * m_unit);
+    box -= m_offset;
+
+    // do not draw if outside of screen
+    return box.isRectCollided( {{0, 0}, screenSize} );
+}
+
+void Level::setDimension(core::dimension2du dim)
+{
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+    m_dimension = dim;
+    //m_unit = (m_columns*m_unit) / m_columns;
+}
+
+core::dimension2du Level::getDimension() const
+{
+    return m_dimension;
+}
+
+void Level::setUnitSize(unsigned unit)
+{
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+    m_unit = unit;
+}
+
+unsigned Level::getUnitSize() const
+{
+    return m_unit;
+}
+
+core::vector2di Level::getViewOffset() const
+{
+    return m_offset;
+}
+
+core::rect<s32> Level::getView() const
+{
+    return {m_offset, m_globals->driver->getScreenSize()};
+}
+
+void Level::update()
+{
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+
+    // adding elements from insertion queue
+    processInsertionQueue();
+
+    // updating physics
+    m_physics->Step(timeStep, velocityIterations, positionIterations);
+
+    // updating view
+    updateView();
 
     // drawing background
     m_bg->draw();
@@ -226,33 +277,13 @@ void Level::update()
         // first update the elements (position sync, player moving, etc)
         element->update();
 
-        // calculating translated bounding box
-        core::rect<s32> box = element->getBoundingBox();
-        box += core::position2di(element->getPosition().X * m_unit, element->getPosition().Y * m_unit);
-        box -= m_offset;
-
         // do not draw if outside of screen
-        if (box.isRectCollided( {{0, 0}, screenSize} ))
+        if (isElementOnScreen(element))
         {
             element->draw();
         }
     }
 
     // remove elements queued for deletion
-    for (Element* element : m_elemDeletionQueue)
-    {
-        // a nice inner loop to find the actual elements to delete
-        for (auto it = m_elements.begin(); it != m_elements.end(); ++it)
-        {
-            if (*it == element)
-            {
-                if (*it == m_player) m_player = findPlayer();
-
-                delete *it;
-                m_elements.erase(it);
-                break;
-            }
-        }
-    }
-    m_elemDeletionQueue.clear();
+    processDeletionQueue();
 }
