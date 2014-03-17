@@ -86,6 +86,12 @@ int main()
 
         level1.update();
 
+        PlayerElement* player = level1.getPlayerElement();
+        if (player)
+        {
+            g.driver->draw2DRectangle({255,255,0,0}, {5, 5, player->getHealth()*2, 15});
+            g.driver->draw2DRectangle({255,255,255,0}, {5, 20, player->getRewards()*20, 30});
+        }
 
         g.driver->endScene();
         if (++frames==100)

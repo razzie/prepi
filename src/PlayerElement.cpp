@@ -4,6 +4,8 @@
 #include "EventListener.h"
 #include "Level.h"
 #include "PlayerElement.h"
+#include "EnemyElement.h"
+#include "RewardElement.h"
 
 using namespace irr;
 
@@ -23,6 +25,8 @@ PlayerElement::PlayerElement(Level* level, std::tuple<unsigned, irr::core::vecto
 PlayerElement::PlayerElement(Level* level, unsigned id,
                              irr::core::vector2di position, irr::core::vector2df realCoord)
  : Element(level, Type::PLAYER, id, position, realCoord, Motion::DYNAMIC)
+ , m_health(100)
+ , m_rewards(0)
  , m_speed(1.2f)
  , m_climbTreshold(FULL_CLIMBING)
 {
@@ -62,6 +66,16 @@ void PlayerElement::setClimbingMode(irr::f32 climbTreshold)
     m_climbTreshold = climbTreshold;
 }
 
+int PlayerElement::getHealth() const
+{
+    return m_health;
+}
+
+unsigned PlayerElement::getRewards() const
+{
+    return m_rewards;
+}
+
 void PlayerElement::update()
 {
     Element::update();
@@ -84,11 +98,21 @@ void PlayerElement::update()
                 isContactRight = true;
             else if (contactElem->getPosition().X < m_position.X)
                 isContactLeft = true;
+        }
 
+        if (contactElem->getType() == Element::Type::ENEMY)
+        {
+            unsigned dmg = (static_cast<EnemyElement*>(contactElem))->getDamage();
+            m_health -= dmg;
+            contactElem->remove(); // should it be removed or just skipped for some seconds??
+        }
+        else if (contactElem->getType() == Element::Type::REWARD)
+        {
+            unsigned val = (static_cast<RewardElement*>(contactElem))->getValue();
+            m_rewards += val;
+            contactElem->remove();
         }
     }
-
-
 
     EventListener* l = m_level->getGlobals()->eventListener;
     b2Vec2 movement = m_body->GetLinearVelocity();

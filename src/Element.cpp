@@ -150,6 +150,11 @@ core::recti Element::getBoundingBox() const
     return m_boundingBox;
 }
 
+void Element::remove()
+{
+    m_level->removeElement(this);
+}
+
 void Element::update()
 {
     tthread::lock_guard<tthread::mutex> guard(m_mutex);
