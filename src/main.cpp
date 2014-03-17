@@ -8,6 +8,7 @@
 #include "PlayerElement.h"
 #include "Background.h"
 #include "Level.h"
+#include "GUI.h"
 #include "Parser.h"
 
 using namespace std;
@@ -25,6 +26,7 @@ int main()
     rofi.play();*/
 
     Level level1(&g, "tale", "../levels/palya.txt");
+    GUI gui(&g, &level1);
 
     gg::script_engine* se = g.app->get_script_engine();
 
@@ -85,13 +87,7 @@ int main()
         //g.smgr->drawAll();
 
         level1.update();
-
-        PlayerElement* player = level1.getPlayerElement();
-        if (player)
-        {
-            g.driver->draw2DRectangle({255,255,0,0}, {5, 5, (s32)player->getHealth()*2, 15});
-            g.driver->draw2DRectangle({255,255,255,0}, {5, 20, (s32)player->getRewards()*20, 30});
-        }
+        gui.update();
 
         g.driver->endScene();
         if (++frames==100)

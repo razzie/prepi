@@ -31,6 +31,7 @@ Level::Level(Globals* globals, std::string tileset, std::string url)
  , m_unit(64)
  , m_bg(new Background(this))
  , m_player(nullptr)
+ , m_rewardSum(0)
 {
     std::fstream file(url);
     Parser p(file);
@@ -55,10 +56,7 @@ Level::Level(Globals* globals, std::string tileset, std::string url)
     {
         try
         {
-            Element* elem = CreateElement(this, file);
-
-            if (elem->getType() == Element::Type::PLAYER)
-                m_player = static_cast<PlayerElement*>(elem);
+            CreateElement(this, file);
         }
         catch (const std::exception& e)
         {
@@ -93,12 +91,31 @@ void Level::addElement(Element* element)
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
     m_elements.push_back(element);
+
+    if (element->getType() == Element::Type::PLAYER)
+        m_player = static_cast<PlayerElement*>(element);
+
+    if (element->getType() == Element::Type::REWARD)
+        m_rewardSum += (static_cast<RewardElement*>(element))->getValue();
 }
 
 void Level::removeElement(Element* element)
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
     m_elemDeletionQueue.push_back(element);
+}
+
+PlayerElement* Level::findPlayer()
+{
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+
+    for (Element* element : m_elements)
+    {
+        if (element->getType() == Element::Type::PLAYER)
+            return static_cast<PlayerElement*>(element);
+    }
+
+    return nullptr;
 }
 
 Background* Level::getBackground()
@@ -109,6 +126,11 @@ Background* Level::getBackground()
 PlayerElement* Level::getPlayerElement()
 {
     return m_player;
+}
+
+unsigned Level::getRewardSum() const
+{
+    return m_rewardSum;
 }
 
 void Level::setDimension(core::dimension2du dim)
@@ -224,6 +246,8 @@ void Level::update()
         {
             if (*it == element)
             {
+                if (*it == m_player) m_player = findPlayer();
+
                 delete *it;
                 m_elements.erase(it);
                 break;

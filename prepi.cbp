@@ -69,7 +69,10 @@
 		<Unit filename="src/EventListener.h" />
 		<Unit filename="src/FinishElement.cpp" />
 		<Unit filename="src/FinishElement.h" />
+		<Unit filename="src/GUI.cpp" />
+		<Unit filename="src/GUI.h" />
 		<Unit filename="src/Globals.cpp" />
+		<Unit filename="src/Globals.h" />
 		<Unit filename="src/GroundElement.cpp" />
 		<Unit filename="src/GroundElement.h" />
 		<Unit filename="src/Level.cpp" />
@@ -86,7 +89,6 @@
 		<Unit filename="src/TileSet.h" />
 		<Unit filename="src/Timer.cpp" />
 		<Unit filename="src/Timer.h" />
-		<Unit filename="src/globals.h" />
 		<Unit filename="src/main.cpp" />
 		<Extensions>
 			<code_completion />

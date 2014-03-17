@@ -90,7 +90,7 @@ void PlayerElement::takeRewardFrom(RewardElement* reward)
 
 void PlayerElement::takeDamage(unsigned dmg)
 {
-    if (dmg > m_health)
+    if (dmg >= m_health)
     {
         m_health = 0;
         die();

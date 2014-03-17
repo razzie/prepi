@@ -27,6 +27,7 @@ public:
     b2World* getPhysics();
     Background* getBackground();
     PlayerElement* getPlayerElement();
+    unsigned getRewardSum() const;
     void setDimension(irr::core::dimension2du);
     irr::core::dimension2du getDimension() const;
     void setUnitSize(unsigned);
@@ -38,6 +39,7 @@ public:
 protected:
     void addElement(Element*);
     void removeElement(Element*);
+    PlayerElement* findPlayer();
 
 private:
     mutable tthread::recursive_mutex m_mutex;
@@ -51,6 +53,7 @@ private:
     std::list<Element*> m_elements;
     std::list<Element*> m_elemDeletionQueue;
     PlayerElement* m_player;
+    unsigned m_rewardSum;
 };
 
 #endif // LEVEL_H_INCLUDED
