@@ -56,6 +56,71 @@ PlayerElement::~PlayerElement()
 {
 }
 
+unsigned PlayerElement::getHealth() const
+{
+    return m_health;
+}
+
+unsigned PlayerElement::getMaxHealth() const
+{
+    return 100;
+}
+
+unsigned PlayerElement::getRewards() const
+{
+    return m_rewards;
+}
+
+void PlayerElement::takeHealth(unsigned health)
+{
+    m_health += health;
+    if (m_health > getMaxHealth()) m_health = getMaxHealth();
+}
+
+void PlayerElement::takeReward(unsigned reward)
+{
+    m_rewards += reward;
+}
+
+void PlayerElement::takeRewardFrom(RewardElement* reward)
+{
+    takeReward(reward->getValue());
+    reward->remove();
+}
+
+void PlayerElement::takeDamage(unsigned dmg)
+{
+    if (dmg > m_health)
+    {
+        m_health = 0;
+        die();
+    }
+    else
+    {
+        m_health -= dmg;
+    }
+}
+
+void PlayerElement::takeDamageFrom(EnemyElement* enemy)
+{
+    auto it = m_damageList.find(enemy);
+    if (it == m_damageList.end())
+    {
+        m_damageList.insert( std::make_pair(enemy, Timer()) );
+        takeDamage(enemy->getDamage());
+    }
+    else if (it->second.peekElapsed() >= 1000)
+    {
+        takeDamage(enemy->getDamage());
+        it->second.reset();
+    }
+}
+
+void PlayerElement::die()
+{
+    std::cout << "Player died!" << std::endl;
+}
+
 void PlayerElement::setSpeed(f32 speed)
 {
     m_speed = speed;
@@ -64,16 +129,6 @@ void PlayerElement::setSpeed(f32 speed)
 void PlayerElement::setClimbingMode(irr::f32 climbTreshold)
 {
     m_climbTreshold = climbTreshold;
-}
-
-int PlayerElement::getHealth() const
-{
-    return m_health;
-}
-
-unsigned PlayerElement::getRewards() const
-{
-    return m_rewards;
 }
 
 void PlayerElement::update()
@@ -102,15 +157,11 @@ void PlayerElement::update()
 
         if (contactElem->getType() == Element::Type::ENEMY)
         {
-            unsigned dmg = (static_cast<EnemyElement*>(contactElem))->getDamage();
-            m_health -= dmg;
-            contactElem->remove(); // should it be removed or just skipped for some seconds??
+            takeDamageFrom(static_cast<EnemyElement*>(contactElem));
         }
         else if (contactElem->getType() == Element::Type::REWARD)
         {
-            unsigned val = (static_cast<RewardElement*>(contactElem))->getValue();
-            m_rewards += val;
-            contactElem->remove();
+            takeRewardFrom(static_cast<RewardElement*>(contactElem));
         }
     }
 
