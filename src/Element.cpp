@@ -53,41 +53,42 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
         (s32)(tileBBox.UpperLeftCorner.X * unit), (s32)(tileBBox.UpperLeftCorner.Y * unit),
         (s32)(tileBBox.LowerRightCorner.X * unit), (s32)(tileBBox.LowerRightCorner.Y * unit)};
 
-    if (m_type != Type::GROUND) m_motion = Motion::DYNAMIC; // why do everything have static motion??
-
-    b2BodyDef bodyDef;
-    switch (m_motion)
+    if (m_motion != Motion::NONE)
     {
-        case Motion::DYNAMIC:
-            bodyDef.type = b2_dynamicBody;
-            break;
+        b2BodyDef bodyDef;
+        switch (m_motion)
+        {
+            case Motion::DYNAMIC:
+                bodyDef.type = b2_dynamicBody;
+                break;
 
-        case Motion::AUTO:
-        case Motion::STRAIGHT:
-        case Motion::CIRCULAR:
-            bodyDef.type = b2_kinematicBody;
-            break;
+            case Motion::AUTO:
+            case Motion::STRAIGHT:
+            case Motion::CIRCULAR:
+                bodyDef.type = b2_kinematicBody;
+                break;
 
-        case Motion::STATIC:
-        default:
-            bodyDef.type = b2_staticBody;
-            break;
+            case Motion::STATIC:
+            default:
+                bodyDef.type = b2_staticBody;
+                break;
+        }
+        bodyDef.position.Set(position.X, position.Y);
+        bodyDef.fixedRotation = true; // do not rotate!
+        bodyDef.userData = this;
+        m_body = level->getPhysics()->CreateBody(&bodyDef);
+
+        b2PolygonShape boxShape;
+        boxShape.SetAsBox(tileBBox.getWidth()/2, tileBBox.getHeight()/2,
+                          {+tileBBox.getWidth()/2 - (1.f - tileBBox.UpperLeftCorner.X), +tileBBox.getHeight()/2 - (1.f - tileBBox.UpperLeftCorner.Y)},
+                          0.f);
+
+        b2FixtureDef fixtureDef;
+        fixtureDef.shape = &boxShape;
+        fixtureDef.density = 1.0f;
+        fixtureDef.friction = 0.5f;
+        m_body->CreateFixture(&fixtureDef);
     }
-    bodyDef.position.Set(position.X, position.Y);
-    bodyDef.fixedRotation = true; // do not rotate!
-    bodyDef.userData = this;
-    m_body = level->getPhysics()->CreateBody(&bodyDef);
-
-    b2PolygonShape boxShape;
-    boxShape.SetAsBox(tileBBox.getWidth()/2, tileBBox.getHeight()/2,
-                      {+tileBBox.getWidth()/2 - (1.f - tileBBox.UpperLeftCorner.X), +tileBBox.getHeight()/2 - (1.f - tileBBox.UpperLeftCorner.Y)},
-                      0.f);
-
-    b2FixtureDef fixtureDef;
-    fixtureDef.shape = &boxShape;
-    fixtureDef.density = 1.0f;
-    fixtureDef.friction = 0.5f;
-    m_body->CreateFixture(&fixtureDef);
 
     m_level->addElement(this);
 }
@@ -191,14 +192,6 @@ std::istream& operator>> (std::istream& i, Element::Type& t)
     unsigned type;
     i >> type;
     t = static_cast<Element::Type>(type);
-    return i;
-}
-
-std::istream& operator>> (std::istream& i, Element::Visibility& v)
-{
-    unsigned visibility;
-    i >> visibility;
-    v = static_cast<Element::Visibility>(visibility);
     return i;
 }
 

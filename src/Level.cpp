@@ -18,10 +18,9 @@
 
 using namespace irr;
 
-static const b2Vec2 gravity(0.0f, 1.0f);
-static float32 timeStep = 1.0f / 45.0f;
-static int32 velocityIterations = 6;
-static int32 positionIterations = 2;
+static const b2Vec2 gravity(0.0f, 5.f);
+static int32 velocityIterations = 8;
+static int32 positionIterations = 3;
 
 Level::Level(Globals* globals, std::string tileset, std::string url)
  : m_globals(globals)
@@ -194,8 +193,10 @@ void Level::updateView()
             m_offset.X = plBox.UpperLeftCorner.X + (plBox.getWidth() / 2);
 
             // align the level if an edge is out of the screen
-            if (m_offset.X < 0) m_offset.X = 0;
-            else if (m_offset.X > (s32)levelSize.Width) m_offset.X = levelSize.Width;
+            if (m_offset.X < 0)
+                m_offset.X = 0;
+            else if (m_offset.X > (s32)(levelSize.Width - screenSize.Width))
+                m_offset.X = (s32)(levelSize.Width - screenSize.Width);
         }
 
         if (levelSize.Height >= screenSize.Height)
@@ -204,8 +205,10 @@ void Level::updateView()
             m_offset.Y = plBox.UpperLeftCorner.Y + (plBox.getHeight() / 2);
 
             // align the level if an edge is out of the screen
-            if (m_offset.Y < 0) m_offset.Y = 0;
-            else if (m_offset.Y > (s32)levelSize.Height) m_offset.Y = levelSize.Height;
+            if (m_offset.Y < 0)
+                m_offset.Y = 0;
+            else if (m_offset.Y > (s32)(s32)(levelSize.Height - screenSize.Height))
+                m_offset.Y = (s32)(levelSize.Height - screenSize.Height);
         }
     }
 }
@@ -260,11 +263,13 @@ void Level::update()
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
 
+    unsigned elapsedTime = m_timer.getElapsed();
+
     // adding elements from insertion queue
     processInsertionQueue();
 
     // updating physics
-    m_physics->Step(timeStep, velocityIterations, positionIterations);
+    m_physics->Step((float)elapsedTime/250, velocityIterations, positionIterations);
 
     // updating view
     updateView();

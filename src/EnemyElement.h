@@ -7,9 +7,8 @@ class EnemyElement : public Element
 {
 public:
     EnemyElement(Level*, std::istream&);
-    EnemyElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion, unsigned>);
-    EnemyElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion, unsigned damage);
-    Visibility getVisibility() const;
+    EnemyElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned>);
+    EnemyElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned damage);
     unsigned getDamage() const;
     //void update();
     //void draw();
@@ -17,7 +16,6 @@ public:
 private:
     ~EnemyElement();
 
-    Visibility m_visibility;
     unsigned m_damage;
 };
 

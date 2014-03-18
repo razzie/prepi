@@ -8,6 +8,11 @@ class EventListener : public irr::IEventReceiver
         EventListener();
         virtual bool OnEvent(const irr::SEvent&);
         virtual bool IsKeyDown(irr::EKEY_CODE) const;
+        virtual bool IsUp() const;
+        virtual bool IsDown() const;
+        virtual bool IsLeft() const;
+        virtual bool IsRight() const;
+
         virtual ~EventListener();
     protected:
     private:

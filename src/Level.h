@@ -5,6 +5,7 @@
 #include <string>
 #include "irrlicht.h"
 #include "tinythread.h"
+#include "Timer.h"
 
 class Globals;
 class TileSet;
@@ -59,6 +60,7 @@ private:
     std::list<Element*> m_elemDeletionQueue;
     PlayerElement* m_player;
     unsigned m_rewardSum;
+    Timer m_timer;
 };
 
 #endif // LEVEL_H_INCLUDED

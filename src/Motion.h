@@ -5,11 +5,13 @@
 
 enum class Motion : unsigned
 {
-	STATIC = 0,
-    DYNAMIC = 1,
-    AUTO = 2,
-    STRAIGHT = 3,
-    CIRCULAR = 4
+    NONE = 0,
+	STATIC = 3,
+	UNSTABLE = 4,
+    DYNAMIC = 5,
+    AUTO = 6,
+    STRAIGHT = 7,
+    CIRCULAR = 8
 };
 
 std::istream& operator>> (std::istream&, Motion&);

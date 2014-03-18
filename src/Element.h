@@ -25,13 +25,6 @@ public:
         FINISH = 4
     };
 
-    enum class Visibility : unsigned
-    {
-        BACK = 0,
-        SOLID = 1,
-        FORE = 2
-    };
-
     Element(Level*, std::istream&);
     Element(Level*, Type, unsigned, irr::core::vector2di, irr::core::vector2df, Motion);
     Type getType() const;
@@ -68,7 +61,6 @@ protected:
 Element* CreateElement(Level*, std::istream&);
 
 std::istream& operator>> (std::istream&, Element::Type&);
-std::istream& operator>> (std::istream&, Element::Visibility&);
 std::istream& operator>> (std::istream&, irr::core::vector2di&);
 std::istream& operator>> (std::istream&, irr::core::vector2df&);
 

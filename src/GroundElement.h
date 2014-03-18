@@ -7,16 +7,13 @@ class GroundElement : public Element
 {
 public:
     GroundElement(Level*, std::istream&);
-    GroundElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion>);
-    GroundElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, Visibility, Motion);
-    Visibility getVisibility() const;
+    GroundElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Motion>);
+    GroundElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, Motion);
     //void update();
     //void draw();
 
 private:
     ~GroundElement();
-
-    Visibility m_visibility;
 };
 
 #endif // GROUNDELEMENT_H_INCLUDED

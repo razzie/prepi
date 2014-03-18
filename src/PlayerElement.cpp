@@ -27,7 +27,7 @@ PlayerElement::PlayerElement(Level* level, unsigned id,
  : Element(level, Type::PLAYER, id, position, realCoord, Motion::DYNAMIC)
  , m_health(100)
  , m_rewards(0)
- , m_speed(1.2f)
+ , m_speed(2.f)
  , m_climbTreshold(FULL_CLIMBING)
 {
     m_level->getPhysics()->DestroyBody(m_body);
@@ -168,20 +168,20 @@ void PlayerElement::update()
     EventListener* l = m_level->getGlobals()->eventListener;
     b2Vec2 movement = m_body->GetLinearVelocity();
 
-    if (l->IsKeyDown(KEY_KEY_W) && isContactUnder)
+    if (l->IsUp() && isContactUnder)
     {
-        movement.y = -m_speed * 2;
+        movement.y = -m_speed * 2.2;
     }
-    else if (l->IsKeyDown(KEY_KEY_S))
+    else if (l->IsDown())
     {
         movement.y = m_speed;
     }
 
-    if (l->IsKeyDown(KEY_KEY_A) && (isContactUnder || !isContactLeft))
+    if (l->IsLeft() && (isContactUnder || !isContactLeft))
     {
         movement.x = -m_speed;
     }
-    else if (l->IsKeyDown(KEY_KEY_D) && (isContactUnder || !isContactRight))
+    else if (l->IsRight() && (isContactUnder || !isContactRight))
     {
         movement.x = m_speed;
     }
