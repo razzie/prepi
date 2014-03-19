@@ -23,8 +23,8 @@ PlayerElement::PlayerElement(Level* level, std::tuple<unsigned, irr::core::vecto
 }
 
 PlayerElement::PlayerElement(Level* level, unsigned id,
-                             irr::core::vector2di position, irr::core::vector2df realCoord)
- : Element(level, Type::PLAYER, id, position, realCoord, Motion::DYNAMIC)
+                             irr::core::vector2di imgPosition, core::vector2df position)
+ : Element(level, Type::PLAYER, id, imgPosition, position, Motion::DYNAMIC)
  , m_health(100)
  , m_rewards(0)
  , m_speed(2.f)

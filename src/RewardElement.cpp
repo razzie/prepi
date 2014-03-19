@@ -21,9 +21,9 @@ RewardElement::RewardElement(Level* level, std::tuple<unsigned, irr::core::vecto
 }
 
 RewardElement::RewardElement(Level* level, unsigned id,
-                             irr::core::vector2di position, irr::core::vector2df realCoord,
+                             irr::core::vector2di imgPosition, core::vector2df position,
                              Motion motion, unsigned value)
- : Element(level, Type::REWARD, id, position, realCoord, Motion::STATIC)
+ : Element(level, Type::REWARD, id, imgPosition, position, Motion::STATIC)
  , m_value(value)
 {
 }

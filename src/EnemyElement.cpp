@@ -21,9 +21,9 @@ EnemyElement::EnemyElement(Level* level, std::tuple<unsigned, irr::core::vector2
 }
 
 EnemyElement::EnemyElement(Level* level, unsigned id,
-                           irr::core::vector2di position, irr::core::vector2df realCoord,
+                           irr::core::vector2di imgPosition, core::vector2df position,
                            Motion motion, unsigned damage)
- : Element(level, Type::ENEMY, id, position, realCoord, Motion::STATIC)
+ : Element(level, Type::ENEMY, id, imgPosition, position, Motion::STATIC)
  , m_damage(damage)
 {
 }

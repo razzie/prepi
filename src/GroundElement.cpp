@@ -20,10 +20,9 @@ GroundElement::GroundElement(Level* level, std::tuple<unsigned, irr::core::vecto
 }
 
 GroundElement::GroundElement(Level* level, unsigned id,
-                             irr::core::vector2di position,
-                             irr::core::vector2df realCoord,
+                             irr::core::vector2di imgPosition, core::vector2df position,
                              Motion motion)
- : Element(level, Type::GROUND, id, position, realCoord, motion)
+ : Element(level, Type::GROUND, id, imgPosition, position, motion)
 {
 }
 

@@ -19,8 +19,8 @@ FinishElement::FinishElement(Level* level, std::tuple<unsigned, irr::core::vecto
 }
 
 FinishElement::FinishElement(Level* level, unsigned id,
-                             irr::core::vector2di position, irr::core::vector2df realCoord)
- : Element(level, Type::FINISH, id, position, realCoord, Motion::STATIC)
+                             irr::core::vector2di imgPosition, core::vector2df position)
+ : Element(level, Type::FINISH, id, imgPosition, position, Motion::STATIC)
 {
 }
 
