@@ -18,6 +18,39 @@
 
 using namespace irr;
 
+struct Version
+{
+    unsigned major;
+    unsigned minor;
+
+    inline friend std::istream& operator>> (std::istream& is, Version& ver)
+    {
+        char unused;
+        is >> unused; // skipping 'v'
+        is >> ver.major;
+        is >> unused; // skipping '.'
+        is >> ver.minor;
+        return is;
+    }
+
+    inline friend std::ostream& operator<< (std::ostream& os, const Version& ver)
+    {
+        os << ver.major << "." << ver.minor;
+        return os;
+    }
+
+    bool operator== (const Version& ver)
+    {
+        return (major == ver.major && minor == ver.minor);
+    }
+
+    bool operator!= (const Version& ver)
+    {
+        return !(*this == ver);
+    }
+};
+
+static const Version prepiVersion {1,0};
 static const b2Vec2 gravity(0.0f, 5.f);
 static int32 velocityIterations = 8;
 static int32 positionIterations = 3;
@@ -34,6 +67,21 @@ Level::Level(Globals* globals, std::string tileset, std::string url)
 {
     std::fstream file(url);
     Parser p(file);
+
+    try
+    {
+        Version ver = p.getArg<Version>();
+
+        if (ver != prepiVersion)
+        {
+            std::cout << "Mismatching version (prepi: " << prepiVersion << ", file: " << ver << ")" << std::endl;
+            return;
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << "Failed to read version info (" << e.what() << ")" << std::endl;
+    }
 
     try
     {
