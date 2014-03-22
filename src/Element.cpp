@@ -69,6 +69,7 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
                 break;
 
             case Motion::STATIC:
+            case Motion::UNSTABLE:
             default:
                 bodyDef.type = b2_staticBody;
                 break;
@@ -149,6 +150,11 @@ void Element::setMovementY(f32 yMov)
 core::recti Element::getBoundingBox() const
 {
     return m_boundingBox;
+}
+
+b2Body* Element::getBody()
+{
+    return m_body;
 }
 
 void Element::remove()

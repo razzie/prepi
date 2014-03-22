@@ -155,13 +155,23 @@ void PlayerElement::update()
                 isContactLeft = true;
         }
 
-        if (contactElem->getType() == Element::Type::ENEMY)
+        if (contactElem->getMotion() == Motion::UNSTABLE)
         {
-            takeDamageFrom(static_cast<EnemyElement*>(contactElem));
+            contactElem->getBody()->SetType(b2_dynamicBody);
         }
-        else if (contactElem->getType() == Element::Type::REWARD)
+
+        switch (contactElem->getType())
         {
-            takeRewardFrom(static_cast<RewardElement*>(contactElem));
+            case Element::Type::ENEMY:
+                takeDamageFrom(static_cast<EnemyElement*>(contactElem));
+                break;
+
+            case Element::Type::REWARD:
+                takeRewardFrom(static_cast<RewardElement*>(contactElem));
+                break;
+
+            default:
+                break;
         }
     }
 

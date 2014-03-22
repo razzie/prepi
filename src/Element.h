@@ -36,7 +36,7 @@ public:
     void setMovementX(irr::f32);
     void setMovementY(irr::f32);
     irr::core::recti getBoundingBox() const;
-    //b2Body* getBody();
+    b2Body* getBody();
     void remove();
     virtual void update();
     virtual void draw();

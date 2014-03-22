@@ -19,13 +19,15 @@ class Level
 public:
     friend class Element;
 
-    Level(Globals*, std::string tileset, std::string url);
+    Level(Globals*, std::string tileset);
     Level(const Level&) = delete;
     ~Level();
 
     Globals* getGlobals();
     TileSet* getTileSet();
     b2World* getPhysics();
+    void loadLevel(std::string file);
+    void clearLevel();
     Background* getBackground();
     PlayerElement* getPlayerElement();
     unsigned getRewardSum() const;

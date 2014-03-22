@@ -35,7 +35,7 @@ struct Version
 
     inline friend std::ostream& operator<< (std::ostream& os, const Version& ver)
     {
-        os << ver.major << "." << ver.minor;
+        os << "v" << ver.major << "." << ver.minor;
         return os;
     }
 
@@ -55,7 +55,7 @@ static const b2Vec2 gravity(0.0f, 5.f);
 static int32 velocityIterations = 8;
 static int32 positionIterations = 3;
 
-Level::Level(Globals* globals, std::string tileset, std::string url)
+Level::Level(Globals* globals, std::string tileset)
  : m_globals(globals)
  , m_tileset(new TileSet(globals, tileset))
  , m_physics(new b2World(gravity))
@@ -65,8 +65,38 @@ Level::Level(Globals* globals, std::string tileset, std::string url)
  , m_player(nullptr)
  , m_rewardSum(0)
 {
-    std::fstream file(url);
-    Parser p(file);
+}
+
+Level::~Level()
+{
+    delete m_physics;
+    delete m_bg;
+    delete m_tileset;
+}
+
+Globals* Level::getGlobals()
+{
+    return m_globals;
+}
+
+TileSet* Level::getTileSet()
+{
+    return m_tileset;
+}
+
+b2World* Level::getPhysics()
+{
+    return m_physics;
+}
+
+void Level::loadLevel(std::string file)
+{
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+
+    clearLevel();
+
+    std::fstream f(file);
+    Parser p(f);
 
     try
     {
@@ -103,7 +133,7 @@ Level::Level(Globals* globals, std::string tileset, std::string url)
     {
         try
         {
-            CreateElement(this, file);
+            CreateElement(this, f);
         }
         catch (const std::exception& e)
         {
@@ -112,26 +142,23 @@ Level::Level(Globals* globals, std::string tileset, std::string url)
     }
 }
 
-Level::~Level()
+void Level::clearLevel()
 {
-    delete m_physics;
-    delete m_bg;
-    delete m_tileset;
-}
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
 
-Globals* Level::getGlobals()
-{
-    return m_globals;
-}
+    m_timer.reset();
+    m_rewardSum = 0;
+    m_player = nullptr;
+    m_bg->setId(0);
 
-TileSet* Level::getTileSet()
-{
-    return m_tileset;
-}
+    for (Element* element : m_elemInsertionQueue) delete element;
+    m_elemInsertionQueue.clear();
 
-b2World* Level::getPhysics()
-{
-    return m_physics;
+    for (Element* element : m_elemDeletionQueue) delete element;
+    m_elemDeletionQueue.clear();
+
+    for (Element* element : m_elements) delete element;
+    m_elements.clear();
 }
 
 void Level::addElement(Element* element)
