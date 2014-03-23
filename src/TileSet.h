@@ -29,22 +29,29 @@ struct TileData
 class TileSet
 {
 public:
+    enum SearchType
+    {
+        EXACT,
+        BEST,
+        NEXT
+    };
+
     TileSet(Globals*, std::string name);
     ~TileSet();
 
     std::string getName() const;
-    irr::video::ITexture* getBackground(unsigned id) const;
-    const TileData* getGroundData(unsigned id) const;
-    const TileData* getEnemyData(unsigned id) const;
-    const TileData* getRewardData(unsigned id) const;
-    const TileData* getPlayerData(unsigned id) const;
-    const TileData* getFinishData(unsigned id) const;
-    const TileData* getData(Element::Type type, unsigned id) const;
+    irr::video::ITexture* getBackground(unsigned id, SearchType = SearchType::EXACT) const;
+    const TileData* getGroundData(unsigned id, SearchType = SearchType::EXACT) const;
+    const TileData* getEnemyData(unsigned id, SearchType = SearchType::EXACT) const;
+    const TileData* getRewardData(unsigned id, SearchType = SearchType::EXACT) const;
+    const TileData* getPlayerData(unsigned id, SearchType = SearchType::EXACT) const;
+    const TileData* getFinishData(unsigned id, SearchType = SearchType::EXACT) const;
+    const TileData* getData(Element::Type type, unsigned id, SearchType = SearchType::EXACT) const;
 
 private:
     Globals* m_globals;
     std::string m_name;
-    mutable std::map<unsigned, BackgroundData> m_backgrouns;
+    mutable std::map<unsigned, BackgroundData> m_backgrounds;
     mutable std::map<unsigned, TileData> m_grounds;
     mutable std::map<unsigned, TileData> m_enemies;
     mutable std::map<unsigned, TileData> m_rewards;

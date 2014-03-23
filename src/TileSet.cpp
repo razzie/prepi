@@ -25,7 +25,7 @@ TileSet::TileSet(Globals* globals, std::string name)
     basedir += name;
     basedir += "/";
 
-    findBackgroundData(basedir + "background/", m_backgrouns);
+    findBackgroundData(basedir + "background/", m_backgrounds);
     findTileData(basedir + "ground/", m_grounds);
     findTileData(basedir + "enemy/", m_enemies);
     findTileData(basedir + "reward/", m_rewards);
@@ -42,108 +42,192 @@ std::string TileSet::getName() const
     return m_name;
 }
 
-irr::video::ITexture* TileSet::getBackground(unsigned id) const
+irr::video::ITexture* TileSet::getBackground(unsigned id, SearchType search) const
 {
-    auto it = m_backgrouns.find(id);
-    if (it != m_backgrouns.end())
+    if (search == SearchType::EXACT)
     {
-        BackgroundData* data = &(it->second);
-        if (data->texture == nullptr)
-            data->texture = m_globals->driver->getTexture(data->fileName.c_str());
-        return data->texture;
+        auto it = m_backgrounds.find(id);
+        if (it != m_backgrounds.end())
+        {
+            BackgroundData* data = &(it->second);
+            if (data->texture == nullptr)
+                data->texture = m_globals->driver->getTexture(data->fileName.c_str());
+            return data->texture;
+        }
+        else
+            return nullptr;
     }
     else
+    {
+        if (search == SearchType::NEXT) ++id;
+
+        for (auto& it : m_backgrounds)
+        {
+            if (it.first >= id) return it.second.texture;
+        }
+
         return nullptr;
+    }
 }
 
-const TileData* TileSet::getGroundData(unsigned id) const
+const TileData* TileSet::getGroundData(unsigned id, SearchType search) const
 {
-    auto it = m_grounds.find(id);
-    if (it != m_grounds.end())
+    if (search == SearchType::EXACT)
     {
-        TileData* data = &(it->second);
-        if (data->texture == nullptr)
-            data->texture = m_globals->driver->getTexture(data->fileName.c_str());
-        return data;
+        auto it = m_grounds.find(id);
+        if (it != m_grounds.end())
+        {
+            TileData* data = &(it->second);
+            if (data->texture == nullptr)
+                data->texture = m_globals->driver->getTexture(data->fileName.c_str());
+            return data;
+        }
+        else
+            return nullptr;
     }
     else
+    {
+        if (search == SearchType::NEXT) ++id;
+
+        for (auto& it : m_grounds)
+        {
+            if (it.first >= id) return &(it.second);
+        }
+
         return nullptr;
+    }
 }
 
-const TileData* TileSet::getEnemyData(unsigned id) const
+const TileData* TileSet::getEnemyData(unsigned id, SearchType search) const
 {
-    auto it = m_enemies.find(id);
-    if (it != m_enemies.end())
+    if (search == SearchType::EXACT)
     {
-        TileData* data = &(it->second);
-        if (data->texture == nullptr)
-            data->texture = m_globals->driver->getTexture(data->fileName.c_str());
-        return data;
+        auto it = m_enemies.find(id);
+        if (it != m_enemies.end())
+        {
+            TileData* data = &(it->second);
+            if (data->texture == nullptr)
+                data->texture = m_globals->driver->getTexture(data->fileName.c_str());
+            return data;
+        }
+        else
+            return nullptr;
     }
     else
+    {
+        if (search == SearchType::NEXT) ++id;
+
+        for (auto& it : m_enemies)
+        {
+            if (it.first >= id) return &(it.second);
+        }
+
         return nullptr;
+    }
 }
 
-const TileData* TileSet::getRewardData(unsigned id) const
+const TileData* TileSet::getRewardData(unsigned id, SearchType search) const
 {
-    auto it = m_rewards.find(id);
-    if (it != m_rewards.end())
+    if (search == SearchType::EXACT)
     {
-        TileData* data = &(it->second);
-        if (data->texture == nullptr)
-            data->texture = m_globals->driver->getTexture(data->fileName.c_str());
-        return data;
+        auto it = m_rewards.find(id);
+        if (it != m_rewards.end())
+        {
+            TileData* data = &(it->second);
+            if (data->texture == nullptr)
+                data->texture = m_globals->driver->getTexture(data->fileName.c_str());
+            return data;
+        }
+        else
+            return nullptr;
     }
     else
+    {
+        if (search == SearchType::NEXT) ++id;
+
+        for (auto& it : m_rewards)
+        {
+            if (it.first >= id) return &(it.second);
+        }
+
         return nullptr;
+    }
 }
 
-const TileData* TileSet::getPlayerData(unsigned id) const
+const TileData* TileSet::getPlayerData(unsigned id, SearchType search) const
 {
-    auto it = m_players.find(id);
-    if (it != m_players.end())
+    if (search == SearchType::EXACT)
     {
-        TileData* data = &(it->second);
-        if (data->texture == nullptr)
-            data->texture = m_globals->driver->getTexture(data->fileName.c_str());
-        return data;
+        auto it = m_players.find(id);
+        if (it != m_players.end())
+        {
+            TileData* data = &(it->second);
+            if (data->texture == nullptr)
+                data->texture = m_globals->driver->getTexture(data->fileName.c_str());
+            return data;
+        }
+        else
+            return nullptr;
     }
     else
+    {
+        if (search == SearchType::NEXT) ++id;
+
+        for (auto& it : m_players)
+        {
+            if (it.first >= id) return &(it.second);
+        }
+
         return nullptr;
+    }
 }
 
-const TileData* TileSet::getFinishData(unsigned id) const
+const TileData* TileSet::getFinishData(unsigned id, SearchType search) const
 {
-    auto it = m_finishes.find(id);
-    if (it != m_finishes.end())
+    if (search == SearchType::EXACT)
     {
-        TileData* data = &(it->second);
-        if (data->texture == nullptr)
-            data->texture = m_globals->driver->getTexture(data->fileName.c_str());
-        return data;
+        auto it = m_finishes.find(id);
+        if (it != m_finishes.end())
+        {
+            TileData* data = &(it->second);
+            if (data->texture == nullptr)
+                data->texture = m_globals->driver->getTexture(data->fileName.c_str());
+            return data;
+        }
+        else
+            return nullptr;
     }
     else
+    {
+        if (search == SearchType::NEXT) ++id;
+
+        for (auto& it : m_finishes)
+        {
+            if (it.first >= id) return &(it.second);
+        }
+
         return nullptr;
+    }
 }
 
-const TileData* TileSet::getData(Element::Type type, unsigned id) const
+const TileData* TileSet::getData(Element::Type type, unsigned id, SearchType search) const
 {
     switch (type)
     {
         case Element::Type::GROUND:
-            return getGroundData(id);
+            return getGroundData(id, search);
 
         case Element::Type::ENEMY:
-            return getEnemyData(id);
+            return getEnemyData(id, search);
 
         case Element::Type::REWARD:
-            return getRewardData(id);
+            return getRewardData(id, search);
 
         case Element::Type::PLAYER:
-            return getPlayerData(id);
+            return getPlayerData(id, search);
 
         case Element::Type::FINISH:
-            return getFinishData(id);
+            return getFinishData(id, search);
 
         default:
             return nullptr;
