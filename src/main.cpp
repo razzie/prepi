@@ -8,6 +8,7 @@
 #include "PlayerElement.h"
 #include "Background.h"
 #include "Level.h"
+#include "LevelGenerator.h"
 #include "GUI.h"
 #include "Parser.h"
 
@@ -35,6 +36,12 @@ int main()
                      {
                          std::string file = "../levels/" + level + ".txt";
                          level1.loadLevel(file);
+                     });
+
+    se->add_function("randomLevel", [&](unsigned columns, unsigned rows)
+                     {
+                         LevelGenerator lg;
+                         lg.generate(&level1, columns, rows);
                      });
 
     se->add_function("setBackground", [&](unsigned id, unsigned mode)

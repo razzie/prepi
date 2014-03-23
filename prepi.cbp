@@ -77,6 +77,8 @@
 		<Unit filename="src/GroundElement.h" />
 		<Unit filename="src/Level.cpp" />
 		<Unit filename="src/Level.h" />
+		<Unit filename="src/LevelGenerator.cpp" />
+		<Unit filename="src/LevelGenerator.h" />
 		<Unit filename="src/Motion.cpp" />
 		<Unit filename="src/Motion.h" />
 		<Unit filename="src/Parser.cpp" />
@@ -90,6 +92,8 @@
 		<Unit filename="src/Timer.cpp" />
 		<Unit filename="src/Timer.h" />
 		<Unit filename="src/main.cpp" />
+		<Unit filename="src/simplex.cpp" />
+		<Unit filename="src/simplex.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
