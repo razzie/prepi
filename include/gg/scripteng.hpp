@@ -1,6 +1,7 @@
 #ifndef GG_SCRIPTENG_HPP_INCLUDED
 #define GG_SCRIPTENG_HPP_INCLUDED
 
+#include <iostream>
 #include <type_traits>
 #include "gg/function.hpp"
 #include "gg/optional.hpp"
@@ -56,8 +57,6 @@ namespace gg
 
     public:
         virtual application* get_app() const = 0;
-        virtual void enable_remote_access() = 0;
-        virtual void disable_remote_access() = 0;
         virtual void add_function(std::string fn, dynamic_function func, std::string args, bool hidden = false) = 0;
         virtual void remove_function(std::string fn) = 0;
         virtual optional<var> exec(std::string fn, varlist vl, std::ostream& output = std::cout) const = 0;

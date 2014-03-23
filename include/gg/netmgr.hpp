@@ -1,7 +1,7 @@
 #ifndef GG_NETMGR_HPP_INCLUDED
 #define GG_NETMGR_HPP_INCLUDED
 
-#include <iostream>
+#include <iosfwd>
 #include <string>
 #include <functional>
 #include "gg/refcounted.hpp"

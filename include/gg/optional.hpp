@@ -1,6 +1,7 @@
 #ifndef OPTIONAL_HPP_INCLUDED
 #define OPTIONAL_HPP_INCLUDED
 
+#include <iosfwd>
 #include <utility>
 #include <stdexcept>
 #include "gg/var.hpp"

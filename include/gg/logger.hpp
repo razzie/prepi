@@ -1,7 +1,7 @@
 #ifndef GG_LOGGER_HPP_INCLUDED
 #define GG_LOGGER_HPP_INCLUDED
 
-#include <iostream>
+#include <iosfwd>
 #include <string>
 
 namespace gg
@@ -25,7 +25,7 @@ namespace gg
 
         virtual void enable_timestamp() = 0;
         virtual void disable_timestamp() = 0;
-        virtual void log_to_stream(std::ostream& = std::cout) = 0;
+        virtual void log_to_stream(std::ostream&) = 0;
         virtual void log_to_file(std::string) = 0;
         virtual void log_to_console(console*) = 0;
         virtual std::ostream& get_nullstream() const = 0;

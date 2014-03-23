@@ -1,12 +1,11 @@
 #ifndef GG_INIPARSER_HPP_INCLUDED
 #define GG_INIPARSER_HPP_INCLUDED
 
-#include <iostream>
-#include <list>
+#include <iosfwd>
 #include <string>
-#include <memory>
 #include "gg/refcounted.hpp"
 #include "gg/optional.hpp"
+#include "gg/enumerator.hpp"
 
 namespace gg
 {
@@ -15,7 +14,7 @@ namespace gg
     public:
         class entry;
 
-        class section
+        class section : public reference_counted
         {
         protected:
             virtual ~section() {}
@@ -29,11 +28,11 @@ namespace gg
             virtual entry* add_entry(std::string, std::string) = 0;
             virtual void remove_entry(std::string) = 0;
             virtual void remove_entry(entry*) = 0;
-            virtual std::list<entry*>& get_entries() = 0;
-            virtual const std::list<entry*>& get_entries() const = 0;
+            virtual enumerator<entry*> get_entries() = 0;
+            virtual enumerator<entry*> get_entries() const = 0;
         };
 
-        class entry
+        class entry : public reference_counted
         {
         protected:
             virtual ~entry() {}
@@ -63,11 +62,11 @@ namespace gg
         virtual section* create_section(std::string) = 0;
         virtual void remove_section(std::string) = 0;
         virtual void remove_section(section*) = 0;
-        virtual std::list<section*>& get_sections() = 0;
-        virtual const std::list<section*>& get_sections() const = 0;
+        virtual enumerator<section*> get_sections() = 0;
+        virtual enumerator<section*> get_sections() const = 0;
 
-        virtual void save(std::string file) = 0;
-        virtual void save(std::ostream&) = 0;
+        virtual void save(std::string file) const = 0;
+        virtual void save(std::ostream&) const = 0;
     };
 };
 

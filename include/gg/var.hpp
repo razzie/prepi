@@ -1,8 +1,7 @@
 #ifndef GG_VAR_HPP_INCLUDED
 #define GG_VAR_HPP_INCLUDED
 
-#include <iostream>
-#include <sstream>
+#include <iosfwd>
 #include <string>
 #include <vector>
 #include <typeinfo>

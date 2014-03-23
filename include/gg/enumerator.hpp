@@ -5,6 +5,7 @@
 #include <iterator>
 #include <type_traits>
 #include <stdexcept>
+#include "gg/refcounted.hpp"
 #include "gg/optional.hpp"
 
 namespace gg
@@ -13,19 +14,27 @@ namespace gg
              bool is_const = std::is_const<container>::value>
     class container_wrapper
     {
+        template<class P>
+        struct is_ptr
+        {
+            enum { value = std::is_pointer<P>::value || is_grab_ptr<P>::value };
+        };
+
         template<class U>
-        using make_ref = typename std::conditional<std::is_pointer<U>::value, U, U&>::type;
+        using make_ref = typename std::conditional<is_ptr<U>::value, U, U&>::type;
 
     public:
         typedef T value_type;
         typedef make_ref<value_type> value_type_ref;
+
         typedef typename container::value_type container_value_type;
         typedef make_ref<container_value_type> container_value_type_ref;
-        typedef std::function<value_type_ref(container_value_type_ref)> extractor;
 
         typedef decltype(((container*)0)->begin()) container_iterator;
         typedef typename std::remove_reference<container>::type container_noref;
         typedef typename std::decay<container>::type container_decay;
+
+        typedef std::function<value_type_ref(container_value_type_ref)> extractor;
 
         class iterator : public std::iterator<std::forward_iterator_tag, value_type>
         {
@@ -61,28 +70,63 @@ namespace gg
         container_noref* m_cont;
         extractor m_extr;
 
+        template<class U = container_value_type_ref, class R = value_type_ref>
+        static R default_extractor(U it)
+        {
+            static_assert(std::is_convertible<U, R>::value, "value type is not convertible to return type");
+            return static_cast<R>(it);
+        }
+
+        template<bool is_const_iterator>
+        typename std::enable_if<!is_const_iterator, iterator>::type
+        _insert(iterator it, value_type val)
+        {
+            return iterator(m_cont->insert(it.get_internal_iterator(), val), m_extr);
+        }
+
+        template<bool is_const_iterator>
+        typename std::enable_if<!is_const_iterator, iterator>::type
+        _erase(iterator it)
+        {
+            return iterator(m_cont->erase(it.get_internal_iterator()), m_extr);
+        }
+
+        template<bool is_const_iterator>
+        typename std::enable_if<is_const_iterator, iterator>::type
+        _insert(iterator it, value_type val)
+        {
+            throw std::runtime_error("container is const");
+            //return it;
+        }
+
+        template<bool is_const_iterator>
+        typename std::enable_if<is_const_iterator, iterator>::type
+        _erase(iterator it)
+        {
+            throw std::runtime_error("container is const");
+            //return it;
+        }
+
     public:
         container_wrapper(container_decay&& cont, extractor extr = {})
         {
-            //static_assert(is_reference, "can't take reference of xvalue");
-            //static_assert(is_const, "can't take xvalue of const");
             if (is_reference) throw std::runtime_error("can't take reference of xvalue");
             m_cont = new container_decay(cont);
-            if (!m_extr) m_extr = [](container_value_type_ref it)->value_type_ref { return static_cast<value_type_ref>(it); };
+            if (!m_extr) m_extr = default_extractor<container_value_type_ref, value_type_ref>;
         }
 
         container_wrapper(container_noref& cont, extractor extr = {})
         {
             if (is_reference) m_cont = &cont;
             else m_cont = new container_decay(cont.begin(), cont.end());
-            if (!m_extr) m_extr = [](container_value_type_ref it)->value_type_ref { return static_cast<value_type_ref>(it); };
+            if (!m_extr) m_extr = default_extractor<container_value_type_ref, value_type_ref>;
         }
 
         container_wrapper(const container_wrapper& cont)
         {
             if (is_reference) m_cont = cont.m_cont;
             else m_cont = new container_decay(cont.m_cont->begin(), cont.m_cont->end());
-            m_extr = cont.m_extr; // can't move as the original would crash then
+            m_extr = cont.m_extr;
         }
 
         container_wrapper(container_wrapper&& cont)
@@ -103,23 +147,17 @@ namespace gg
         iterator begin() { return iterator(m_cont->begin(), m_extr); }
         iterator end() { return iterator(m_cont->end(), m_extr); }
 
-        iterator insert(iterator it, value_type val)
-        {
-            if (is_const) throw std::runtime_error("container is const");
-            return iterator(m_cont->insert(it.get_internal_iterator(), val), m_extr);
-        }
-
-        iterator erase(iterator it)
-        {
-            if (is_const) throw std::runtime_error("container is const");
-            return iterator(m_cont->erase(it.get_internal_iterator()), m_extr);
-        }
+        iterator insert(iterator it, value_type val) { return _insert<is_const>(it, val); }
+        iterator erase(iterator it) { return _erase<is_const>(it); }
     };
 
 
     template<class T>
     class enumerator
     {
+        template<class U>
+        using ptr_of = typename std::conditional<std::is_pointer<U>::value, U, U*>::type;
+
         class enumerator_impl_base
         {
         public:
@@ -133,9 +171,21 @@ namespace gg
             virtual void insert(const T&) = 0;
             virtual void insert(T&&) = 0;
             virtual size_t count() const = 0;
-            virtual optional<T> get() = 0;
-            virtual optional<T> get() const = 0;
+            virtual ptr_of<T> get_ptr() = 0;
+            virtual const ptr_of<T> get_ptr() const = 0;
         };
+
+        template<class U, class = typename std::enable_if<std::is_pointer<U>::value>>
+        static U make_ptr(U u) { return u; }
+
+        template<class U, class R, class = typename std::enable_if<!std::is_pointer<U>::value>>
+        static R* make_ptr(U& u) { return static_cast<R*>(&u); }
+
+        template<class U = T, class = typename std::enable_if<std::is_pointer<U>::value>>
+        static optional<U> ptr_to_opt(T p) { return p; }
+
+        template<class U = T, class = typename std::enable_if<!std::is_pointer<U>::value>>
+        static optional<U> ptr_to_opt(T* p) { return *p; }
 
         template<class container, bool is_reference, bool is_const>
         class enumerator_impl : public enumerator_impl_base
@@ -160,8 +210,8 @@ namespace gg
             void insert(const T& t) { m_next = m_cont.insert(m_next, t); }
             void insert(T&& t) { m_next = m_cont.insert(m_next, t); }
             size_t count() const { return m_cont.size(); }
-            optional<T> get() { if (has_next() && m_current != m_next) return *m_current; else return {}; }
-            optional<T> get() const { if (has_next() && m_current != m_next) return *m_current; else return {}; }
+            ptr_of<T> get_ptr() { if (has_next() && m_current != m_next) return make_ptr(*m_current); else return nullptr; }
+            const ptr_of<T> get_ptr() const { if (has_next() && m_current != m_next) return make_ptr(*m_current); else return nullptr; }
         };
 
         enumerator_impl_base* m_enum;
@@ -189,8 +239,12 @@ namespace gg
         void insert(const T& t) { if (this->m_enum != nullptr) this->m_enum->insert(t); else throw std::runtime_error("empty enumerator"); }
         void insert(T&& t) { if (this->m_enum != nullptr) this->m_enum->insert(t); else throw std::runtime_error("empty enumerator"); }
         size_t count() const { if (m_enum != nullptr) return m_enum->count(); else return 0; }
-        optional<T> get() { if (m_enum != nullptr) return m_enum->get(); else return {}; }
-        optional<T> get() const { if (m_enum != nullptr) return m_enum->get(); else return {}; }
+        optional<T> get() { if (m_enum != nullptr) return ptr_to_opt(m_enum->get_ptr()); else return {}; }
+        optional<T> get() const { if (m_enum != nullptr) return ptr_to_opt(m_enum->get_ptr()); else return {}; }
+        optional<T> operator* () { if (m_enum != nullptr) return ptr_to_opt(m_enum->get_ptr()); else return {}; }
+        optional<T> operator* () const { if (m_enum != nullptr) return ptr_to_opt(m_enum->get_ptr()); else return {}; }
+        ptr_of<T> operator-> () { if (m_enum != nullptr) return m_enum->get_ptr(); else return nullptr; }
+        const ptr_of<T> operator-> () const { if (m_enum != nullptr) return m_enum->get_ptr(); else return nullptr; }
     };
 
 

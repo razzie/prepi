@@ -3,8 +3,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
-#include <sstream>
+#include <iosfwd>
 #include <locale>
 #include <string>
 #include <vector>
@@ -64,6 +63,27 @@ namespace util
         std::stringstream ss(str);
         if (d) ss << delimiter(*d);
         return parse<Args...>(ss);
+    }
+
+
+    template<size_t I = 0, class... Args>
+    typename std::enable_if<I == sizeof...(Args), void>::type
+    tuple_to_varlist(const std::tuple<Args...>& tup, varlist& vl) {}
+
+    template<size_t I = 0, class... Args>
+    typename std::enable_if<I < sizeof...(Args), void>::type
+    tuple_to_varlist(const std::tuple<Args...>& tup, varlist& vl)
+    {
+        vl.push_back(std::get<I>(tup));
+        tuple_to_varlist<I+1, Args...>(tup, vl);
+    }
+
+    template<class... Args>
+    varlist tuple_to_varlist(const std::tuple<Args...>& tup)
+    {
+        varlist vl;
+        tuple_to_varlist(tup, vl);
+        return std::move(vl);
     }
 
 

@@ -1,7 +1,7 @@
 #ifndef GG_BUFFER_HPP_INCLUDED
 #define GG_BUFFER_HPP_INCLUDED
 
-#include <iostream>
+#include <iosfwd>
 #include <cstdint>
 #include <vector>
 #include "gg/refcounted.hpp"

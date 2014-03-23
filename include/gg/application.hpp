@@ -1,7 +1,7 @@
 #ifndef GG_APPLICATION_HPP_INCLUDED
 #define GG_APPLICATION_HPP_INCLUDED
 
-#include <iostream>
+#include <iosfwd>
 #include <cstdint>
 #include <string>
 #include <functional>
@@ -59,6 +59,10 @@ namespace gg
         virtual void push_event(event_type, event::attribute_list) const = 0;
         virtual optional<var> exec(std::string fn, varlist vl, std::ostream&) const = 0;
         virtual optional<var> parse_and_exec(std::string expr, std::ostream&) const = 0;
+        virtual void enable_remote_events() = 0;
+        virtual void disable_remote_events() = 0;
+        virtual void enable_remote_exec() = 0;
+        virtual void disable_remote_exec() = 0;
         virtual void set_error_stream(std::ostream&) = 0;
     };
 

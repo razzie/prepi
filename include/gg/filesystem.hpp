@@ -1,8 +1,8 @@
 #ifndef GG_FILESYSTEM_HPP_INCLUDED
 #define GG_FILESYSTEM_HPP_INCLUDED
 
+#include <iosfwd>
 #include <string>
-#include <fstream>
 #include "gg/refcounted.hpp"
 #include "gg/enumerator.hpp"
 

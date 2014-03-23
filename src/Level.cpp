@@ -69,6 +69,7 @@ Level::Level(Globals* globals, std::string tileset)
 
 Level::~Level()
 {
+    clearLevel();
     delete m_physics;
     delete m_bg;
     delete m_tileset;
