@@ -15,6 +15,7 @@ static IrrlichtDevice* createIrrlichtDevice()
     params.Fullscreen = false;
     params.WindowSize = core::dimension2d<u32>(1366, 768);
     params.WithAlphaChannel = true;
+    params.Vsync = true;
 
     return createDeviceEx(params);
 }

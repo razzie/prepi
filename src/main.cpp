@@ -100,6 +100,8 @@ int main()
 
         //g.smgr->drawAll();
 
+        //tthread::this_thread::sleep_for(tthread::chrono::milliseconds(40));
+
         level1.update();
         gui.update();
 
