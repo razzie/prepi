@@ -27,7 +27,7 @@ int main()
     rofi.play();*/
 
     Level level1(&g, "tale");
-    level1.loadLevel("../levels/new_shit.txt");
+    level1.loadLevel("../levels/autoMotionTest.txt");
     GUI gui(&g, &level1);
 
     gg::script_engine* se = g.app->get_script_engine();

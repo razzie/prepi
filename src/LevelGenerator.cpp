@@ -1,4 +1,5 @@
 #include <ctime>
+#include <stdexcept>
 #include "simplex.h"
 #include "Level.h"
 #include "TileSet.h"
@@ -28,8 +29,12 @@ LevelGenerator::Params LevelGenerator::getDefaultParams() const
     return m_defaultParams;
 }
 
-void LevelGenerator::generate(Level* level, unsigned columns, unsigned rows, const Params* params)
+void LevelGenerator::generate(Level* level, unsigned columns, unsigned rows, const Params* params) const
 {
     if (params == nullptr) params = &m_defaultParams;
+
+    if (columns < 3 || rows < 3)
+        throw std::runtime_error("column or row number is too low");
+
 
 }

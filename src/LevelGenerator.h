@@ -20,7 +20,7 @@ public:
     LevelGenerator();
     ~LevelGenerator();
     Params getDefaultParams() const;
-    void generate(Level*, unsigned columns, unsigned rows, const Params* = nullptr);
+    void generate(Level*, unsigned columns, unsigned rows, const Params* = nullptr) const;
 
 private:
     Params m_defaultParams;

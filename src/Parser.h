@@ -11,8 +11,8 @@ class Parser
     std::locale m_origLoc;
 
 public:
-    Parser(std::istream&, char delimiter = ',');
-    Parser(std::string, char delimiter = ',');
+    Parser(std::istream&, char delimiter);
+    Parser(std::string, char delimiter);
     Parser(const Parser&) = delete;
     ~Parser();
 

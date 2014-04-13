@@ -7,8 +7,8 @@ class EnemyElement : public Element
 {
 public:
     EnemyElement(Level*, std::istream&);
-    EnemyElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned>);
-    EnemyElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned damage);
+    EnemyElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, MotionWrapper, unsigned>);
+    EnemyElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, Motion*, unsigned damage);
     unsigned getDamage() const;
     //void update();
     //void draw();

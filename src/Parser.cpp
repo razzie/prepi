@@ -26,6 +26,7 @@ Parser::Parser(std::istream& stream, char delimiter)
 {
     m_origLoc = m_stream->getloc();
     m_stream->imbue(std::locale(m_origLoc, new delimiter_is_space(delimiter)));
+    *m_stream >> std::boolalpha;
 }
 
 Parser::Parser(std::string str, char delimiter)
@@ -35,6 +36,7 @@ Parser::Parser(std::string str, char delimiter)
 
     m_origLoc = m_stream->getloc();
     m_stream->imbue(std::locale(m_origLoc, new delimiter_is_space(delimiter)));
+    *m_stream >> std::boolalpha;
 }
 
 Parser::~Parser()

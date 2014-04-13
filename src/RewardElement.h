@@ -7,8 +7,8 @@ class RewardElement : public Element
 {
 public:
     RewardElement(Level*, std::istream&);
-    RewardElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned>);
-    RewardElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, Motion, unsigned value);
+    RewardElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, unsigned, MotionWrapper>);
+    RewardElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, unsigned value, Motion*);
     unsigned getValue() const;
 
     //void update();

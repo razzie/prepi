@@ -59,8 +59,14 @@
 			<Add library="tthread" />
 			<Add directory="lib" />
 		</Linker>
+		<Unit filename="src/ActiveMotion.cpp" />
+		<Unit filename="src/ActiveMotion.h" />
+		<Unit filename="src/AutoMotion.cpp" />
+		<Unit filename="src/AutoMotion.h" />
 		<Unit filename="src/Background.cpp" />
 		<Unit filename="src/Background.h" />
+		<Unit filename="src/CircularMotion.cpp" />
+		<Unit filename="src/CircularMotion.h" />
 		<Unit filename="src/Element.cpp" />
 		<Unit filename="src/Element.h" />
 		<Unit filename="src/EnemyElement.cpp" />
@@ -87,6 +93,8 @@
 		<Unit filename="src/PlayerElement.h" />
 		<Unit filename="src/RewardElement.cpp" />
 		<Unit filename="src/RewardElement.h" />
+		<Unit filename="src/StraightMotion.cpp" />
+		<Unit filename="src/StraightMotion.h" />
 		<Unit filename="src/TileSet.cpp" />
 		<Unit filename="src/TileSet.h" />
 		<Unit filename="src/Timer.cpp" />

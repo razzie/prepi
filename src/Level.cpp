@@ -50,10 +50,10 @@ struct Version
     }
 };
 
-static const Version prepiVersion {1,0};
+static const Version prepiVersion {1, 1};
 static const b2Vec2 gravity(0.0f, 5.f);
-static int32 velocityIterations = 8;
-static int32 positionIterations = 3;
+static const int32 velocityIterations = 8;
+static const int32 positionIterations = 3;
 
 Level::Level(Globals* globals, std::string tileset)
  : m_globals(globals)
@@ -97,7 +97,7 @@ void Level::loadLevel(std::string file)
     clearLevel();
 
     std::fstream f(file);
-    Parser p(f);
+    Parser p(f, ';');
 
     try
     {

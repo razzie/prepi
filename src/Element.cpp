@@ -14,7 +14,7 @@ using namespace irr;
 
 Element* CreateElement(Level* level, std::istream& stream)
 {
-    Element::Type type = Parser(stream).getArg<Element::Type>();
+    Element::Type type = Parser(stream, ';').getArg<Element::Type>();
 
     switch (type)
     {
@@ -38,7 +38,7 @@ Element* CreateElement(Level* level, std::istream& stream)
     }
 }
 
-Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgPosition, core::vector2df position, Motion motion)
+Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgPosition, core::vector2df position, Motion* motion)
  : m_level(level)
  , m_type(type)
  , m_id(id)
@@ -53,23 +53,23 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
         (s32)(tileBBox.UpperLeftCorner.X * unit), (s32)(tileBBox.UpperLeftCorner.Y * unit),
         (s32)(tileBBox.LowerRightCorner.X * unit), (s32)(tileBBox.LowerRightCorner.Y * unit)};
 
-    if (m_motion != Motion::NONE)
+    if (m_motion && m_motion->getType() != Motion::Type::NONE)
     {
         b2BodyDef bodyDef;
-        switch (m_motion)
+        switch (m_motion->getType())
         {
-            case Motion::DYNAMIC:
+            case Motion::Type::DYNAMIC:
                 bodyDef.type = b2_dynamicBody;
                 break;
 
-            case Motion::AUTO:
-            case Motion::STRAIGHT:
-            case Motion::CIRCULAR:
+            case Motion::Type::AUTO:
+            case Motion::Type::STRAIGHT:
+            case Motion::Type::CIRCULAR:
                 bodyDef.type = b2_kinematicBody;
                 break;
 
-            case Motion::STATIC:
-            case Motion::UNSTABLE:
+            case Motion::Type::STATIC:
+            case Motion::Type::UNSTABLE:
             default:
                 bodyDef.type = b2_staticBody;
                 break;
@@ -80,7 +80,7 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
         m_body = level->getPhysics()->CreateBody(&bodyDef);
 
         b2PolygonShape boxShape;
-        boxShape.SetAsBox(tileBBox.getWidth()/2, tileBBox.getHeight()/2,
+        boxShape.SetAsBox(tileBBox.getWidth()/2 - 0.01f, tileBBox.getHeight()/2 - 0.01f,
                           {+tileBBox.getWidth()/2 - (1.f - tileBBox.UpperLeftCorner.X), +tileBBox.getHeight()/2 - (1.f - tileBBox.UpperLeftCorner.Y)},
                           0.f);
 
@@ -98,6 +98,7 @@ Element::~Element()
 {
     m_level->getPhysics()->DestroyBody(m_body);
     m_body = nullptr;
+    if (m_motion != nullptr) delete m_motion;
 }
 
 Element::Type Element::getType() const
@@ -128,9 +129,22 @@ void Element::setPosition(core::vector2df position)
     m_body->SetLinearVelocity({0.f, 0.f});
 }
 
-Motion Element::getMotion() const
+Motion* Element::getMotion()
 {
     return m_motion;
+}
+
+const Motion* Element::getMotion() const
+{
+    return m_motion;
+}
+
+Motion::Type Element::getMotionType() const
+{
+    if (m_motion == nullptr)
+        return Motion::Type::NONE;
+    else
+        return m_motion->getType();
 }
 
 void Element::setMovementX(f32 xMov)

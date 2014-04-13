@@ -7,8 +7,8 @@ class GroundElement : public Element
 {
 public:
     GroundElement(Level*, std::istream&);
-    GroundElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, Motion>);
-    GroundElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, Motion);
+    GroundElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, MotionWrapper>);
+    GroundElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, Motion*);
     //void update();
     //void draw();
 

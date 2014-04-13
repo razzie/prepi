@@ -10,7 +10,7 @@
 using namespace irr;
 
 PlayerElement::PlayerElement(Level* level, std::istream& stream)
- : PlayerElement(level, Parser(stream).getArgs<unsigned, irr::core::vector2di, irr::core::vector2df>())
+ : PlayerElement(level, Parser(stream, ';').getArgs<unsigned, irr::core::vector2di, irr::core::vector2df>())
 {
 }
 
@@ -24,7 +24,7 @@ PlayerElement::PlayerElement(Level* level, std::tuple<unsigned, irr::core::vecto
 
 PlayerElement::PlayerElement(Level* level, unsigned id,
                              irr::core::vector2di imgPosition, core::vector2df position)
- : Element(level, Type::PLAYER, id, imgPosition, position, Motion::DYNAMIC)
+ : Element(level, Type::PLAYER, id, imgPosition, position, new Motion(this, Motion::Type::DYNAMIC))
  , m_health(100)
  , m_rewards(0)
  , m_speed(2.f)
@@ -155,7 +155,7 @@ void PlayerElement::update()
                 isContactLeft = true;
         }
 
-        if (contactElem->getMotion() == Motion::UNSTABLE)
+        if (contactElem->getMotionType() == Motion::Type::UNSTABLE)
         {
             contactElem->getBody()->SetType(b2_dynamicBody);
         }
