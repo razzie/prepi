@@ -9,7 +9,7 @@ public:
     GroundElement(Level*, std::istream&);
     GroundElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, MotionWrapper>);
     GroundElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, Motion*);
-    //void update();
+    //void update(uint32_t elapsedMs);
     //void draw();
 
 private:

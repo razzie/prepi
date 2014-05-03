@@ -27,6 +27,7 @@ public:
     TileSet* getTileSet();
     b2World* getPhysics();
     void loadLevel(std::string file);
+    void reloadLevel();
     void clearLevel();
     Background* getBackground();
     PlayerElement* getPlayerElement();
@@ -53,6 +54,7 @@ private:
     Globals* m_globals;
     TileSet* m_tileset;
     b2World* m_physics;
+    std::string m_levelFile;
     irr::core::vector2di m_offset;
     irr::core::dimension2du m_dimension;
     unsigned m_unit;

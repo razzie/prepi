@@ -1,9 +1,10 @@
 #include <stdexcept>
 #include "Parser.h"
 #include "AutoMotion.h"
+#include "Element.h"
 
 AutoMotion::AutoMotion(Element* element, std::istream& stream)
- : AutoMotion(element, Parser(stream, ';').getArgs<uint32_t, uint32_t, bool, Direction>())
+ : AutoMotion(element, Parser(stream, ',').getArgs<uint32_t, uint32_t, bool, Direction>())
 {
 }
 
@@ -29,6 +30,13 @@ AutoMotion::~AutoMotion()
 AutoMotion::Direction AutoMotion::getDirection() const
 {
     return m_direction;
+}
+
+void AutoMotion::setElement(Element* element)
+{
+    Motion::setElement(element);
+
+    // TBD
 }
 
 void AutoMotion::update(uint32_t elapsedMs)

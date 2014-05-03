@@ -50,7 +50,7 @@ struct Version
     }
 };
 
-static const Version prepiVersion {1, 1};
+static const Version prepiVersion {1, 2};
 static const b2Vec2 gravity(0.0f, 5.f);
 static const int32 velocityIterations = 8;
 static const int32 positionIterations = 3;
@@ -141,6 +141,13 @@ void Level::loadLevel(std::string file)
             std::cout << "Failed to add element to level (" << e.what() << ")" << std::endl;
         }
     }
+
+    m_levelFile = file;
+}
+
+void Level::reloadLevel()
+{
+    loadLevel(m_levelFile);
 }
 
 void Level::clearLevel()
@@ -356,7 +363,7 @@ void Level::update()
     for (Element* element : m_elements)
     {
         // first update the elements (position sync, player moving, etc)
-        element->update();
+        element->update(elapsedTime);
 
         // do not draw if outside of screen
         if (isElementOnScreen(element))

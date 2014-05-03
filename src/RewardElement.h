@@ -11,7 +11,7 @@ public:
     RewardElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, unsigned value, Motion*);
     unsigned getValue() const;
 
-    //void update();
+    //void update(uint32_t elapsedMs);
     //void draw();
 
 private:

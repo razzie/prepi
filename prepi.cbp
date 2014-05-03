@@ -67,6 +67,7 @@
 		<Unit filename="src/Background.h" />
 		<Unit filename="src/CircularMotion.cpp" />
 		<Unit filename="src/CircularMotion.h" />
+		<Unit filename="src/Collision.h" />
 		<Unit filename="src/Element.cpp" />
 		<Unit filename="src/Element.h" />
 		<Unit filename="src/EnemyElement.cpp" />

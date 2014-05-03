@@ -131,9 +131,9 @@ void PlayerElement::setClimbingMode(irr::f32 climbTreshold)
     m_climbTreshold = climbTreshold;
 }
 
-void PlayerElement::update()
+void PlayerElement::update(uint32_t elapsedMs)
 {
-    Element::update();
+    Element::update(elapsedMs);
 
     bool isContactUnder = false;
     bool isContactLeft = false;

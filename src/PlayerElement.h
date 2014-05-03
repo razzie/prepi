@@ -29,7 +29,7 @@ public:
     void die();
     void setSpeed(irr::f32);
     void setClimbingMode(irr::f32);
-    void update();
+    void update(uint32_t elapsedMs);
     //void draw();
 
 protected:

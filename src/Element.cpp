@@ -53,7 +53,7 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
         (s32)(tileBBox.UpperLeftCorner.X * unit), (s32)(tileBBox.UpperLeftCorner.Y * unit),
         (s32)(tileBBox.LowerRightCorner.X * unit), (s32)(tileBBox.LowerRightCorner.Y * unit)};
 
-    if (m_motion && m_motion->getType() != Motion::Type::NONE)
+    if (getMotionType() != Motion::Type::NONE)
     {
         b2BodyDef bodyDef;
         switch (m_motion->getType())
@@ -123,7 +123,7 @@ core::vector2df Element::getPosition() const
 
 void Element::setPosition(core::vector2df position)
 {
-    tthread::lock_guard<tthread::mutex> guard(m_mutex);
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
     m_position = position;
     m_body->SetTransform({position.X, position.Y}, 0.f);
     m_body->SetLinearVelocity({0.f, 0.f});
@@ -149,14 +149,14 @@ Motion::Type Element::getMotionType() const
 
 void Element::setMovementX(f32 xMov)
 {
-    tthread::lock_guard<tthread::mutex> guard(m_mutex);
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
     f32 y = m_body->GetLinearVelocity().y;
     m_body->SetLinearVelocity({xMov, y});
 }
 
 void Element::setMovementY(f32 yMov)
 {
-    tthread::lock_guard<tthread::mutex> guard(m_mutex);
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
     f32 x = m_body->GetLinearVelocity().x;
     m_body->SetLinearVelocity({x, yMov});
 }
@@ -171,22 +171,38 @@ b2Body* Element::getBody()
     return m_body;
 }
 
+const std::vector<Collision> Element::getCollisions() const
+{
+    return m_collisions;
+}
+
+std::vector<Collision> Element::getCollisionsForUpdate()
+{
+    return m_collisions;
+}
+
 void Element::remove()
 {
     m_level->removeElement(this);
 }
 
-void Element::update()
+void Element::update(uint32_t elapsedMs)
 {
-    tthread::lock_guard<tthread::mutex> guard(m_mutex);
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+
     b2Vec2 pos = m_body->GetPosition();
     m_position.X = pos.x;
     m_position.Y = pos.y;
+
+    if (m_motion)
+    {
+        m_motion->update(elapsedMs);
+    }
 }
 
 void Element::draw()
 {
-    tthread::lock_guard<tthread::mutex> guard(m_mutex);
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
     drawTile(m_level, m_tileData, m_imgPosition, m_position);
 }
 
@@ -217,20 +233,16 @@ std::istream& operator>> (std::istream& i, Element::Type& t)
 
 std::istream& operator>> (std::istream& i, core::vector2di& v)
 {
-    int x,y;
-    char c;
-    i >> x >> c >> y;
-    v.X = x;
-    v.Y = y;
+    i >> v.X;
+    i.ignore();
+    i >> v.Y;
     return i;
 }
 
 std::istream& operator>> (std::istream& i, core::vector2df& v)
 {
-    float x,y;
-    char c;
-    i >> x >> c >> y;
-    v.X = x;
-    v.Y = y;
+    i >> v.X;
+    i.ignore();
+    i >> v.Y;
     return i;
 }

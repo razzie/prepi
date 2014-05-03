@@ -16,6 +16,7 @@ public:
     ~StraightMotion();
     PointVector& getPointVector();
     const PointVector& getPointVector() const;
+    void setElement(Element*);
     void update(uint32_t elapsedMs);
 
 private:

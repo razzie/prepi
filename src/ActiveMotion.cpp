@@ -1,5 +1,6 @@
 #include "Parser.h"
 #include "ActiveMotion.h"
+#include "Element.h"
 
 /*ActiveMotion::ActiveMotion(Element* element, Motion::Type type, std::istream& stream)
  : ActiveMotion(element, type, Parser(stream, ';').getArgs<uint32_t, uint32_t, bool>())
@@ -16,6 +17,7 @@
 
 ActiveMotion::ActiveMotion(Element* element, Motion::Type type, uint32_t speed, uint32_t delay, bool ai)
  : Motion(element, type)
+ , m_elapsed(0)
  , m_speed(speed)
  , m_delay(delay)
  , m_ai(ai)

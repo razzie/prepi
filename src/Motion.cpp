@@ -6,10 +6,11 @@
 #include "CircularMotion.h"
 
 Motion::Motion(Element* element, Type type)
- : m_element(nullptr)
- , m_type(type)
+ : m_type(type)
+ , m_element(nullptr)
 {
-    setElement(element);
+    Motion* motion = this; // this is for calling setElement virtual method of derived class
+    motion->setElement(element);
 }
 
 Motion::~Motion()

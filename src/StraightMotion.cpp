@@ -2,13 +2,14 @@
 #include <sstream>
 #include "Parser.h"
 #include "StraightMotion.h"
+#include "Element.h"
 
 using namespace irr;
 
 std::istream& operator>> (std::istream&, irr::core::vector2df&);
 
 StraightMotion::StraightMotion(Element* element, std::istream& stream)
- : StraightMotion(element, Parser(stream, ';').getArgs<uint32_t, uint32_t, bool, PointVector>())
+ : StraightMotion(element, Parser(stream, ',').getArgs<uint32_t, uint32_t, bool, PointVector>())
 {
 }
 
@@ -39,6 +40,13 @@ StraightMotion::PointVector& StraightMotion::getPointVector()
 const StraightMotion::PointVector& StraightMotion::getPointVector() const
 {
     return m_pointVector;
+}
+
+void StraightMotion::setElement(Element* element)
+{
+    Motion::setElement(element);
+
+    // TBD
 }
 
 void StraightMotion::update(uint32_t elapsedMs)

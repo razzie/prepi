@@ -17,6 +17,7 @@ public:
     AutoMotion(Element*, uint32_t speed, uint32_t delay, bool ai, Direction);
     ~AutoMotion();
     Direction getDirection() const;
+    void setElement(Element*);
     void update(uint32_t elapsedMs);
 
 private:

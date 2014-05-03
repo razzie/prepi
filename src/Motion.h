@@ -22,7 +22,7 @@ public:
     Motion(Element*, Type = Type::NONE);
     virtual ~Motion();
     Type getType() const;
-    void setElement(Element*);
+    virtual void setElement(Element*);
     Element* getElement();
     const Element* getElement() const;
     virtual void update(uint32_t elapsedMs);
