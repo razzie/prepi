@@ -24,7 +24,7 @@ GroundElement::GroundElement(Level* level, unsigned id,
                              Motion* motion)
  : Element(level, Type::GROUND, id, imgPosition, position, motion)
 {
-    m_motion->setElement(this);
+    if (m_motion != nullptr) m_motion->setElement(this);
 }
 
 GroundElement::~GroundElement()

@@ -27,7 +27,7 @@ int main()
     rofi.play();*/
 
     Level level1(&g, "tale");
-    level1.loadLevel("../levels/CircularMotion.txt");
+    level1.loadLevel("../levels/gabor_shit.txt");
     GUI gui(&g, &level1);
 
     gg::script_engine* se = g.app->get_script_engine();
@@ -43,11 +43,11 @@ int main()
                          level1.reloadLevel();
                      });
 
-    se->add_function("randomLevel", [&](unsigned columns, unsigned rows)
+    /*se->add_function("randomLevel", [&](unsigned columns, unsigned rows)
                      {
                          LevelGenerator lg;
                          lg.generate(&level1, columns, rows);
-                     });
+                     });*/
 
     se->add_function("setBackground", [&](unsigned id, unsigned mode)
                      {

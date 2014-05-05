@@ -15,7 +15,7 @@ Motion::Motion(Element* element, Type type)
 
 Motion::~Motion()
 {
-    m_element->m_motion = nullptr;
+    if (m_element != nullptr) m_element->m_motion = nullptr;
 }
 
 Motion::Type Motion::getType() const

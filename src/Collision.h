@@ -1,10 +1,13 @@
 #ifndef COLLISION_H_INCLUDED
 #define COLLISION_H_INCLUDED
 
+#include <vector>
+
 class Element;
 
-struct Collision
+class Collision
 {
+public:
     enum Direction
     {
         TOP,
@@ -13,9 +16,21 @@ struct Collision
         RIGHT
     };
 
-    Element*  otherElement;
-    float     otherElementAngle;
-    Direction otherElementDirection;
+    Collision(Element*, float);
+    Collision(Element*, float, Direction);
+    Collision(const Collision&);
+    ~Collision();
+    Element*  getOtherElement() const;
+    float     getOtherElementAngle() const;
+    Direction getOtherElementDirection() const;
+
+    static void getElementCollisions(Element*, std::vector<Collision>&, bool clearPrevious = true);
+    static Direction getDirectionFromAngle(float angle, float leftRightThresholdAngle = 90.f);
+
+private:
+    Element*  m_otherElement;
+    float     m_otherElementAngle;
+    Direction m_otherElementDirection;
 };
 
 #endif // COLLISION_H_INCLUDED

@@ -42,8 +42,8 @@ public:
     void setMovementY(irr::f32);
     irr::core::recti getBoundingBox() const;
     b2Body* getBody();
-    const std::vector<Collision> getCollisions() const;
-    std::vector<Collision> getCollisionsForUpdate();
+    void updateCollisions();
+    const std::vector<Collision>& getCollisions() const;
     void remove();
     virtual void update(uint32_t elapsedMs);
     virtual void draw();

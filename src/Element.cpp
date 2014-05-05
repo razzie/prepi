@@ -46,6 +46,7 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
  , m_position(position)
  , m_motion(motion)
  , m_tileData(level->getTileSet()->getData(type, id))
+ , m_body(nullptr)
 {
     s32 unit = (s32)m_level->getUnitSize();
     core::rectf tileBBox = m_tileData->getBoundingBox(imgPosition);
@@ -96,8 +97,12 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
 
 Element::~Element()
 {
-    m_level->getPhysics()->DestroyBody(m_body);
-    m_body = nullptr;
+    if (m_body)
+    {
+        m_level->getPhysics()->DestroyBody(m_body);
+        m_body = nullptr;
+    }
+
     if (m_motion != nullptr) delete m_motion;
 }
 
@@ -171,12 +176,12 @@ b2Body* Element::getBody()
     return m_body;
 }
 
-const std::vector<Collision> Element::getCollisions() const
+void Element::updateCollisions()
 {
-    return m_collisions;
+    Collision::getElementCollisions(this, m_collisions);
 }
 
-std::vector<Collision> Element::getCollisionsForUpdate()
+const std::vector<Collision>& Element::getCollisions() const
 {
     return m_collisions;
 }
@@ -190,9 +195,12 @@ void Element::update(uint32_t elapsedMs)
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
 
-    b2Vec2 pos = m_body->GetPosition();
-    m_position.X = pos.x;
-    m_position.Y = pos.y;
+    if (m_body)
+    {
+        b2Vec2 pos = m_body->GetPosition();
+        m_position.X = pos.x;
+        m_position.Y = pos.y;
+    }
 
     if (m_motion)
     {

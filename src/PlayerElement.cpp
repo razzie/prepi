@@ -139,10 +139,11 @@ void PlayerElement::update(uint32_t elapsedMs)
     bool isContactLeft = false;
     bool isContactRight = false;
 
-    b2ContactEdge* edges = m_body->GetContactList();
-    for (b2ContactEdge* edge = edges; edge != NULL; edge = edge->next)
+    updateCollisions();
+
+    for (auto collision : m_collisions)
     {
-        Element* contactElem = static_cast<Element*>(edge->other->GetUserData());
+        Element* contactElem = collision.getOtherElement();
 
         //if (contactElem->getType() == Element::Type::GROUND)
         {
@@ -154,6 +155,14 @@ void PlayerElement::update(uint32_t elapsedMs)
             else if (contactElem->getPosition().X < m_position.X)
                 isContactLeft = true;
         }
+
+        /*if (collision.getOtherElementDirection() == Collision::Direction::BOTTOM)
+            isContactUnder = true;
+
+        if (collision.getOtherElementDirection() == Collision::Direction::RIGHT)
+            isContactRight = true;
+        else if (collision.getOtherElementDirection() == Collision::Direction::LEFT)
+            isContactLeft = true;*/
 
         if (contactElem->getMotionType() == Motion::Type::UNSTABLE)
         {
