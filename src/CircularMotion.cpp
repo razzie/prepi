@@ -68,8 +68,10 @@ void CircularMotion::update(uint32_t elapsedMs)
 {
     m_elapsed += elapsedMs;
 
+    if (m_elapsed <= m_delay) return;
+
     int travelInterval = 1000 * m_angle / m_speed;
-    int alignedElapsedMs = m_elapsed % (travelInterval * 2);
+    int alignedElapsedMs = (m_elapsed - m_delay) % (travelInterval * 2);
 
     float elapsedSec;
 
