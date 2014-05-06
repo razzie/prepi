@@ -266,8 +266,9 @@ void Level::updateView()
     if (m_player)
     {
         // calculating player's position
-        core::rect<s32> plBox = m_player->getBoundingBox();
-        plBox += core::position2di(m_player->getPosition().X * m_unit, m_player->getPosition().Y * m_unit);
+        core::rectf box = m_player->getBoundingBox() + m_player->getPosition();
+        core::recti plBox( (s32)(box.UpperLeftCorner.X * m_unit),  (s32)(box.UpperLeftCorner.Y * m_unit),
+                           (s32)(box.LowerRightCorner.X * m_unit), (s32)(box.LowerRightCorner.Y * m_unit) );
         plBox -= {(s32)screenSize.Width / 2, (s32)screenSize.Height / 2};
 
         if (levelSize.Width >= screenSize.Width)
@@ -301,12 +302,13 @@ bool Level::isElementOnScreen(Element* element)
     core::dimension2du screenSize = m_globals->driver->getScreenSize();
 
     // calculating translated bounding box
-    core::rect<s32> box = element->getBoundingBox();
-    box += core::position2di(element->getPosition().X * m_unit, element->getPosition().Y * m_unit);
-    box -= m_offset;
+    core::rectf box = element->getBoundingBox() + element->getPosition();
+    core::recti pixelBox( (s32)(box.UpperLeftCorner.X * m_unit),  (s32)(box.UpperLeftCorner.Y * m_unit),
+                          (s32)(box.LowerRightCorner.X * m_unit), (s32)(box.LowerRightCorner.Y * m_unit) );
+    pixelBox -= m_offset;
 
     // do not draw if outside of screen
-    return box.isRectCollided( {{0, 0}, screenSize} );
+    return pixelBox.isRectCollided( {{0, 0}, screenSize} );
 }
 
 void Level::setDimension(core::dimension2du dim)

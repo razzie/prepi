@@ -65,11 +65,12 @@ void Collision::getElementCollisions(Element* element, std::vector<Collision>& c
         b2Body* contactBody = edge->other;
         Element* contactElem = static_cast<Element*>(contactBody->GetUserData());
 
-        if (contactElem == 0) continue;
+        if (contactElem == 0 || contactElem == element)
+            continue;
 
         b2Vec2 posA = element->getBody()->GetPosition();
         b2Vec2 posB = contactBody->GetPosition();
-        float contactAngle = alignedAngle( -(core::vector2df(posB.x - posA.x, posB.y - posA.y).getAngleTrig()) + 90.f );
+        float contactAngle = alignedAngle( (core::vector2df(posB.x - posA.x, posB.y - posA.y).getAngleTrig()) /*+ 90.f*/ );
 
         collisions.push_back({contactElem, contactAngle});
     }
@@ -102,21 +103,25 @@ Collision::Direction Collision::getDirectionFromAngle(float angle, float leftRig
     // left
     if (angleBetweenThreshold(angle + 180, leftRightThresholdAngle))
     {
+        //std::cout << "angle: " << angle << " left" << std::endl;
         return Direction::LEFT;
     }
     // right
     else if (angleBetweenThreshold(angle, leftRightThresholdAngle))
     {
+        //std::cout << "angle: " << angle << " right" << std::endl;
         return Direction::RIGHT;
     }
     // top
     else if (angleBetweenThreshold(angle + 270, leftRightThresholdAngle))
     {
+        //std::cout << "angle: " << angle << " top" << std::endl;
         return Direction::TOP;
     }
     // bottom
     else// if (angleBetweenThreshold(angle + 90, leftRightThresholdAngle))
     {
+        //std::cout << "angle: " << angle << " bottom" << std::endl;
         return Direction::BOTTOM;
     }
 }

@@ -156,13 +156,26 @@ void PlayerElement::update(uint32_t elapsedMs)
                 isContactLeft = true;
         }
 
-        /*if (collision.getOtherElementDirection() == Collision::Direction::BOTTOM)
-            isContactUnder = true;
+        //std::cout << contactElem << " " << collision.getOtherElementAngle() << std::endl;
+        contactElem->drawDebugBox();
 
-        if (collision.getOtherElementDirection() == Collision::Direction::RIGHT)
-            isContactRight = true;
-        else if (collision.getOtherElementDirection() == Collision::Direction::LEFT)
-            isContactLeft = true;*/
+        /*switch (collision.getOtherElementDirection())
+        {
+            case Collision::Direction::BOTTOM:
+                isContactUnder = true;
+                break;
+
+            case Collision::Direction::RIGHT:
+                isContactRight = true;
+                break;
+
+            case Collision::Direction::LEFT:
+                isContactLeft = true;
+                break;
+
+            default:
+                break;
+        }*/
 
         if (contactElem->getMotionType() == Motion::Type::UNSTABLE)
         {

@@ -48,11 +48,7 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
  , m_tileData(level->getTileSet()->getData(type, id))
  , m_body(nullptr)
 {
-    s32 unit = (s32)m_level->getUnitSize();
-    core::rectf tileBBox = m_tileData->getBoundingBox(imgPosition);
-    m_boundingBox = {
-        (s32)(tileBBox.UpperLeftCorner.X * unit), (s32)(tileBBox.UpperLeftCorner.Y * unit),
-        (s32)(tileBBox.LowerRightCorner.X * unit), (s32)(tileBBox.LowerRightCorner.Y * unit)};
+    m_boundingBox = m_tileData->getBoundingBox(imgPosition);
 
     if (getMotionType() != Motion::Type::NONE)
     {
@@ -81,9 +77,10 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
         m_body = level->getPhysics()->CreateBody(&bodyDef);
 
         b2PolygonShape boxShape;
-        boxShape.SetAsBox(tileBBox.getWidth()/2 - 0.01f, tileBBox.getHeight()/2 - 0.01f,
-                          {+tileBBox.getWidth()/2 - (1.f - tileBBox.UpperLeftCorner.X), +tileBBox.getHeight()/2 - (1.f - tileBBox.UpperLeftCorner.Y)},
-                          0.f);
+        boxShape.SetAsBox(m_boundingBox.getWidth()/2 - 0.01f, m_boundingBox.getHeight()/2 - 0.01f,
+                           { m_boundingBox.getWidth()/2 - (1.f - m_boundingBox.UpperLeftCorner.X),
+                             m_boundingBox.getHeight()/2 - (1.f - m_boundingBox.UpperLeftCorner.Y) },
+                           0.f);
 
         b2FixtureDef fixtureDef;
         fixtureDef.shape = &boxShape;
@@ -166,7 +163,7 @@ void Element::setMovementY(f32 yMov)
     m_body->SetLinearVelocity({x, yMov});
 }
 
-core::recti Element::getBoundingBox() const
+core::rectf Element::getBoundingBox() const
 {
     return m_boundingBox;
 }
@@ -212,6 +209,17 @@ void Element::draw()
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
     drawTile(m_level, m_tileData, m_imgPosition, m_position);
+}
+
+void Element::drawDebugBox() const
+{
+    unsigned unit = m_level->getUnitSize();
+    core::rectf box = m_boundingBox + m_position;
+    core::recti pixelBox( (s32)(box.UpperLeftCorner.X * unit),  (s32)(box.UpperLeftCorner.Y * unit),
+                          (s32)(box.LowerRightCorner.X * unit), (s32)(box.LowerRightCorner.Y * unit) );
+    pixelBox -= m_level->getViewOffset();
+
+    m_level->getGlobals()->driver->draw2DRectangleOutline(pixelBox);
 }
 
 void Element::drawTile(Level* level, const TileData* td, core::vector2di imgPos, core::vector2df pos)

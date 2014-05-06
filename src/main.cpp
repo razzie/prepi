@@ -4,6 +4,7 @@
 #include "SFML\Audio.hpp"
 #include "gglib.hpp"
 #include "Globals.h"
+#include "EventListener.h"
 #include "Element.h"
 #include "PlayerElement.h"
 #include "Background.h"
@@ -106,6 +107,9 @@ int main()
         //g.smgr->drawAll();
 
         //tthread::this_thread::sleep_for(tthread::chrono::milliseconds(40));
+
+        if (g.eventListener->IsKeyDown(KEY_KEY_R))
+            level1.reloadLevel();
 
         level1.update();
         gui.update();

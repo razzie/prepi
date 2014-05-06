@@ -40,13 +40,14 @@ public:
     Motion::Type getMotionType() const;
     void setMovementX(irr::f32);
     void setMovementY(irr::f32);
-    irr::core::recti getBoundingBox() const;
+    irr::core::rectf getBoundingBox() const;
     b2Body* getBody();
     void updateCollisions();
     const std::vector<Collision>& getCollisions() const;
     void remove();
     virtual void update(uint32_t elapsedMs);
     virtual void draw();
+    void drawDebugBox() const;
 
 protected:
     virtual ~Element();
@@ -58,7 +59,7 @@ protected:
     irr::core::vector2di m_imgPosition;
     irr::core::vector2df m_position;
     Motion* m_motion;
-    irr::core::recti m_boundingBox;
+    irr::core::rectf m_boundingBox;
     const TileData* m_tileData;
     b2Body* m_body;
     std::vector<Collision> m_collisions;
