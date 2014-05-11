@@ -81,13 +81,8 @@ int main()
                          if (player) player->setSpeed(speed);
                      });
 
-    se->add_function("setClimbingMode", [&](irr::f32 climbTreshold)
+    se->add_function("setClimbingThreshold", [&](irr::f32 climbTreshold)
                      {
-                        if (climbTreshold>=1.f || climbTreshold<=-1.0f)
-                        {
-                            std::cout << "Szarjál sünt!";
-                            return;
-                        }
                         PlayerElement* player = level1.getPlayerElement();
                         if (player) player->setClimbingMode(climbTreshold);
                      });

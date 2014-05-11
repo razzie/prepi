@@ -132,6 +132,10 @@ void Level::loadLevel(std::string file)
     // elements
     while(p.nextLine())
     {
+        /*std::string line;
+        std::getline(f, line);
+        std::cout << line << std::endl;*/
+
         try
         {
             CreateElement(this, f);
