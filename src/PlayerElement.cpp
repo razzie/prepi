@@ -145,21 +145,10 @@ void PlayerElement::update(uint32_t elapsedMs)
     {
         Element* contactElem = collision.getOtherElement();
 
-        //if (contactElem->getType() == Element::Type::GROUND)
-        {
-            if (contactElem->getPosition().Y  > m_position.Y - m_climbTreshold)
-                isContactUnder = true;
-
-            if (contactElem->getPosition().X > m_position.X)
-                isContactRight = true;
-            else if (contactElem->getPosition().X < m_position.X)
-                isContactLeft = true;
-        }
-
-        //std::cout << contactElem << " " << collision.getOtherElementAngle() << std::endl;
         contactElem->drawDebugBox();
 
-        /*switch (collision.getOtherElementDirection())
+        //switch (collision.getOtherElementDirection())
+        switch ( Collision::getDirectionFromAngle(collision.getOtherElementAngle(), 90.f - m_climbTreshold) )
         {
             case Collision::Direction::BOTTOM:
                 isContactUnder = true;
@@ -175,7 +164,7 @@ void PlayerElement::update(uint32_t elapsedMs)
 
             default:
                 break;
-        }*/
+        }
 
         if (contactElem->getMotionType() == Motion::Type::UNSTABLE)
         {

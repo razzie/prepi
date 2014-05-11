@@ -62,6 +62,9 @@ void Collision::getElementCollisions(Element* element, std::vector<Collision>& c
 
     for (b2ContactEdge* edge = edges; edge != NULL; edge = edge->next)
     {
+        if (!edge->contact->IsTouching())
+            continue;
+
         b2Body* contactBody = edge->other;
         Element* contactElem = static_cast<Element*>(contactBody->GetUserData());
 
@@ -103,25 +106,21 @@ Collision::Direction Collision::getDirectionFromAngle(float angle, float leftRig
     // left
     if (angleBetweenThreshold(angle + 180, leftRightThresholdAngle))
     {
-        //std::cout << "angle: " << angle << " left" << std::endl;
         return Direction::LEFT;
     }
     // right
     else if (angleBetweenThreshold(angle, leftRightThresholdAngle))
     {
-        //std::cout << "angle: " << angle << " right" << std::endl;
         return Direction::RIGHT;
     }
     // top
-    else if (angleBetweenThreshold(angle + 270, leftRightThresholdAngle))
+    else if (angleBetweenThreshold(angle + 90, leftRightThresholdAngle))
     {
-        //std::cout << "angle: " << angle << " top" << std::endl;
         return Direction::TOP;
     }
     // bottom
     else// if (angleBetweenThreshold(angle + 90, leftRightThresholdAngle))
     {
-        //std::cout << "angle: " << angle << " bottom" << std::endl;
         return Direction::BOTTOM;
     }
 }
