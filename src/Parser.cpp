@@ -49,3 +49,14 @@ bool Parser::nextLine()
     m_stream->ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     return *m_stream;
 }
+
+bool Parser::hasNextArg() const
+{
+    std::streampos curr = m_stream->tellg();
+    m_stream->seekg(-1, m_stream->end);
+
+    std::streampos last = m_stream->tellg();
+    m_stream->seekg(curr);
+
+    return (*m_stream && (curr != last) && (m_stream->peek() != '\n'));
+}

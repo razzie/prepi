@@ -9,11 +9,11 @@ using namespace irr;
 std::istream& operator>> (std::istream&, irr::core::vector2df&);
 
 StraightMotion::StraightMotion(Element* element, std::istream& stream)
- : StraightMotion(element, Parser(stream, ',').getArgs<uint32_t, uint32_t, bool, PointVector>())
+ : StraightMotion(element, Parser(stream, ',').getArgs<uint32_t, uint32_t, bool, PointArray>())
 {
 }
 
-StraightMotion::StraightMotion(Element* element, std::tuple<uint32_t, uint32_t, bool, PointVector> data)
+StraightMotion::StraightMotion(Element* element, std::tuple<uint32_t, uint32_t, bool, PointArray> data)
  : StraightMotion(element,
     std::get<0>(data),
     std::get<1>(data),
@@ -22,9 +22,9 @@ StraightMotion::StraightMotion(Element* element, std::tuple<uint32_t, uint32_t, 
 {
 }
 
-StraightMotion::StraightMotion(Element* element, uint32_t speed, uint32_t delay, bool ai, PointVector pointVector)
+StraightMotion::StraightMotion(Element* element, uint32_t speed, uint32_t delay, bool ai, PointArray pointArray)
  : ActiveMotion(element, Type::STRAIGHT, speed, delay, ai)
- , m_pointVector(pointVector)
+ , m_pointArray(pointArray)
 {
 }
 
@@ -32,24 +32,24 @@ StraightMotion::~StraightMotion()
 {
 }
 
-StraightMotion::PointVector& StraightMotion::getPointVector()
+StraightMotion::PointArray& StraightMotion::getPointArray()
 {
-    return m_pointVector;
+    return m_pointArray;
 }
 
-const StraightMotion::PointVector& StraightMotion::getPointVector() const
+const StraightMotion::PointArray& StraightMotion::getPointArray() const
 {
-    return m_pointVector;
+    return m_pointArray;
 }
 
 void StraightMotion::setElement(Element* element)
 {
     Motion::setElement(element);
 
-    m_pointVector.insert(m_pointVector.begin(), element->getPosition()); // push to front
-    rebuildPathVector();
+    m_pointArray.insert(m_pointArray.begin(), element->getPosition()); // push to front
+    rebuildPathArray();
 
-    m_circularMode = (m_pointVector[0] == m_pointVector[m_pointVector.size()-1]);
+    m_circularMode = (m_pointArray.front() == m_pointArray.back());
 }
 
 void StraightMotion::update(uint32_t elapsedMs)
@@ -58,40 +58,59 @@ void StraightMotion::update(uint32_t elapsedMs)
 
     if (m_elapsed <= m_delay) return;
 
-    uint32_t travelInterval = m_pathVector[m_pathVector.size()-1].endTime;
-    uint32_t alignedElapsedMs = (m_elapsed - m_delay) % (travelInterval * 2);
+    uint32_t travelInterval = m_pathArray[m_pathArray.size()-1].endTime;
+    uint32_t alignedElapsedMs;
 
-    for (auto& path : m_pathVector)
+    if (m_circularMode)
     {
-        if (path.startTime >= alignedElapsedMs)
+        alignedElapsedMs = (m_elapsed - m_delay) % travelInterval;
+    }
+    else
+    {
+        alignedElapsedMs = (m_elapsed - m_delay) % (travelInterval * 2);
+
+        if (alignedElapsedMs > travelInterval)
+            alignedElapsedMs = travelInterval - (alignedElapsedMs - travelInterval);
+    }
+
+    for (auto& path : m_pathArray)
+    {
+        if (path.startTime <= alignedElapsedMs &&
+            path.endTime > alignedElapsedMs)
         {
             m_element->setPosition(path.getPointByTime(alignedElapsedMs));
+            break;
         }
     }
 }
 
-void StraightMotion::rebuildPathVector()
+void StraightMotion::rebuildPathArray()
 {
-    m_pathVector.clear();
+    m_pathArray.clear();
+    m_pathArray.reserve( m_pointArray.size() );
 
-    for (unsigned i = 0; i < m_pathVector.size()-1; ++i)
+    if (m_pointArray.size() == 0) return;
+
+    for (unsigned i = 0; i < m_pointArray.size()-1; ++i)
     {
         Path p;
 
-        p.startPoint = m_pointVector[i];
-        p.endPoint = m_pointVector[i+1];
+        p.startPoint = m_pointArray[i];
+        p.endPoint = m_pointArray[i+1];
         float dist = p.startPoint.getDistanceFrom(p.endPoint); // distance in units
 
-        p.startTime = (i == 0) ? 0 : m_pathVector[i-1].endTime;
-        p.endTime = p.startTime + ((100 * dist) / m_speed); // 100 means: 10 units / 1000 msec
+        p.startTime = ((i == 0) ? 0 : (m_pathArray[i-1].endTime));
+        p.endTime = p.startTime + (uint32_t)((1000.f * dist) / (float)m_speed); // x speed: x units / 1000 msec
+
+        m_pathArray.push_back(p);
     }
 }
 
 core::vector2df StraightMotion::Path::getPointByTime(uint32_t elapsedMs) const
 {
-    if (elapsedMs < startTime)
+    if (elapsedMs <= startTime)
         return startPoint;
-    else if (elapsedMs > endTime)
+    else if (elapsedMs >= endTime)
         return endPoint;
 
     uint32_t duration = endTime - startTime;
@@ -100,27 +119,19 @@ core::vector2df StraightMotion::Path::getPointByTime(uint32_t elapsedMs) const
     core::vector2df pathMovement = endPoint - startPoint;
 
     core::vector2df midPoint = startPoint;
-    midPoint += (pathMovement / (elapsed/duration));
+    midPoint += (pathMovement * ((float)elapsed / (float)duration));
 
     return midPoint;
 }
 
-std::istream& operator>> (std::istream& stream, StraightMotion::PointVector& pointVector)
+std::istream& operator>> (std::istream& stream, StraightMotion::PointArray& pointArray)
 {
-    stream.ignore(); // ignore colon
-
-    std::string str;
-    std::getline(stream, str);
-    std::stringstream ss(str);
-
-    //std::cout << "PointVector debug: " << str << std::endl;
-
-    Parser p(ss, ',');
-    while (ss)
+    Parser p(stream, ',');
+    while (p.hasNextArg())
     {
         core::vector2df point = p.getArg<core::vector2df>();
-        pointVector.push_back(point);
-        std::cout << "x: " << point.X << ", y: " << point.Y << std::endl;
+        pointArray.push_back(point);
+        //std::cout << "x: " << point.X << ", y: " << point.Y << std::endl;
     }
 
     return stream;

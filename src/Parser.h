@@ -19,6 +19,9 @@ public:
     // jump to next line
     bool nextLine();
 
+    // has next arg in this line
+    bool hasNextArg() const;
+
     // get one argument
     template<class T>
     T getArg()
