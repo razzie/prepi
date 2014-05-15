@@ -23,12 +23,9 @@ RewardElement::RewardElement(Level* level, std::tuple<unsigned, irr::core::vecto
 RewardElement::RewardElement(Level* level, unsigned id,
                              irr::core::vector2di imgPosition, core::vector2df position,
                              unsigned value, Motion* motion)
- : Element(level, Type::REWARD, id, imgPosition, position, new Motion(this, Motion::Type::STATIC))
+ : Element(level, Type::REWARD, id, imgPosition, position, motion)
  , m_value(value)
 {
-    if (motion != nullptr) delete motion; // remporary code!!
-
-    //m_motion->setElement(this); // uncomment this if the line above is removed
 }
 
 RewardElement::~RewardElement()

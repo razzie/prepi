@@ -56,10 +56,10 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
         switch (m_motion->getType())
         {
             case Motion::Type::DYNAMIC:
+            case Motion::Type::AUTO:
                 bodyDef.type = b2_dynamicBody;
                 break;
 
-            case Motion::Type::AUTO:
             case Motion::Type::STRAIGHT:
             case Motion::Type::CIRCULAR:
                 bodyDef.type = b2_kinematicBody;
@@ -90,6 +90,9 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
     }
 
     m_level->addElement(this);
+
+    if (m_motion != nullptr && m_motion->getElement() == nullptr)
+        m_motion->setElement(this);
 }
 
 Element::~Element()

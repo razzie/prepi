@@ -50,8 +50,6 @@ irr::video::ITexture* TileSet::getBackground(unsigned id, SearchType search) con
         if (it != m_backgrounds.end())
         {
             BackgroundData* data = &(it->second);
-            if (data->texture == nullptr)
-                data->texture = m_globals->driver->getTexture(data->fileName.c_str());
             return data->texture;
         }
         else
@@ -78,8 +76,6 @@ const TileData* TileSet::getGroundData(unsigned id, SearchType search) const
         if (it != m_grounds.end())
         {
             TileData* data = &(it->second);
-            if (data->texture == nullptr)
-                data->texture = m_globals->driver->getTexture(data->fileName.c_str());
             return data;
         }
         else
@@ -106,8 +102,6 @@ const TileData* TileSet::getEnemyData(unsigned id, SearchType search) const
         if (it != m_enemies.end())
         {
             TileData* data = &(it->second);
-            if (data->texture == nullptr)
-                data->texture = m_globals->driver->getTexture(data->fileName.c_str());
             return data;
         }
         else
@@ -134,8 +128,6 @@ const TileData* TileSet::getRewardData(unsigned id, SearchType search) const
         if (it != m_rewards.end())
         {
             TileData* data = &(it->second);
-            if (data->texture == nullptr)
-                data->texture = m_globals->driver->getTexture(data->fileName.c_str());
             return data;
         }
         else
@@ -162,8 +154,6 @@ const TileData* TileSet::getPlayerData(unsigned id, SearchType search) const
         if (it != m_players.end())
         {
             TileData* data = &(it->second);
-            if (data->texture == nullptr)
-                data->texture = m_globals->driver->getTexture(data->fileName.c_str());
             return data;
         }
         else
@@ -190,8 +180,6 @@ const TileData* TileSet::getFinishData(unsigned id, SearchType search) const
         if (it != m_finishes.end())
         {
             TileData* data = &(it->second);
-            if (data->texture == nullptr)
-                data->texture = m_globals->driver->getTexture(data->fileName.c_str());
             return data;
         }
         else
@@ -241,15 +229,11 @@ bool TileSet::fillTileData(std::string dirName, std::string fileName, unsigned& 
     try
     {
         data.fileName = dirName + fileName;
-        data.texture = nullptr;
+        data.texture = m_globals->driver->getTexture(data.fileName.c_str());
 
         Parser tileParser(fileName, '_');
         std::tie(id, data.tileSize, data.tileDimension.X, data.tileDimension.Y, data.tileCount) =
             tileParser.getArgs<unsigned, unsigned, int, int, unsigned>();
-
-        // set up default bounding boxes
-        /*for (unsigned i = 0; i < data.tileCount; ++i)
-            data.boundingBoxes.insert( std::make_pair(i, core::rectf(0.f, 0.f, 1.f, 1.f)) );*/
 
         std::string txtname = dirName + fileName;
         txtname.replace(txtname.end()-3, txtname.end(), "txt");
@@ -312,7 +296,7 @@ bool TileSet::fillBackgroundData(std::string dirName, std::string fileName, unsi
         Parser p(fileName, '_');
 
         data.fileName = dirName + fileName;
-        data.texture = nullptr;
+        data.texture = m_globals->driver->getTexture(data.fileName.c_str());
         id = p.getArg<unsigned>();
 
         return true;

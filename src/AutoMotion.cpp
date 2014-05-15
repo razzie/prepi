@@ -3,6 +3,8 @@
 #include "AutoMotion.h"
 #include "Element.h"
 
+using namespace irr;
+
 AutoMotion::AutoMotion(Element* element, std::istream& stream)
  : AutoMotion(element, Parser(stream, ',').getArgs<uint32_t, uint32_t, bool, Direction>())
 {
@@ -41,7 +43,46 @@ void AutoMotion::setElement(Element* element)
 
 void AutoMotion::update(uint32_t elapsedMs)
 {
-    //TBD
+    m_elapsed += elapsedMs;
+
+    if (m_elapsed <= m_delay) return;
+
+    bool isOnGround = false;
+
+    m_element->updateCollisions();
+    for (const Collision& collision : m_element->getCollisions())
+    {
+        Collision::Direction direction = Collision::getDirectionFromAngle( collision.getOtherElementAngle(), 45.f );
+        switch (direction)
+        {
+            case Collision::Direction::LEFT:
+                m_direction = Direction::RIGHT;
+                break;
+
+            case Collision::Direction::RIGHT:
+                m_direction = Direction::LEFT;
+                break;
+
+            case Collision::Direction::BOTTOM:
+                isOnGround = true;
+                break;
+
+            default:
+                break;
+        }
+
+        collision.getOtherElement()->drawDebugBox();
+    }
+
+    if (isOnGround)
+    {
+        float speed = (float)m_speed / 10.f;
+
+        if (m_direction == Direction::LEFT)
+            m_element->setMovementX(-speed);
+        else
+            m_element->setMovementX(speed);
+    }
 }
 
 std::istream& operator>> (std::istream& stream, AutoMotion::Direction& dir)

@@ -100,7 +100,7 @@ void StraightMotion::rebuildPathArray()
         float dist = p.startPoint.getDistanceFrom(p.endPoint); // distance in units
 
         p.startTime = ((i == 0) ? 0 : (m_pathArray[i-1].endTime));
-        p.endTime = p.startTime + (uint32_t)((1000.f * dist) / (float)m_speed); // x speed: x units / 1000 msec
+        p.endTime = p.startTime + (uint32_t)((10000.f * dist) / (float)m_speed); // x speed: x units / 1000 msec
 
         m_pathArray.push_back(p);
     }

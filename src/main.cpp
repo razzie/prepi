@@ -28,7 +28,7 @@ int main()
     rofi.play();*/
 
     Level level1(&g, "tale");
-    level1.loadLevel("../levels/StraightMotion.txt");
+    level1.loadLevel("../levels/AutoMotionSimple.txt");
     GUI gui(&g, &level1);
 
     gg::script_engine* se = g.app->get_script_engine();

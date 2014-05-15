@@ -23,12 +23,9 @@ EnemyElement::EnemyElement(Level* level, std::tuple<unsigned, irr::core::vector2
 EnemyElement::EnemyElement(Level* level, unsigned id,
                            irr::core::vector2di imgPosition, core::vector2df position,
                            unsigned damage, Motion* motion)
- : Element(level, Type::ENEMY, id, imgPosition, position, /*new Motion(this, Motion::Type::STATIC)*/ motion)
+ : Element(level, Type::ENEMY, id, imgPosition, position, motion)
  , m_damage(damage)
 {
-    //if (motion != nullptr) delete motion; // remporary code!!
-
-    m_motion->setElement(this); // uncomment this if the line above is removed
 }
 
 EnemyElement::~EnemyElement()
