@@ -48,46 +48,9 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
  , m_tileData(level->getTileSet()->getData(type, id))
  , m_body(nullptr)
 {
-    m_boundingBox = m_tileData->getBoundingBox(imgPosition);
+    m_boundingBox = m_tileData->getBoundingShape(imgPosition).getBoxData();
 
-    if (getMotionType() != Motion::Type::NONE)
-    {
-        b2BodyDef bodyDef;
-        switch (m_motion->getType())
-        {
-            case Motion::Type::DYNAMIC:
-            case Motion::Type::AUTO:
-                bodyDef.type = b2_dynamicBody;
-                break;
-
-            case Motion::Type::STRAIGHT:
-            case Motion::Type::CIRCULAR:
-                bodyDef.type = b2_kinematicBody;
-                break;
-
-            case Motion::Type::STATIC:
-            case Motion::Type::UNSTABLE:
-            default:
-                bodyDef.type = b2_staticBody;
-                break;
-        }
-        bodyDef.position.Set(position.X, position.Y);
-        bodyDef.fixedRotation = true; // do not rotate!
-        bodyDef.userData = this;
-        m_body = level->getPhysics()->CreateBody(&bodyDef);
-
-        b2PolygonShape boxShape;
-        boxShape.SetAsBox(m_boundingBox.getWidth()/2 - 0.01f, m_boundingBox.getHeight()/2 - 0.01f,
-                           { m_boundingBox.getWidth()/2 - (1.f - m_boundingBox.UpperLeftCorner.X),
-                             m_boundingBox.getHeight()/2 - (1.f - m_boundingBox.UpperLeftCorner.Y) },
-                           0.f);
-
-        b2FixtureDef fixtureDef;
-        fixtureDef.shape = &boxShape;
-        fixtureDef.density = 1.0f;
-        fixtureDef.friction = 0.5f;
-        m_body->CreateFixture(&fixtureDef);
-    }
+    m_body = m_tileData->createBody(this);
 
     m_level->addElement(this);
 
@@ -104,6 +67,16 @@ Element::~Element()
     }
 
     if (m_motion != nullptr) delete m_motion;
+}
+
+Level* Element::getLevel()
+{
+    return m_level;
+}
+
+const Level* Element::getLevel() const
+{
+    return m_level;
 }
 
 Element::Type Element::getType() const
@@ -150,6 +123,11 @@ Motion::Type Element::getMotionType() const
         return Motion::Type::NONE;
     else
         return m_motion->getType();
+}
+
+const TileData* Element::getTileData() const
+{
+    return m_tileData;
 }
 
 void Element::setMovementX(f32 xMov)

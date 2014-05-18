@@ -95,6 +95,8 @@
 		<Unit filename="src/PlayerElement.h" />
 		<Unit filename="src/RewardElement.cpp" />
 		<Unit filename="src/RewardElement.h" />
+		<Unit filename="src/Shape.cpp" />
+		<Unit filename="src/Shape.h" />
 		<Unit filename="src/StraightMotion.cpp" />
 		<Unit filename="src/StraightMotion.h" />
 		<Unit filename="src/TileSet.cpp" />

@@ -30,26 +30,6 @@ PlayerElement::PlayerElement(Level* level, unsigned id,
  , m_speed(2.f)
  , m_climbTreshold(FULL_CLIMBING)
 {
-    m_level->getPhysics()->DestroyBody(m_body);
-    m_body = nullptr;
-
-    // creating new circular body
-    b2BodyDef bodyDef;
-    bodyDef.type = b2_dynamicBody;
-    bodyDef.position.Set(position.X, position.Y);
-    bodyDef.fixedRotation = true; // do not rotate!
-    bodyDef.userData = this;
-    m_body = level->getPhysics()->CreateBody(&bodyDef);
-
-    b2CircleShape circleShape;
-    circleShape.m_p.Set(-0.5f, -0.5f);
-    circleShape.m_radius = 0.48f;
-
-    b2FixtureDef fixtureDef;
-    fixtureDef.shape = &circleShape;
-    fixtureDef.density = 1.0f;
-    fixtureDef.friction = 1.f;
-    m_body->CreateFixture(&fixtureDef);
 }
 
 PlayerElement::~PlayerElement()

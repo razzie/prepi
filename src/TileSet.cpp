@@ -1,19 +1,95 @@
 #include <dirent.h>
 #include <fstream>
+#include "Box2D\Box2D.h"
 #include "Globals.h"
+#include "Level.h"
 #include "TileSet.h"
+//#include "Element.h"
+//#include "Motion.h"
 #include "Parser.h"
 
 using namespace irr;
 
-core::rectf TileData::getBoundingBox(core::vector2di imgPosition) const
+static b2BodyType motionTypeToBodyType(Motion::Type motionType)
+{
+    switch (motionType)
+    {
+        case Motion::Type::DYNAMIC:
+        case Motion::Type::AUTO:
+            return b2_dynamicBody;
+
+        case Motion::Type::STRAIGHT:
+        case Motion::Type::CIRCULAR:
+            return b2_kinematicBody;
+
+        case Motion::Type::STATIC:
+        case Motion::Type::UNSTABLE:
+        default:
+            return b2_staticBody;
+    }
+}
+
+Shape TileData::getBoundingShape(core::vector2di imgPosition) const
 {
     unsigned tileId = (tileDimension.X * imgPosition.Y) + imgPosition.X;
-    auto it = boundingBoxes.find(tileId);
-    if (it == boundingBoxes.end())
-        return {0.f, 0.f, 1.f, 1.f};
+    auto it = boundings.find(tileId);
+    if (it == boundings.end())
+        return {};
     else
         return it->second;
+}
+
+b2Body* TileData::createBody(Element* element) const
+{
+    b2Body* body = nullptr;
+    Motion::Type motionType = element->getMotionType();
+
+    if (motionType != Motion::Type::NONE)
+    {
+        Shape shape = element->getTileData()->getBoundingShape(element->getImagePosition());
+        core::vector2df position = element->getPosition();
+
+        b2BodyDef bodyDef;
+        bodyDef.type = motionTypeToBodyType(motionType);
+        bodyDef.position.Set(position.X, position.Y);
+        bodyDef.fixedRotation = true; // do not rotate!
+        bodyDef.userData = element;
+        body = element->getLevel()->getPhysics()->CreateBody(&bodyDef);
+
+        b2FixtureDef fixtureDef;
+        fixtureDef.density = 1.0f;
+        fixtureDef.friction = 0.5f;
+
+        switch (shape.getType())
+        {
+            case Shape::Type::BOX:
+                {
+                    core::rectf boundingBox = shape.getBoxData();
+                    b2PolygonShape boxShape;
+                    boxShape.SetAsBox(boundingBox.getWidth()/2 - 0.01f, boundingBox.getHeight()/2 - 0.01f,
+                                       { boundingBox.getWidth()/2 - (1.f - boundingBox.UpperLeftCorner.X),
+                                         boundingBox.getHeight()/2 - (1.f - boundingBox.UpperLeftCorner.Y) },
+                                       0.f);
+
+                    fixtureDef.shape = &boxShape;
+                    body->CreateFixture(&fixtureDef);
+                    break;
+                }
+
+            case Shape::Type::SPHERE:
+                {
+                    Shape::SphereData boundingSphere = shape.getSphereData();
+                    b2CircleShape circleShape;
+                    circleShape.m_p.Set(-boundingSphere.center.X, -boundingSphere.center.Y);
+                    circleShape.m_radius = boundingSphere.radius - 0.02f;
+
+                    fixtureDef.shape = &circleShape;
+                    body->CreateFixture(&fixtureDef);
+                }
+        }
+    }
+
+    return body;
 }
 
 
@@ -246,10 +322,30 @@ bool TileSet::fillTileData(std::string dirName, std::string fileName, unsigned& 
             // set up special bounding boxes
             do {
                 unsigned id;
-                core::vector2df upperLeft;
-                core::vector2df lowerRight;
-                std::tie(id, upperLeft, lowerRight) = bbParser.getArgs<unsigned, core::vector2df, core::vector2df>();
-                data.boundingBoxes[id] = {upperLeft, lowerRight};
+                unsigned shape;
+                std::tie(id, shape) = bbParser.getArgs<unsigned, unsigned>();
+
+                switch (shape)
+                {
+                    case Shape::Type::BOX:
+                        {
+                            core::rectf boundingBox;
+                            std::tie(boundingBox.UpperLeftCorner, boundingBox.LowerRightCorner) = bbParser.getArgs<core::vector2df, core::vector2df>();
+                            data.boundings[id] = boundingBox;
+                            break;
+                        }
+
+                    case Shape::Type::SPHERE:
+                        {
+                            Shape::SphereData boundingSphere;
+                            std::tie(boundingSphere.center, boundingSphere.radius) = bbParser.getArgs<core::vector2df, f32>();
+                            data.boundings[id] = boundingSphere;
+                            break;
+                        }
+
+                    default:
+                        break;
+                }
             }
             while (bbParser.nextLine());
         }
@@ -282,7 +378,7 @@ void TileSet::findTileData(std::string dirName, std::map<unsigned, TileData>& da
             {
                 TileData& savedtd = data[id];
                 savedtd = td;
-                for (auto& it : td.boundingBoxes) savedtd.boundingBoxes.insert(it);
+                for (auto& it : td.boundings) savedtd.boundings.insert(it);
             }
         }
         closedir(dir);

@@ -30,6 +30,8 @@ public:
 
     //Element(Level*, std::istream&);
     Element(Level*, Type, unsigned, irr::core::vector2di, irr::core::vector2df, Motion*);
+    Level* getLevel();
+    const Level* getLevel() const;
     Type getType() const;
     unsigned getId() const;
     irr::core::vector2di getImagePosition() const;
@@ -38,6 +40,7 @@ public:
     Motion* getMotion();
     const Motion* getMotion() const;
     Motion::Type getMotionType() const;
+    const TileData* getTileData() const;
     void setMovementX(irr::f32);
     void setMovementY(irr::f32);
     irr::core::rectf getBoundingBox() const;

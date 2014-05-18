@@ -5,8 +5,10 @@
 #include <map>
 #include "irrlicht.h"
 #include "Element.h"
+#include "Shape.h"
 
 class Globals;
+class b2Body;
 
 struct BackgroundData
 {
@@ -21,9 +23,10 @@ struct TileData
     unsigned tileSize;
     irr::core::vector2di tileDimension;
     unsigned tileCount;
-    std::map<unsigned, irr::core::rectf> boundingBoxes;
+    std::map<unsigned, Shape> boundings;
 
-    irr::core::rectf getBoundingBox(irr::core::vector2di imgPosition) const;
+    Shape getBoundingShape(irr::core::vector2di imgPosition) const;
+    b2Body* createBody(Element*) const;
 };
 
 class TileSet
