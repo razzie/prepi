@@ -1,22 +1,31 @@
 #ifndef EVENTLISTENER_H
 #define EVENTLISTENER_H
+
 #include <irrlicht.h>
 
 class EventListener : public irr::IEventReceiver
 {
     public:
         EventListener();
-        virtual bool OnEvent(const irr::SEvent&);
-        virtual bool IsKeyDown(irr::EKEY_CODE) const;
-        virtual bool IsUp() const;
-        virtual bool IsDown() const;
-        virtual bool IsLeft() const;
-        virtual bool IsRight() const;
-
         virtual ~EventListener();
+        virtual bool OnEvent(const irr::SEvent&);
+        bool isLeftMouseDown() const;
+        bool isMiddleMouseDown() const;
+        bool isRightMouseDown() const;
+        irr::core::vector2di getMousePosition() const;
+        bool isKeyDown(irr::EKEY_CODE) const;
+        bool isUp() const;
+        bool isDown() const;
+        bool isLeft() const;
+        bool isRight() const;
+
     protected:
     private:
-        bool KeyIsDown[irr::KEY_KEY_CODES_COUNT];
+        bool m_keyDown[irr::KEY_KEY_CODES_COUNT];
+        bool m_leftMouseDown;
+        bool m_middleMouseDown;
+        bool m_rightMouseDown;
+        irr::core::vector2di m_mousePos;
 };
 
 #endif // EVENTLISTENER_H

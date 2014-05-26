@@ -127,6 +127,29 @@ void PlayerElement::update(uint32_t elapsedMs)
 
         contactElem->drawDebugBox();
 
+        if (contactElem->getMotionType() == Motion::Type::UNSTABLE)
+        {
+            contactElem->getBody()->SetType(b2_dynamicBody);
+        }
+
+        switch (contactElem->getType())
+        {
+            case Element::Type::ENEMY:
+                takeDamageFrom(static_cast<EnemyElement*>(contactElem));
+                break;
+
+            case Element::Type::REWARD:
+                takeRewardFrom(static_cast<RewardElement*>(contactElem));
+                break;
+
+            case Element::Type::PARTICLE:
+                continue; // skip this element
+                break;
+
+            default:
+                break;
+        }
+
         //switch (collision.getOtherElementDirection())
         switch ( Collision::getDirectionFromAngle(collision.getOtherElementAngle(), 90.f - m_climbTreshold) )
         {
@@ -145,44 +168,25 @@ void PlayerElement::update(uint32_t elapsedMs)
             default:
                 break;
         }
-
-        if (contactElem->getMotionType() == Motion::Type::UNSTABLE)
-        {
-            contactElem->getBody()->SetType(b2_dynamicBody);
-        }
-
-        switch (contactElem->getType())
-        {
-            case Element::Type::ENEMY:
-                takeDamageFrom(static_cast<EnemyElement*>(contactElem));
-                break;
-
-            case Element::Type::REWARD:
-                takeRewardFrom(static_cast<RewardElement*>(contactElem));
-                break;
-
-            default:
-                break;
-        }
     }
 
     EventListener* l = m_level->getGlobals()->eventListener;
     b2Vec2 movement = m_body->GetLinearVelocity();
 
-    if (l->IsUp() && isContactUnder)
+    if (l->isUp() && isContactUnder)
     {
         movement.y = -m_speed * 2.2;
     }
-    else if (l->IsDown())
+    else if (l->isDown())
     {
         movement.y = m_speed;
     }
 
-    if (l->IsLeft() && (isContactUnder || !isContactLeft))
+    if (l->isLeft() && (isContactUnder || !isContactLeft))
     {
         movement.x = -m_speed;
     }
-    else if (l->IsRight() && (isContactUnder || !isContactRight))
+    else if (l->isRight() && (isContactUnder || !isContactRight))
     {
         movement.x = m_speed;
     }

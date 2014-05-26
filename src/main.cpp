@@ -7,6 +7,7 @@
 #include "EventListener.h"
 #include "Element.h"
 #include "PlayerElement.h"
+#include "ParticleElement.h"
 #include "Background.h"
 #include "Level.h"
 #include "LevelGenerator.h"
@@ -28,7 +29,7 @@ int main()
     rofi.play();*/
 
     Level level1(&g, "tale");
-    level1.loadLevel("../levels/AutoMotionSimple.txt");
+    level1.loadLevel("../levels/gabor_shit.txt");
     GUI gui(&g, &level1);
 
     gg::script_engine* se = g.app->get_script_engine();
@@ -103,8 +104,11 @@ int main()
 
         //tthread::this_thread::sleep_for(tthread::chrono::milliseconds(40));
 
-        if (g.eventListener->IsKeyDown(KEY_KEY_R))
+        if (g.eventListener->isKeyDown(KEY_KEY_R))
             level1.reloadLevel();
+
+        if (g.eventListener->isLeftMouseDown())
+            new ParticleElement(&level1, irr::video::SColor(~0), g.eventListener->getMousePosition() + level1.getViewOffset());
 
         level1.update();
         gui.update();

@@ -46,7 +46,7 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
  , m_position(position)
  , m_motion(motion)
  , m_tileData(level->getTileSet()->getData(type, id))
- , m_body(nullptr)
+// , m_body(nullptr)
 {
     m_boundingBox = m_tileData->getBoundingShape(imgPosition).getBoxData();
 
@@ -56,6 +56,18 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
 
     if (m_motion != nullptr && m_motion->getElement() == nullptr)
         m_motion->setElement(this);
+}
+
+Element::Element(Level* level, Type type, core::vector2df position)
+ : m_level(level)
+ , m_type(type)
+ , m_id(0)
+// , m_imgPosition({0,0})
+ , m_motion(nullptr)
+ , m_tileData(nullptr)
+ , m_body(nullptr)
+{
+    m_level->addElement(this);
 }
 
 Element::~Element()

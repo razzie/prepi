@@ -91,6 +91,8 @@
 		<Unit filename="src/Motion.h" />
 		<Unit filename="src/Parser.cpp" />
 		<Unit filename="src/Parser.h" />
+		<Unit filename="src/ParticleElement.cpp" />
+		<Unit filename="src/ParticleElement.h" />
 		<Unit filename="src/PlayerElement.cpp" />
 		<Unit filename="src/PlayerElement.h" />
 		<Unit filename="src/RewardElement.cpp" />

@@ -25,7 +25,8 @@ public:
         ENEMY = 1,
         REWARD = 2,
         PLAYER = 3,
-        FINISH = 4
+        FINISH = 4,
+        PARTICLE = 999
     };
 
     //Element(Level*, std::istream&);
@@ -53,6 +54,7 @@ public:
     void drawDebugBox() const;
 
 protected:
+    Element(Level*, Type, irr::core::vector2df);
     virtual ~Element();
 
     mutable tthread::recursive_mutex m_mutex;
