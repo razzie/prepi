@@ -68,8 +68,6 @@ protected:
     const TileData* m_tileData;
     b2Body* m_body;
     std::vector<Collision> m_collisions;
-
-    static void drawTile(Level*, const TileData*, irr::core::vector2di imgPos, irr::core::vector2df pos);
 };
 
 Element* CreateElement(Level*, std::istream&);

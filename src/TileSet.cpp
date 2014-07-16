@@ -92,6 +92,76 @@ b2Body* TileData::createBody(Element* element) const
     return body;
 }
 
+TileData::Animation* TileData::getAnimation(irr::core::vector2di imgPos)
+{
+    auto it = animations.find(imgPos);
+    if (it != animations.end())
+        return &it->second;
+    else
+        return nullptr;
+}
+
+const TileData::Animation* TileData::getAnimation(irr::core::vector2di imgPos) const
+{
+    auto it = animations.find(imgPos);
+    if (it != animations.end())
+        return &it->second;
+    else
+        return nullptr;
+}
+
+void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df pos) const
+{
+    core::rect<s32> srcRect =
+        {(s32)(imgPos.X * tileSize), (s32)(imgPos.Y * tileSize),
+        (s32)((imgPos.X + 1) * tileSize), (s32)((imgPos.Y + 1) * tileSize)};
+
+    unsigned unit = level->getUnitSize();
+    core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
+
+    core::rect<s32> destRect = {0, 0, (s32)unit, (s32)unit};
+    destRect += calcPos;
+    destRect -= level->getViewOffset();
+
+    level->getGlobals()->driver->draw2DImage(texture, destRect, srcRect, 0, 0, true);
+}
+
+void TileData::drawAnimation(Animation::Type animType, unsigned animSpeed, Level* level, core::vector2di imgPos, core::vector2df pos, bool standby) const
+{
+    auto it = animations.find(imgPos);
+    if (it == animations.end())
+    {
+        drawTile(level, imgPos, pos);
+        return;
+    }
+
+    const Animation* anim = &(it->second);
+    unsigned frame;
+
+    if (standby)
+    {
+        frame = 0;
+    }
+    else
+    {
+        uint32_t elapsedMs = level->getTileSet()->getAnimationTimer()->peekElapsed();
+        frame = ((elapsedMs / (1000 / animSpeed)) % (anim->frameCount - 1)) + 1;
+    }
+
+    core::rect<s32> srcRect =
+        {(frame * tileSize), ((unsigned)animType * tileSize),
+         ((frame + 1) * tileSize), (((unsigned)animType + 1) * tileSize)};
+
+    unsigned unit = level->getUnitSize();
+    core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
+
+    core::rect<s32> destRect = {0, 0, (s32)unit, (s32)unit};
+    destRect += calcPos;
+    destRect -= level->getViewOffset();
+
+    level->getGlobals()->driver->draw2DImage(anim->texture, destRect, srcRect, 0, 0, true);
+}
+
 
 TileSet::TileSet(Globals* globals, std::string name)
  : m_globals(globals)
@@ -107,6 +177,7 @@ TileSet::TileSet(Globals* globals, std::string name)
     findTileData(basedir + "reward/", m_rewards);
     findTileData(basedir + "player/", m_players);
     findTileData(basedir + "finish/", m_finishes);
+    findAnimationData(basedir + "animations/");
 }
 
 TileSet::~TileSet()
@@ -116,6 +187,11 @@ TileSet::~TileSet()
 std::string TileSet::getName() const
 {
     return m_name;
+}
+
+const Timer* TileSet::getAnimationTimer() const
+{
+    return &m_animTimer;
 }
 
 irr::video::ITexture* TileSet::getBackground(unsigned id, SearchType search) const
@@ -381,6 +457,87 @@ void TileSet::findTileData(std::string dirName, std::map<unsigned, TileData>& da
                 for (auto& it : td.boundings) savedtd.boundings.insert(it);
             }
         }
+        closedir(dir);
+    }
+}
+
+void TileSet::findAnimationData(std::string dirName) const
+{
+    DIR *dir;
+    struct dirent *ent;
+
+    if ((dir = opendir( dirName.c_str() )) != NULL)
+    {
+        while ((ent = readdir(dir)) != NULL)
+        {
+            if (ent->d_name[0] == '.')
+                continue;
+
+            std::string baseName = ent->d_name;
+            std::string fileName = dirName + baseName;
+            std::map<unsigned, TileData>* elemTypeTiles = nullptr;
+
+            try
+            {
+                Element::Type tileType;
+                unsigned tileId;
+                core::vector2di imgPos;
+                Parser p(baseName, '_');
+
+                std::tie(tileType, tileId, imgPos.X, imgPos.Y) = p.getArgs<Element::Type, unsigned, unsigned, unsigned>();
+
+                switch (tileType)
+                {
+                    case Element::Type::GROUND:
+                        elemTypeTiles = &m_grounds;
+                        break;
+
+                    case Element::Type::ENEMY:
+                        elemTypeTiles = &m_enemies;
+                        break;
+
+                    case Element::Type::REWARD:
+                        elemTypeTiles = &m_rewards;
+                        break;
+
+                    case Element::Type::PLAYER:
+                        elemTypeTiles = &m_players;
+                        break;
+
+                    case Element::Type::FINISH:
+                        elemTypeTiles = &m_finishes;
+                        break;
+
+                    default:
+                        throw std::runtime_error("unknown element type");
+                }
+
+                auto tileIter = elemTypeTiles->find(tileId);
+                if (tileIter != elemTypeTiles->end())
+                {
+                    irr::video::ITexture* animTexture = m_globals->driver->getTexture(fileName.c_str());
+
+                    if (animTexture)
+                    {
+                        TileData* td = &tileIter->second;
+                        TileData::Animation* anim = &td->animations[imgPos]; // this will do the insertion to the std::map also
+
+                        core::dimension2du animTextureSize = animTexture->getSize();
+                        anim->texture = animTexture;
+                        anim->animCount = animTextureSize.Height / td->tileSize;
+                        anim->frameCount = animTextureSize.Width / td->tileSize;
+
+                        std::cout << "Animation loaded: " << baseName << "!" << std::endl;
+                        std::cout << "animCount: " << anim->animCount << ", frameCount: " << anim->frameCount << std::endl;
+                    }
+                }
+            }
+            catch (const std::exception& e)
+            {
+                std::cout << "Animation error: " << fileName << " (" << e.what() << ")" << std::endl;
+            }
+        }
+
         closedir(dir);
     }
 }

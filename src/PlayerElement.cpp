@@ -185,15 +185,25 @@ void PlayerElement::update(uint32_t elapsedMs)
     if (l->isLeft() && (isContactUnder || !isContactLeft))
     {
         movement.x = -m_speed;
+        m_lastAnimType = TileData::Animation::Type::LEFT;
+        m_standbyAnim = false;
     }
     else if (l->isRight() && (isContactUnder || !isContactRight))
     {
         movement.x = m_speed;
+        m_lastAnimType = TileData::Animation::Type::RIGHT;
+        m_standbyAnim = false;
     }
     else
     {
         movement.x = 0.f;
+        m_standbyAnim = true;
     }
 
     m_body->SetLinearVelocity(movement);
+}
+
+void PlayerElement::draw()
+{
+    m_tileData->drawAnimation(m_lastAnimType, 20, m_level, m_imgPosition, m_position, m_standbyAnim);
 }

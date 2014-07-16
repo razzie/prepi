@@ -201,7 +201,11 @@ void Element::update(uint32_t elapsedMs)
 void Element::draw()
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
-    drawTile(m_level, m_tileData, m_imgPosition, m_position);
+
+    if (m_tileData)
+        m_tileData->drawTile(m_level, m_imgPosition, m_position);
+    else
+        drawDebugBox();
 }
 
 void Element::drawDebugBox() const
@@ -213,22 +217,6 @@ void Element::drawDebugBox() const
     pixelBox -= m_level->getViewOffset();
 
     m_level->getGlobals()->driver->draw2DRectangleOutline(pixelBox);
-}
-
-void Element::drawTile(Level* level, const TileData* td, core::vector2di imgPos, core::vector2df pos)
-{
-    core::rect<s32> srcRect =
-        {(s32)(imgPos.X * td->tileSize), (s32)(imgPos.Y * td->tileSize),
-        (s32)((imgPos.X + 1) * td->tileSize), (s32)((imgPos.Y + 1) * td->tileSize)};
-
-    unsigned unit = level->getUnitSize();
-    core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
-
-    core::rect<s32> destRect = {0, 0, (s32)unit, (s32)unit};
-    destRect += calcPos;
-    destRect -= level->getViewOffset();
-
-    level->getGlobals()->driver->draw2DImage(td->texture, destRect, srcRect, 0, 0, true);
 }
 
 

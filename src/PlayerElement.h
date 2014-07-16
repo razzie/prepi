@@ -2,6 +2,7 @@
 #define PLAYERELEMENT_H_INCLUDED
 
 #include <map>
+#include "TileSet.h"
 #include "Timer.h"
 #include "Element.h"
 
@@ -30,7 +31,7 @@ public:
     void setSpeed(irr::f32);
     void setClimbingMode(irr::f32);
     void update(uint32_t elapsedMs);
-    //void draw();
+    void draw();
 
 protected:
     ~PlayerElement();
@@ -40,6 +41,8 @@ protected:
     irr::f32 m_speed;
     irr::f32 m_climbTreshold;
     std::map<EnemyElement*, Timer> m_damageList;
+    TileData::Animation::Type m_lastAnimType;
+    bool m_standbyAnim;
 };
 
 #endif // PLAYERELEMENT_H_INCLUDED
