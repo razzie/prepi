@@ -10,26 +10,29 @@
 using namespace irr;
 
 PlayerElement::PlayerElement(Level* level, std::istream& stream)
- : PlayerElement(level, Parser(stream, ';').getArgs<unsigned, irr::core::vector2di, irr::core::vector2df>())
+ : PlayerElement(level, Parser(stream, ';').getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, float>())
 {
 }
 
-PlayerElement::PlayerElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df> data)
+PlayerElement::PlayerElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, float> data)
  : PlayerElement(level,
     std::get<0>(data),
     std::get<1>(data),
-    std::get<2>(data))
+    std::get<2>(data),
+    std::get<3>(data))
 {
 }
 
 PlayerElement::PlayerElement(Level* level, unsigned id,
-                             irr::core::vector2di imgPosition, core::vector2df position)
- : Element(level, Type::PLAYER, id, imgPosition, position, new Motion(this, Motion::Type::DYNAMIC))
+                             irr::core::vector2di imgPosition, core::vector2df position,
+                             float animSpeed)
+ : Element(level, Type::PLAYER, id, imgPosition, position, nullptr, new Motion(this, Motion::Type::DYNAMIC))
  , m_health(100)
  , m_rewards(0)
  , m_speed(2.f)
  , m_climbTreshold(FULL_CLIMBING)
 {
+    setAnimSpeed(animSpeed);
 }
 
 PlayerElement::~PlayerElement()
@@ -127,7 +130,7 @@ void PlayerElement::update(uint32_t elapsedMs)
 
         contactElem->drawDebugBox();
 
-        if (contactElem->getMotionType() == Motion::Type::UNSTABLE)
+        if (contactElem->getBehaviorType() == Behavior::Type::UNSTABLE)
         {
             contactElem->getBody()->SetType(b2_dynamicBody);
         }
@@ -205,5 +208,5 @@ void PlayerElement::update(uint32_t elapsedMs)
 
 void PlayerElement::draw()
 {
-    m_tileData->drawAnimation(m_lastAnimType, 20, m_level, m_imgPosition, m_position, m_standbyAnim);
+    m_tileData->drawAnimation(m_lastAnimType, (unsigned)(m_animSpeed * 10), m_level, m_imgPosition, m_position, m_standbyAnim);
 }

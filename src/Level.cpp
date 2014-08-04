@@ -132,6 +132,8 @@ void Level::loadLevel(std::string file)
     // elements
     while(p.nextLine())
     {
+        if (f.peek() == '#') continue; // skip comments
+
         try
         {
             CreateElement(this, f);

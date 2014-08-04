@@ -23,7 +23,6 @@ static b2BodyType motionTypeToBodyType(Motion::Type motionType)
             return b2_kinematicBody;
 
         case Motion::Type::STATIC:
-        case Motion::Type::UNSTABLE:
         default:
             return b2_staticBody;
     }

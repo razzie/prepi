@@ -1,6 +1,7 @@
 #ifndef MOTION_H_INCLUDED
 #define MOTION_H_INCLUDED
 
+#include <cstdint>
 #include <iostream>
 
 class Element;
@@ -12,11 +13,10 @@ public:
     {
         NONE = 0,
         STATIC = 3,
-        UNSTABLE = 4,
-        DYNAMIC = 5,
-        AUTO = 6,
-        STRAIGHT = 7,
-        CIRCULAR = 8
+        DYNAMIC = 4,
+        AUTO = 5,
+        STRAIGHT = 6,
+        CIRCULAR = 7
     };
 
     Motion(Element*, Type = Type::NONE);

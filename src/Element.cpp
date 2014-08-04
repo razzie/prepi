@@ -38,12 +38,15 @@ Element* CreateElement(Level* level, std::istream& stream)
     }
 }
 
-Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgPosition, core::vector2df position, Motion* motion)
+Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgPosition, core::vector2df position,
+                 Behavior* behavior, Motion* motion)
  : m_level(level)
  , m_type(type)
  , m_id(id)
  , m_imgPosition(imgPosition)
  , m_position(position)
+ , m_animSpeed(1.0f)
+ , m_behavior(behavior)
  , m_motion(motion)
  , m_tileData(level->getTileSet()->getData(type, id))
 // , m_body(nullptr)
@@ -56,6 +59,9 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
 
     if (m_motion != nullptr && m_motion->getElement() == nullptr)
         m_motion->setElement(this);
+
+    if (m_behavior != nullptr && m_behavior->getElement() == nullptr)
+        m_behavior->setElement(this);
 }
 
 Element::Element(Level* level, Type type, core::vector2df position)
@@ -63,6 +69,8 @@ Element::Element(Level* level, Type type, core::vector2df position)
  , m_type(type)
  , m_id(0)
 // , m_imgPosition({0,0})
+ , m_animSpeed(1.0f)
+ , m_behavior(nullptr)
  , m_motion(nullptr)
  , m_tileData(nullptr)
  , m_body(nullptr)
@@ -117,6 +125,34 @@ void Element::setPosition(core::vector2df position)
     m_position = position;
     m_body->SetTransform({position.X, position.Y}, 0.f);
     m_body->SetLinearVelocity({0.f, 0.f});
+}
+
+float Element::getAnimSpeed() const
+{
+    return m_animSpeed;
+}
+
+void Element::setAnimSpeed(float animSpeed)
+{
+    m_animSpeed = animSpeed;
+}
+
+Behavior* Element::getBehavior()
+{
+    return m_behavior;
+}
+
+const Behavior* Element::getBehavior() const
+{
+    return m_behavior;
+}
+
+Behavior::Type Element::getBehaviorType() const
+{
+    if (m_behavior == nullptr)
+        return Behavior::Type::NONE;
+    else
+        return m_behavior->getType();
 }
 
 Motion* Element::getMotion()

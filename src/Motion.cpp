@@ -10,7 +10,7 @@ Motion::Motion(Element* element, Type type)
  , m_element(nullptr)
 {
     Motion* motion = this; // this is for calling setElement virtual method of derived class
-    motion->setElement(element);
+    if (element) motion->setElement(element);
 }
 
 Motion::~Motion()
@@ -51,7 +51,6 @@ Motion* CreateMotion(Element* element, std::istream& stream)
     switch (type)
     {
         case Motion::Type::STATIC:
-        case Motion::Type::UNSTABLE:
         case Motion::Type::DYNAMIC:
             return new Motion(element, type);
 
@@ -83,11 +82,10 @@ std::istream& operator>> (std::istream& stream, Motion::Type& m)
             break;
 
         case 3: // STATIC
-        case 4: // UNSTABLE
-        case 5: // DYNAMIC
-        case 6: // AUTO
-        case 7: // STRAIGHT
-        case 8: // CIRCULAR
+        case 4: // DYNAMIC
+        case 5: // AUTO
+        case 6: // STRAIGHT
+        case 7: // CIRCULAR
             m = static_cast<Motion::Type>(motion);
             break;
 

@@ -65,6 +65,8 @@
 		<Unit filename="src/AutoMotion.h" />
 		<Unit filename="src/Background.cpp" />
 		<Unit filename="src/Background.h" />
+		<Unit filename="src/Behavior.cpp" />
+		<Unit filename="src/Behavior.h" />
 		<Unit filename="src/CircularMotion.cpp" />
 		<Unit filename="src/CircularMotion.h" />
 		<Unit filename="src/Collision.cpp" />
