@@ -107,6 +107,8 @@
 		<Unit filename="src/TileSet.h" />
 		<Unit filename="src/Timer.cpp" />
 		<Unit filename="src/Timer.h" />
+		<Unit filename="src/UnstableBehavior.cpp" />
+		<Unit filename="src/UnstableBehavior.h" />
 		<Unit filename="src/main.cpp" />
 		<Unit filename="src/simplex.cpp" />
 		<Unit filename="src/simplex.h" />

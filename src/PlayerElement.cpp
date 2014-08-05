@@ -130,11 +130,6 @@ void PlayerElement::update(uint32_t elapsedMs)
 
         contactElem->drawDebugBox();
 
-        if (contactElem->getBehaviorType() == Behavior::Type::UNSTABLE)
-        {
-            contactElem->getBody()->SetType(b2_dynamicBody);
-        }
-
         switch (contactElem->getType())
         {
             case Element::Type::ENEMY:

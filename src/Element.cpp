@@ -232,6 +232,11 @@ void Element::update(uint32_t elapsedMs)
     {
         m_motion->update(elapsedMs);
     }
+
+    if (m_behavior)
+    {
+        m_behavior->update(elapsedMs);
+    }
 }
 
 void Element::draw()

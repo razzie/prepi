@@ -1,6 +1,10 @@
 #include "Parser.h"
 #include "Element.h"
 #include "Behavior.h"
+#include "UnstableBehavior.h"
+//#include "ExplosiveBehavior.h"
+//#include "TeleportBehavior.h"
+//#include "ResizerBehavior.h"
 
 Behavior::Behavior(Element* element, Type type)
  : m_type(type)
@@ -47,7 +51,17 @@ Behavior* CreateBehavior(Element* element, std::istream& stream)
 
     switch (type)
     {
-        //case Behavior::Type::UNSTABLE:
+        case Behavior::Type::UNSTABLE:
+            return new UnstableBehavior(element, stream);
+
+        /*case Behavior::Type::EXPLOSIVE:
+            return new ExplosiveBehavior(element, stream);
+
+        case Behavior::Type::TELEPORT:
+            return new TeleportBehavior(element, stream);
+
+        case Behavior::Type::RESIZER:
+            return new ResizerBehavior(element, stream);*/
 
         case Behavior::Type::NONE:
         default:
