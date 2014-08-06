@@ -1,7 +1,7 @@
 #include "Globals.h"
 #include "Parser.h"
-#include "Level.h"
-#include "GroundElement.h"
+#include "level\Level.h"
+#include "elements\GroundElement.h"
 
 using namespace irr;
 

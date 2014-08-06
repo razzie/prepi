@@ -7,8 +7,8 @@
 #include "irrlicht.h"
 #include "tinythread.h"
 #include "Collision.h"
-#include "Motion.h"
-#include "Behavior.h"
+#include "motions\Motion.h"
+#include "behaviors\Behavior.h"
 
 class Level;
 class TileData;

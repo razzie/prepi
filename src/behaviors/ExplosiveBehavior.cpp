@@ -1,11 +1,11 @@
 #include <ctime>
 #include "irrlicht.h"
 #include "Parser.h"
-#include "Level.h"
-#include "Element.h"
-#include "PlayerElement.h"
-#include "ParticleElement.h"
-#include "ExplosiveBehavior.h"
+#include "level\Level.h"
+#include "elements\Element.h"
+#include "elements\PlayerElement.h"
+#include "elements\ParticleElement.h"
+#include "behaviors\ExplosiveBehavior.h"
 
 #define PI 3.14159265358979323846
 

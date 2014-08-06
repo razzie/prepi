@@ -2,10 +2,10 @@
 #include "Globals.h"
 #include "Parser.h"
 #include "EventListener.h"
-#include "Level.h"
-#include "PlayerElement.h"
-#include "EnemyElement.h"
-#include "RewardElement.h"
+#include "level\Level.h"
+#include "elements\PlayerElement.h"
+#include "elements\EnemyElement.h"
+#include "elements\RewardElement.h"
 
 using namespace irr;
 

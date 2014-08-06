@@ -1,7 +1,7 @@
 #include "Box2D\Box2D.h"
 #include "Parser.h"
-#include "Element.h"
-#include "UnstableBehavior.h"
+#include "elements\Element.h"
+#include "behaviors\UnstableBehavior.h"
 
 UnstableBehavior::UnstableBehavior(Element* element, std::istream& stream)
  : UnstableBehavior(element, Parser(stream, ',').getArg<bool>())

@@ -1,7 +1,7 @@
 #include "Box2D\Box2D.h"
 #include "Globals.h"
-#include "Level.h"
-#include "ParticleElement.h"
+#include "level\Level.h"
+#include "elements\ParticleElement.h"
 
 using namespace irr;
 

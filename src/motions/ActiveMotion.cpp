@@ -1,6 +1,6 @@
 #include "Parser.h"
-#include "ActiveMotion.h"
-#include "Element.h"
+#include "motions\ActiveMotion.h"
+#include "elements\Element.h"
 
 /*ActiveMotion::ActiveMotion(Element* element, Motion::Type type, std::istream& stream)
  : ActiveMotion(element, type, Parser(stream, ';').getArgs<uint32_t, uint32_t, bool>())

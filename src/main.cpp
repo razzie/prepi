@@ -1,16 +1,17 @@
 #include <iostream>
 #include <sstream>
+#include "windows.h"
 #include "Box2D\Box2D.h"
 #include "SFML\Audio.hpp"
 #include "gglib.hpp"
 #include "Globals.h"
 #include "EventListener.h"
-#include "Element.h"
-#include "PlayerElement.h"
-#include "ParticleElement.h"
-#include "Background.h"
-#include "Level.h"
-#include "LevelGenerator.h"
+#include "elements\Element.h"
+#include "elements\PlayerElement.h"
+#include "elements\ParticleElement.h"
+#include "level\Background.h"
+#include "level\Level.h"
+//#include "level\LevelGenerator.h"
 #include "GUI.h"
 #include "Parser.h"
 
@@ -124,6 +125,8 @@ int main()
             g.device->setWindowCaption(str.c_str());
             frames=0;
         }
+
+        Sleep(1); // windows api
     }
 
     return 0;

@@ -1,9 +1,9 @@
 #include "Parser.h"
-#include "Element.h"
-#include "Motion.h"
-#include "AutoMotion.h"
-#include "StraightMotion.h"
-#include "CircularMotion.h"
+#include "elements\Element.h"
+#include "motions\Motion.h"
+#include "motions\AutoMotion.h"
+#include "motions\StraightMotion.h"
+#include "motions\CircularMotion.h"
 
 Motion::Motion(Element* element, Type type)
  : m_type(type)

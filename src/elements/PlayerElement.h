@@ -2,9 +2,9 @@
 #define PLAYERELEMENT_H_INCLUDED
 
 #include <map>
-#include "TileSet.h"
+#include "level\TileSet.h"
 #include "Timer.h"
-#include "Element.h"
+#include "elements\Element.h"
 
 class EnemyElement;
 class RewardElement;

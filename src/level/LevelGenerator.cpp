@@ -1,16 +1,16 @@
 #include <ctime>
 #include <stdexcept>
 #include "simplex.h"
-#include "Level.h"
-#include "TileSet.h"
-#include "LevelGenerator.h"
-#include "Background.h"
-#include "Element.h"
-#include "GroundElement.h"
-#include "EnemyElement.h"
-#include "RewardElement.h"
-#include "PlayerElement.h"
-#include "FinishElement.h"
+#include "level\Level.h"
+#include "level\TileSet.h"
+#include "level\LevelGenerator.h"
+#include "level\Background.h"
+#include "elements\Element.h"
+#include "elements\GroundElement.h"
+#include "elements\EnemyElement.h"
+#include "elements\RewardElement.h"
+#include "elements\PlayerElement.h"
+#include "elements\FinishElement.h"
 
 LevelGenerator::LevelGenerator()
 {

@@ -1,7 +1,7 @@
 #include "Globals.h"
 #include "Parser.h"
-#include "Level.h"
-#include "EnemyElement.h"
+#include "level\Level.h"
+#include "elements\EnemyElement.h"
 
 using namespace irr;
 

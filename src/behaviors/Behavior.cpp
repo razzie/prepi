@@ -1,10 +1,10 @@
 #include "Parser.h"
-#include "Element.h"
-#include "Behavior.h"
-#include "UnstableBehavior.h"
-#include "ExplosiveBehavior.h"
-//#include "TeleportBehavior.h"
-//#include "ResizerBehavior.h"
+#include "elements\Element.h"
+#include "behaviors\Behavior.h"
+#include "behaviors\UnstableBehavior.h"
+#include "behaviors\ExplosiveBehavior.h"
+//#include "behaviors\TeleportBehavior.h"
+//#include "behaviors\ResizerBehavior.h"
 
 Behavior::Behavior(Element* element, Type type)
  : m_type(type)

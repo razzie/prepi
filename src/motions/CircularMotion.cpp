@@ -1,7 +1,7 @@
 #include <cmath>
 #include "Parser.h"
-#include "CircularMotion.h"
-#include "Element.h"
+#include "motions\CircularMotion.h"
+#include "elements\Element.h"
 
 #define PI 3.14159265358979323846
 

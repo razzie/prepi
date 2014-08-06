@@ -1,8 +1,8 @@
 #include <string>
 #include <sstream>
 #include "Parser.h"
-#include "StraightMotion.h"
-#include "Element.h"
+#include "motions\StraightMotion.h"
+#include "elements\Element.h"
 
 using namespace irr;
 

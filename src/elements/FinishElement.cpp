@@ -1,7 +1,7 @@
 #include "Globals.h"
 #include "Parser.h"
-#include "Level.h"
-#include "FinishElement.h"
+#include "level\Level.h"
+#include "elements\FinishElement.h"
 
 using namespace irr;
 

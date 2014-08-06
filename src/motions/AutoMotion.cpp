@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include "Parser.h"
-#include "AutoMotion.h"
-#include "Element.h"
+#include "motions\AutoMotion.h"
+#include "elements\Element.h"
 
 using namespace irr;
 

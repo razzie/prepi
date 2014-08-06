@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 #include "irrlicht.h"
-#include "Element.h"
+#include "elements\Element.h"
 #include "Shape.h"
 #include "Timer.h"
 

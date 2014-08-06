@@ -1,6 +1,6 @@
 #include "Globals.h"
-#include "Level.h"
-#include "PlayerElement.h"
+#include "level\Level.h"
+#include "elements\PlayerElement.h"
 #include "GUI.h"
 
 using namespace irr;
