@@ -77,6 +77,8 @@
 		<Unit filename="src/EnemyElement.h" />
 		<Unit filename="src/EventListener.cpp" />
 		<Unit filename="src/EventListener.h" />
+		<Unit filename="src/ExplosiveBehavior.cpp" />
+		<Unit filename="src/ExplosiveBehavior.h" />
 		<Unit filename="src/FinishElement.cpp" />
 		<Unit filename="src/FinishElement.h" />
 		<Unit filename="src/GUI.cpp" />

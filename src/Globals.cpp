@@ -1,3 +1,4 @@
+#include <ctime>
 #include "Globals.h"
 #include "EventListener.h"
 #include "gg/application.hpp"
@@ -27,6 +28,8 @@ Globals::Globals()
  , eventListener(new EventListener())
  , app(gg::application::create("prepi"))
 {
+    srand(time(NULL));
+
     device->setEventReceiver(eventListener);
     device->setResizable(true);
     device->setWindowCaption(L"Custom Scene Node - Irrlicht Engine Demo");

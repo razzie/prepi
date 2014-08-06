@@ -26,9 +26,8 @@ GroundElement::GroundElement(Level* level, std::tuple<unsigned, irr::core::vecto
 GroundElement::GroundElement(Level* level, unsigned id,
                              irr::core::vector2di imgPosition, core::vector2df position,
                              float animSpeed, Behavior* behavior, Motion* motion)
- : Element(level, Type::GROUND, id, imgPosition, position, behavior, motion)
+ : Element(level, Type::GROUND, id, imgPosition, position, animSpeed, behavior, motion)
 {
-    setAnimSpeed(animSpeed);
 }
 
 GroundElement::~GroundElement()

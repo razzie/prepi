@@ -148,8 +148,8 @@ void TileData::drawAnimation(Animation::Type animType, unsigned animSpeed, Level
     }
 
     core::rect<s32> srcRect =
-        {(frame * tileSize), ((unsigned)animType * tileSize),
-         ((frame + 1) * tileSize), (((unsigned)animType + 1) * tileSize)};
+        {(s32)(frame * tileSize), (s32)((unsigned)animType * tileSize),
+         (s32)((frame + 1) * tileSize), (s32)(((unsigned)animType + 1) * tileSize)};
 
     unsigned unit = level->getUnitSize();
     core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};

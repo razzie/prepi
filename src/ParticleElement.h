@@ -7,7 +7,8 @@
 class ParticleElement : public Element
 {
 public:
-    ParticleElement(Level*, irr::video::SColor, irr::core::vector2di);
+    ParticleElement(Level*, irr::video::SColor, irr::core::vector2df pos, unsigned life = 5000);
+    ParticleElement(Level*, irr::video::SColor, irr::core::vector2di pixPos, unsigned life = 5000);
     ~ParticleElement();
     irr::video::SColor getColor() const;
     void setColor(irr::video::SColor);
@@ -16,6 +17,7 @@ public:
 
 private:
     irr::video::SColor m_color;
+    unsigned m_life;
     uint32_t m_elapsed;
 };
 

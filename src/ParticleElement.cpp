@@ -5,15 +5,12 @@
 
 using namespace irr;
 
-ParticleElement::ParticleElement(Level* level, video::SColor color, core::vector2di pixPosition)
- : Element(level, Type::PARTICLE, {0,0})
+ParticleElement::ParticleElement(Level* level, video::SColor color, core::vector2df position, unsigned life)
+ : Element(level, Type::PARTICLE, position)
  , m_color(color)
+ , m_life(life)
  , m_elapsed(0)
 {
-    unsigned unit = m_level->getUnitSize();
-    m_position.X = (float)pixPosition.X / (float)unit;
-    m_position.Y = (float)pixPosition.Y / (float)unit;
-
     //m_boundingBox = core::rectf(-0.05f, -0.05f, 0.05f, 0.05f);
 
     b2BodyDef bodyDef;
@@ -32,6 +29,16 @@ ParticleElement::ParticleElement(Level* level, video::SColor color, core::vector
     fixtureDef.friction = 0.05f;
     fixtureDef.shape = &circleShape;
     m_body->CreateFixture(&fixtureDef);
+}
+
+ParticleElement::ParticleElement(Level* level, video::SColor color, core::vector2di pixPosition, unsigned life)
+ : ParticleElement(level, color, core::vector2df(0,0), life)
+{
+    unsigned unit = m_level->getUnitSize();
+    m_position.X = (float)pixPosition.X / (float)unit;
+    m_position.Y = (float)pixPosition.Y / (float)unit;
+
+    m_body->SetTransform({m_position.X, m_position.Y}, 0.f);
 }
 
 ParticleElement::~ParticleElement()
@@ -53,7 +60,7 @@ void ParticleElement::update(uint32_t elapsedMs)
     Element::update(elapsedMs);
 
     m_elapsed += elapsedMs;
-    if (m_elapsed > 5000) this->remove(); // disappears after 5 seconds
+    if (m_elapsed > m_life) this->remove(); // disappears after 5 seconds
 }
 
 void ParticleElement::draw()

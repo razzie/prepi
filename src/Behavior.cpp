@@ -2,7 +2,7 @@
 #include "Element.h"
 #include "Behavior.h"
 #include "UnstableBehavior.h"
-//#include "ExplosiveBehavior.h"
+#include "ExplosiveBehavior.h"
 //#include "TeleportBehavior.h"
 //#include "ResizerBehavior.h"
 
@@ -54,10 +54,10 @@ Behavior* CreateBehavior(Element* element, std::istream& stream)
         case Behavior::Type::UNSTABLE:
             return new UnstableBehavior(element, stream);
 
-        /*case Behavior::Type::EXPLOSIVE:
+        case Behavior::Type::EXPLOSIVE:
             return new ExplosiveBehavior(element, stream);
 
-        case Behavior::Type::TELEPORT:
+        /*case Behavior::Type::TELEPORT:
             return new TeleportBehavior(element, stream);
 
         case Behavior::Type::RESIZER:

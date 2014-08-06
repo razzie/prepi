@@ -32,7 +32,7 @@ public:
     };
 
     //Element(Level*, std::istream&);
-    Element(Level*, Type, unsigned, irr::core::vector2di, irr::core::vector2df, Behavior*, Motion*);
+    Element(Level*, Type, unsigned, irr::core::vector2di, irr::core::vector2df, float, Behavior*, Motion*);
 
     Level* getLevel();
     const Level* getLevel() const;

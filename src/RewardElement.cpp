@@ -27,10 +27,9 @@ RewardElement::RewardElement(Level* level, std::tuple<unsigned, irr::core::vecto
 RewardElement::RewardElement(Level* level, unsigned id,
                              irr::core::vector2di imgPosition, core::vector2df position,
                              float animSpeed, unsigned value, Behavior* behavior, Motion* motion)
- : Element(level, Type::REWARD, id, imgPosition, position, behavior, motion)
+ : Element(level, Type::REWARD, id, imgPosition, position, animSpeed, behavior, motion)
  , m_value(value)
 {
-    setAnimSpeed(animSpeed);
 }
 
 RewardElement::~RewardElement()

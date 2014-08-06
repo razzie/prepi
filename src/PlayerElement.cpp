@@ -26,13 +26,12 @@ PlayerElement::PlayerElement(Level* level, std::tuple<unsigned, irr::core::vecto
 PlayerElement::PlayerElement(Level* level, unsigned id,
                              irr::core::vector2di imgPosition, core::vector2df position,
                              float animSpeed)
- : Element(level, Type::PLAYER, id, imgPosition, position, nullptr, new Motion(this, Motion::Type::DYNAMIC))
+ : Element(level, Type::PLAYER, id, imgPosition, position, 1.0f, nullptr, new Motion(this, Motion::Type::DYNAMIC))
  , m_health(100)
  , m_rewards(0)
  , m_speed(2.f)
  , m_climbTreshold(FULL_CLIMBING)
 {
-    setAnimSpeed(animSpeed);
 }
 
 PlayerElement::~PlayerElement()
