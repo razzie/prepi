@@ -7,6 +7,8 @@
 #include "elements\ParticleElement.h"
 #include "behaviors\ExplosiveBehavior.h"
 
+#define ABS(x) ( (x)<0 ? -(x) : (x) )
+
 #define PI 3.14159265358979323846
 
 using namespace irr;
@@ -30,7 +32,7 @@ ExplosiveBehavior::ExplosiveBehavior(Element* element, unsigned damage, unsigned
  , m_explosionTimer(0)
  , m_damage(damage)
  , m_timeout(timeout)
- , m_range(range)
+ , m_range((range == 0) ? 1 : range)
 {
 }
 
@@ -48,24 +50,27 @@ void ExplosiveBehavior::update(uint32_t elapsedMs)
 
         if (m_explosionTimer >= m_timeout)
         {
-            auto explosionPos = m_element->getPosition();
-
             // damaging player
             PlayerElement* player = m_element->getLevel()->getPlayerElement();
-            if (player && explosionPos.getDistanceFrom(player->getPosition()) <= m_range)
+            if (player &&
+                m_element->getPosition().getDistanceFrom(player->getPosition()) <= m_range)
             {
                 player->takeDamage(m_damage);
             }
 
             // explosion effect
-            for (int deg = 0; deg <= 360; deg += 10)
+            const int angle = 90;
+            unsigned particles = (8 - m_range < 0) ? 1 : (8 - m_range);
+            core::vector2df explosionPos = m_element->getPosition() + m_element->getBoundingBox().getCenter();
+
+            for (int deg = -angle; deg <= angle; deg += particles)
             {
-                unsigned intensity = rand() % 50;
+                float intensity = m_range * 2 + rand() % m_range;
                 video::SColor color(255, rand() % 256, 0, 0);
 
-                Element* particle = new ParticleElement(m_element->getLevel(), color, explosionPos, 3000 + rand()%500);
+                Element* particle = new ParticleElement(m_element->getLevel(), color, explosionPos, 1000 + rand()%500);
                 particle->setMovementX( sin((float)deg / (2 * PI)) * intensity );
-                particle->setMovementX( cos((float)deg / (2 * PI)) * intensity );
+                particle->setMovementY( cos((float)deg / (2 * PI)) * intensity );
             }
 
             // remove exploded element from scene

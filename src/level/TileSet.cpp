@@ -141,6 +141,11 @@ void TileData::drawAnimation(Animation::Type animType, unsigned animSpeed, Level
     {
         frame = 0;
     }
+    else if (anim->animCount == 1)
+    {
+        uint32_t elapsedMs = level->getTileSet()->getAnimationTimer()->peekElapsed();
+        frame = ((elapsedMs / (1000 / animSpeed)) % (anim->frameCount));
+    }
     else
     {
         uint32_t elapsedMs = level->getTileSet()->getAnimationTimer()->peekElapsed();

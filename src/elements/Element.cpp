@@ -45,7 +45,7 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
  , m_id(id)
  , m_imgPosition(imgPosition)
  , m_position(position)
- , m_animSpeed(animSpeed)
+ , m_animSpeed((animSpeed < 0.1f) ? 0.1f : animSpeed)
  , m_behavior(behavior)
  , m_motion(motion)
  , m_tileData(level->getTileSet()->getData(type, id))
@@ -88,6 +88,8 @@ Element::~Element()
     }
 
     if (m_motion != nullptr) delete m_motion;
+
+    if (m_behavior != nullptr) delete m_behavior;
 }
 
 Level* Element::getLevel()
@@ -135,7 +137,7 @@ float Element::getAnimSpeed() const
 
 void Element::setAnimSpeed(float animSpeed)
 {
-    m_animSpeed = animSpeed;
+    m_animSpeed = (animSpeed < 0.1f) ? 0.1f : animSpeed;
 }
 
 Behavior* Element::getBehavior()

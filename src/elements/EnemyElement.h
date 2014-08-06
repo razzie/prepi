@@ -1,6 +1,7 @@
 #ifndef ENEMYELEMENT_H_INCLUDED
 #define ENEMYELEMENT_H_INCLUDED
 
+#include "level\TileSet.h"
 #include "Element.h"
 
 class EnemyElement : public Element
@@ -10,13 +11,14 @@ public:
     EnemyElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, float, unsigned, BehaviorWrapper, MotionWrapper>);
     EnemyElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, float, unsigned damage, Behavior*, Motion*);
     unsigned getDamage() const;
-    //void update(uint32_t elapsedMs);
-    //void draw();
+    void update(uint32_t elapsedMs);
+    void draw();
 
 private:
     ~EnemyElement();
 
     unsigned m_damage;
+    TileData::Animation::Type m_lastAnimType;
 };
 
 #endif // ENEMYELEMENT_H_INCLUDED

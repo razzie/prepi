@@ -92,8 +92,7 @@ int main()
     se->add_function("exit", [&]{ quit = true; });
 
     gg::console* con = g.app->create_console();
-    con->open();
-    con->drop();
+    //con->open();
 
     u32 frames=0;
 
@@ -107,6 +106,9 @@ int main()
 
         if (g.eventListener->isKeyDown(KEY_KEY_R))
             level1.reloadLevel();
+
+        if (g.eventListener->isKeyDown(KEY_KEY_O))
+            con->open();
 
         if (g.eventListener->isLeftMouseDown())
             new ParticleElement(&level1, irr::video::SColor(~0), g.eventListener->getMousePosition() + level1.getViewOffset());
@@ -128,6 +130,8 @@ int main()
 
         Sleep(1); // windows api
     }
+
+    con->drop();
 
     return 0;
 }

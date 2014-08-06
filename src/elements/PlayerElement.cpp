@@ -31,6 +31,7 @@ PlayerElement::PlayerElement(Level* level, unsigned id,
  , m_rewards(0)
  , m_speed(2.f)
  , m_climbTreshold(FULL_CLIMBING)
+ , m_lastAnimType(TileData::Animation::Type::RIGHT)
 {
 }
 
