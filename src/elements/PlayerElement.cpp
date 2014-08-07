@@ -97,7 +97,7 @@ void PlayerElement::takeDamageFrom(EnemyElement* enemy)
         m_damageList.insert( std::make_pair(enemy, Timer()) );
         takeDamage(enemy->getDamage());
     }
-    else if (it->second.peekElapsed() >= 1000)
+    else if (it->second.peekElapsed() >= 500)
     {
         takeDamage(enemy->getDamage());
         it->second.reset();

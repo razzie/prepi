@@ -1,10 +1,10 @@
 #include <ctime>
-#include "Globals.h"
 #include "level\Level.h"
 #include "elements\Element.h"
 #include "elements\PlayerElement.h"
 #include "elements\ParticleElement.h"
 #include "effects\EffectManager.h"
+#include "effects\DamageEffect.h"
 
 #define PI 3.14159265358979323846
 
@@ -55,28 +55,6 @@ void EffectManager::update(uint32_t elapsedMs)
 
 void EffectManager::playerDamage()
 {
-    class DamageEffect : public Effect
-    {
-    private:
-        Level* m_level;
-
-    public:
-        DamageEffect(Level* level) : m_level(level) {}
-
-        void update(uint32_t)
-        {
-            video::IVideoDriver* driver = m_level->getGlobals()->driver;
-            core::recti screen({0,0}, driver->getScreenSize());
-
-            driver->draw2DRectangle(video::SColor(100, 255, 0, 0), screen);
-        }
-
-        bool isFinished() const
-        {
-            return true;
-        }
-    };
-
     // adding red screen to effects
     addEffect(new DamageEffect(m_level));
 
