@@ -18,6 +18,7 @@ public:
 private:
     irr::video::SColor m_color;
     unsigned m_life;
+    float m_size;
     uint32_t m_elapsed;
 };
 

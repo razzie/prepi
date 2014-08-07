@@ -531,8 +531,8 @@ void TileSet::findAnimationData(std::string dirName) const
                         anim->animCount = animTextureSize.Height / td->tileSize;
                         anim->frameCount = animTextureSize.Width / td->tileSize;
 
-                        std::cout << "Animation loaded: " << baseName << "!" << std::endl;
-                        std::cout << "animCount: " << anim->animCount << ", frameCount: " << anim->frameCount << std::endl;
+                        //std::cout << "Animation loaded: " << baseName << "!" << std::endl;
+                        //std::cout << "animCount: " << anim->animCount << ", frameCount: " << anim->frameCount << std::endl;
                     }
                 }
             }

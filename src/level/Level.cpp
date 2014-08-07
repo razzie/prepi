@@ -4,6 +4,7 @@
 #include "Box2D\Box2D.h"
 #include "Globals.h"
 #include "level\TileSet.h"
+#include "effects\EffectManager.h"
 #include "Parser.h"
 #include "level\Level.h"
 #include "level\Background.h"
@@ -59,6 +60,7 @@ Level::Level(Globals* globals, std::string tileset)
  : m_globals(globals)
  , m_tileset(new TileSet(globals, tileset))
  , m_physics(new b2World(gravity))
+ , m_effectMgr(new EffectManager(this))
  , m_offset(0,0)
  , m_unit(64)
  , m_bg(new Background(this))
@@ -88,6 +90,11 @@ TileSet* Level::getTileSet()
 b2World* Level::getPhysics()
 {
     return m_physics;
+}
+
+EffectManager* Level::getEffectManager()
+{
+    return m_effectMgr;
 }
 
 void Level::loadLevel(std::string file)
@@ -248,6 +255,8 @@ void Level::processDeletionQueue()
 
 void Level::updateView()
 {
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+
     core::dimension2du screenSize = m_globals->driver->getScreenSize();
     core::dimension2du levelSize = {m_dimension.Width * m_unit, m_dimension.Height * m_unit};
 
@@ -350,6 +359,7 @@ void Level::update()
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
 
+    // getting elapsed time since the last update
     unsigned elapsedTime = m_timer.getElapsed();
 
     // adding elements from insertion queue
@@ -364,8 +374,15 @@ void Level::update()
     // drawing background
     m_bg->draw();
 
+    // updating and drawing each element
     for (Element* element : m_elements)
     {
+        // if the element is disabled, we skip it
+        if (!element->isEnabled())
+        {
+            continue;
+        }
+
         // first update the elements (position sync, player moving, etc)
         element->update(elapsedTime);
 
@@ -375,6 +392,9 @@ void Level::update()
             element->draw();
         }
     }
+
+    // rendering effects
+    m_effectMgr->update(elapsedTime);
 
     // remove elements queued for deletion
     processDeletionQueue();

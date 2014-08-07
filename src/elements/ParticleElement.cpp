@@ -1,3 +1,4 @@
+#include <ctime>
 #include "Box2D\Box2D.h"
 #include "Globals.h"
 #include "level\Level.h"
@@ -9,9 +10,10 @@ ParticleElement::ParticleElement(Level* level, video::SColor color, core::vector
  : Element(level, Type::PARTICLE, position)
  , m_color(color)
  , m_life(life)
+ , m_size(0.03f + ((float)(rand() % 40) / 1000.f))
  , m_elapsed(0)
 {
-    //m_boundingBox = core::rectf(-0.05f, -0.05f, 0.05f, 0.05f);
+    m_boundingBox = core::rectf(-m_size, -m_size, m_size, m_size);
 
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
@@ -22,7 +24,7 @@ ParticleElement::ParticleElement(Level* level, video::SColor color, core::vector
 
     b2CircleShape circleShape;
     circleShape.m_p.Set(-1.f, -1.f);
-    circleShape.m_radius = 0.05f;
+    circleShape.m_radius = m_size;
 
     b2FixtureDef fixtureDef;
     fixtureDef.density = 1.0f;
@@ -60,7 +62,7 @@ void ParticleElement::update(uint32_t elapsedMs)
     Element::update(elapsedMs);
 
     m_elapsed += elapsedMs;
-    if (m_elapsed > m_life) this->remove(); // disappears after 5 seconds
+    if (m_elapsed > m_life) this->remove(); // disappears after a while
 }
 
 void ParticleElement::draw()
@@ -70,9 +72,8 @@ void ParticleElement::draw()
     pos -= m_level->getViewOffset();
 
     core::recti box(pos, pos);
-    box.UpperLeftCorner -= unit/20;
-    box.LowerRightCorner += unit/20;
+    box.UpperLeftCorner -= m_size * unit;
+    box.LowerRightCorner += m_size * unit;
 
-    //m_level->getGlobals()->driver->draw2DPolygon(pos, 3.f, m_color);
     m_level->getGlobals()->driver->draw2DRectangle(m_color, box);
 }

@@ -2,14 +2,11 @@
 #include "irrlicht.h"
 #include "Parser.h"
 #include "level\Level.h"
+#include "effects\EffectManager.h"
 #include "elements\Element.h"
 #include "elements\PlayerElement.h"
 #include "elements\ParticleElement.h"
 #include "behaviors\ExplosiveBehavior.h"
-
-#define ABS(x) ( (x)<0 ? -(x) : (x) )
-
-#define PI 3.14159265358979323846
 
 using namespace irr;
 
@@ -59,19 +56,8 @@ void ExplosiveBehavior::update(uint32_t elapsedMs)
             }
 
             // explosion effect
-            const int angle = 90;
-            unsigned particles = (8 - m_range < 0) ? 1 : (8 - m_range);
             core::vector2df explosionPos = m_element->getPosition() + m_element->getBoundingBox().getCenter();
-
-            for (int deg = -angle; deg <= angle; deg += particles)
-            {
-                float intensity = m_range * 2 + rand() % m_range;
-                video::SColor color(255, rand() % 256, 0, 0);
-
-                Element* particle = new ParticleElement(m_element->getLevel(), color, explosionPos, 1000 + rand()%500);
-                particle->setMovementX( sin((float)deg / (2 * PI)) * intensity );
-                particle->setMovementY( cos((float)deg / (2 * PI)) * intensity );
-            }
+            m_element->getLevel()->getEffectManager()->explosion(explosionPos, m_range, video::SColor(0, 255, 155, 0));
 
             // remove exploded element from scene
             m_element->remove();

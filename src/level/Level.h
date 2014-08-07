@@ -10,6 +10,7 @@
 class Globals;
 class TileSet;
 class b2World;
+class EffectManager;
 class Background;
 class Element;
 class PlayerElement;
@@ -26,6 +27,7 @@ public:
     Globals* getGlobals();
     TileSet* getTileSet();
     b2World* getPhysics();
+    EffectManager* getEffectManager();
     void loadLevel(std::string file);
     void reloadLevel();
     void clearLevel();
@@ -54,6 +56,7 @@ private:
     Globals* m_globals;
     TileSet* m_tileset;
     b2World* m_physics;
+    EffectManager* m_effectMgr;
     std::string m_levelFile;
     irr::core::vector2di m_offset;
     irr::core::dimension2du m_dimension;

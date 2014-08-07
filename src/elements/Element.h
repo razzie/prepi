@@ -66,6 +66,8 @@ public:
     void updateCollisions();
     const std::vector<Collision>& getCollisions() const;
 
+    void enable(bool enabled = true);
+    bool isEnabled() const;
     void remove();
 
     virtual void update(uint32_t elapsedMs);
@@ -90,6 +92,7 @@ protected:
     const TileData* m_tileData;
     b2Body* m_body;
     std::vector<Collision> m_collisions;
+    bool m_enabled;
 };
 
 Element* CreateElement(Level*, std::istream&);

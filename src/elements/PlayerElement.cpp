@@ -3,6 +3,7 @@
 #include "Parser.h"
 #include "EventListener.h"
 #include "level\Level.h"
+#include "effects\EffectManager.h"
 #include "elements\PlayerElement.h"
 #include "elements\EnemyElement.h"
 #include "elements\RewardElement.h"
@@ -67,12 +68,16 @@ void PlayerElement::takeReward(unsigned reward)
 
 void PlayerElement::takeRewardFrom(RewardElement* reward)
 {
+    m_level->getEffectManager()->pickUp(reward);
+
     takeReward(reward->getValue());
     reward->remove();
 }
 
 void PlayerElement::takeDamage(unsigned dmg)
 {
+    m_level->getEffectManager()->playerDamage();
+
     if (dmg >= m_health)
     {
         m_health = 0;
@@ -128,7 +133,7 @@ void PlayerElement::update(uint32_t elapsedMs)
     {
         Element* contactElem = collision.getOtherElement();
 
-        contactElem->drawDebugBox();
+        //contactElem->drawDebugBox();
 
         switch (contactElem->getType())
         {

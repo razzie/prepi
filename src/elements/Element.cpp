@@ -50,6 +50,7 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
  , m_motion(motion)
  , m_tileData(level->getTileSet()->getData(type, id))
 // , m_body(nullptr)
+ , m_enabled(true)
 {
     m_boundingBox = m_tileData->getBoundingShape(imgPosition).getBoxData();
 
@@ -75,6 +76,7 @@ Element::Element(Level* level, Type type, core::vector2df position)
  , m_motion(nullptr)
  , m_tileData(nullptr)
  , m_body(nullptr)
+ , m_enabled(true)
 {
     m_level->addElement(this);
 }
@@ -184,6 +186,7 @@ const TileData* Element::getTileData() const
 void Element::setMovementX(f32 xMov)
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+
     f32 y = m_body->GetLinearVelocity().y;
     m_body->SetLinearVelocity({xMov, y});
 }
@@ -207,12 +210,25 @@ b2Body* Element::getBody()
 
 void Element::updateCollisions()
 {
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
     Collision::getElementCollisions(this, m_collisions);
 }
 
 const std::vector<Collision>& Element::getCollisions() const
 {
     return m_collisions;
+}
+
+void Element::enable(bool enabled)
+{
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+    m_body->SetActive(enabled);
+    m_enabled = enabled;
+}
+
+bool Element::isEnabled() const
+{
+    return m_enabled;
 }
 
 void Element::remove()

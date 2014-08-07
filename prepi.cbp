@@ -79,6 +79,8 @@
 		<Unit filename="src/behaviors/ExplosiveBehavior.h" />
 		<Unit filename="src/behaviors/UnstableBehavior.cpp" />
 		<Unit filename="src/behaviors/UnstableBehavior.h" />
+		<Unit filename="src/effects/EffectManager.cpp" />
+		<Unit filename="src/effects/EffectManager.h" />
 		<Unit filename="src/elements/Element.cpp" />
 		<Unit filename="src/elements/Element.h" />
 		<Unit filename="src/elements/EnemyElement.cpp" />

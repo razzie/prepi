@@ -20,7 +20,7 @@ protected:
     irr::video::ITexture* texture;
     unsigned m_damage;
     unsigned m_timeout;
-    unsigned m_range;
+    float m_range;
 };
 
 #endif // EXPLOSIVEBEHAVIOR_H_INCLUDED
