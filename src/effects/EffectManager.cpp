@@ -5,6 +5,10 @@
 #include "elements\ParticleElement.h"
 #include "effects\EffectManager.h"
 #include "effects\DamageEffect.h"
+#include "effects\AppearEffect.h"
+#include "effects\DisappearEffect.h"
+#include "effects\FallEffect.h"
+#include "effects\PickUpEffect.h"
 
 #define PI 3.14159265358979323846
 
@@ -88,20 +92,20 @@ void EffectManager::explosion(irr::core::vector2df pos, float range, irr::video:
 
 void EffectManager::appear(Element* element)
 {
-
+    addEffect(new AppearEffect(element));
 }
 
 void EffectManager::disappear(Element* element)
 {
-
+    addEffect(new DisappearEffect(element));
 }
 
 void EffectManager::fall(Element* element)
 {
-
+    addEffect(new FallEffect(element));
 }
 
 void EffectManager::pickUp(Element* element)
 {
-
+    addEffect(new PickUpEffect(element));
 }

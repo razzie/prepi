@@ -187,6 +187,13 @@ void Level::addElement(Element* element)
 void Level::removeElement(Element* element)
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+
+    // an element shouldn't be inserted twice
+    for (Element* listElem : m_elemDeletionQueue)
+    {
+        if (listElem == element) return;
+    }
+
     m_elemDeletionQueue.push_back(element);
 }
 
