@@ -44,6 +44,9 @@ public:
     irr::core::vector2df getPosition() const;
     void setPosition(irr::core::vector2df);
 
+    float getScale() const;
+    void setScale(float);
+
     float getAnimSpeed() const;
     void setAnimSpeed(float);
 
@@ -85,6 +88,7 @@ protected:
     unsigned m_id;
     irr::core::vector2di m_imgPosition;
     irr::core::vector2df m_position;
+    float m_scale;
     float m_animSpeed;
     Behavior* m_behavior;
     Motion* m_motion;

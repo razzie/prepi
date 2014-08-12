@@ -59,5 +59,6 @@ void EnemyElement::update(uint32_t elapsedMs)
 
 void EnemyElement::draw()
 {
-    m_tileData->drawAnimation(m_lastAnimType, (unsigned)(m_animSpeed * 10), m_level, m_imgPosition, m_position);
+    m_tileData->drawAnimation(m_lastAnimType, (unsigned)(m_animSpeed * 10), m_level, m_imgPosition,
+                              m_position, m_scale);
 }

@@ -178,11 +178,11 @@ void PlayerElement::update(uint32_t elapsedMs)
 
     if (l->isUp() && isContactUnder)
     {
-        movement.y = -m_speed * 2.2;
+        movement.y = -m_speed * 2.2f;
     }
     else if (l->isDown())
     {
-        movement.y = m_speed;
+        movement.y += m_speed / 2.f;
     }
 
     if (l->isLeft() && (isContactUnder || !isContactLeft))
@@ -208,5 +208,6 @@ void PlayerElement::update(uint32_t elapsedMs)
 
 void PlayerElement::draw()
 {
-    m_tileData->drawAnimation(m_lastAnimType, (unsigned)(m_animSpeed * 10), m_level, m_imgPosition, m_position, m_standbyAnim);
+    m_tileData->drawAnimation(m_lastAnimType, (unsigned)(m_animSpeed * 10), m_level, m_imgPosition,
+                              m_position, m_scale, m_standbyAnim);
 }

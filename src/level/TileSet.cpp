@@ -47,6 +47,7 @@ b2Body* TileData::createBody(Element* element) const
     {
         Shape shape = element->getTileData()->getBoundingShape(element->getImagePosition());
         core::vector2df position = element->getPosition();
+        float scale = element->getScale();
 
         b2BodyDef bodyDef;
         bodyDef.type = motionTypeToBodyType(motionType);
@@ -64,6 +65,9 @@ b2Body* TileData::createBody(Element* element) const
             case Shape::Type::BOX:
                 {
                     core::rectf boundingBox = shape.getBoxData();
+                    boundingBox.UpperLeftCorner *= scale;
+                    boundingBox.LowerRightCorner *= scale;
+
                     b2PolygonShape boxShape;
                     boxShape.SetAsBox(boundingBox.getWidth()/2 - 0.01f, boundingBox.getHeight()/2 - 0.01f,
                                        { boundingBox.getWidth()/2 - (1.f - boundingBox.UpperLeftCorner.X),
@@ -78,12 +82,16 @@ b2Body* TileData::createBody(Element* element) const
             case Shape::Type::SPHERE:
                 {
                     Shape::SphereData boundingSphere = shape.getSphereData();
+                    boundingSphere.radius *= scale;
+                    boundingSphere.center *= scale;
+
                     b2CircleShape circleShape;
-                    circleShape.m_p.Set(-boundingSphere.center.X, -boundingSphere.center.Y);
+                    circleShape.m_p.Set(boundingSphere.center.X - 1.f, boundingSphere.center.Y - 1.f);
                     circleShape.m_radius = boundingSphere.radius - 0.02f;
 
                     fixtureDef.shape = &circleShape;
                     body->CreateFixture(&fixtureDef);
+                    break;
                 }
         }
     }
@@ -109,7 +117,7 @@ const TileData::Animation* TileData::getAnimation(irr::core::vector2di imgPos) c
         return nullptr;
 }
 
-void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df pos) const
+void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df pos, float scale) const
 {
     core::rect<s32> srcRect =
         {(s32)(imgPos.X * tileSize), (s32)(imgPos.Y * tileSize),
@@ -118,14 +126,15 @@ void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df po
     unsigned unit = level->getUnitSize();
     core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
 
-    core::rect<s32> destRect = {0, 0, (s32)unit, (s32)unit};
+    core::rect<s32> destRect = {0, 0, (s32)(scale * unit), (s32)(scale * unit)};
     destRect += calcPos;
     destRect -= level->getViewOffset();
 
     level->getGlobals()->driver->draw2DImage(texture, destRect, srcRect, 0, 0, true);
 }
 
-void TileData::drawAnimation(Animation::Type animType, unsigned animSpeed, Level* level, core::vector2di imgPos, core::vector2df pos, bool standby) const
+void TileData::drawAnimation(Animation::Type animType, unsigned animSpeed, Level* level, core::vector2di imgPos,
+                             core::vector2df pos, float scale, bool standby) const
 {
     auto it = animations.find(imgPos);
     if (it == animations.end())
@@ -159,7 +168,7 @@ void TileData::drawAnimation(Animation::Type animType, unsigned animSpeed, Level
     unsigned unit = level->getUnitSize();
     core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
 
-    core::rect<s32> destRect = {0, 0, (s32)unit, (s32)unit};
+    core::rect<s32> destRect = {0, 0, (s32)(scale * unit), (s32)(scale * unit)};
     destRect += calcPos;
     destRect -= level->getViewOffset();
 

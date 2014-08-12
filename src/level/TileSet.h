@@ -52,10 +52,10 @@ struct TileData
     Animation* getAnimation(irr::core::vector2di imgPos);
     const Animation* getAnimation(irr::core::vector2di imgPos) const;
 
-    void drawTile(Level* level, irr::core::vector2di imgPos, irr::core::vector2df pos) const;
+    void drawTile(Level* level, irr::core::vector2di imgPos, irr::core::vector2df pos, float scale = 1.0f) const;
     void drawAnimation(Animation::Type animType, unsigned animSpeed, Level* level,
                        irr::core::vector2di imgPos, irr::core::vector2df pos,
-                       bool standby = false) const;
+                       float scale = 1.0f, bool standby = false) const;
 };
 
 class TileSet
