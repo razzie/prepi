@@ -40,6 +40,8 @@ public:
     unsigned getUnitSize() const;
     irr::core::vector2di getViewOffset() const;
     irr::core::rect<irr::s32> getView() const;
+    irr::core::vector2di getScreenPosition(Element*) const;
+    irr::core::vector2di getScreenPosition(irr::core::vector2df) const;
     void update();
 
 protected:

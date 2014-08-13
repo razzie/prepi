@@ -2,14 +2,14 @@
 #include "level\Level.h"
 #include "effects\PickUpEffect.h"
 
-#define DURATION 500
+#define DURATION 250
 
 using namespace irr;
 
 PickUpEffect::PickUpEffect(Element* element)
  : ElementEffect(element)
  , m_elapsed(0)
- , m_beginPos(getScreenPosition())
+ , m_beginPos(m_level->getScreenPosition(element))
  , m_endPos(0, 0)
 {
 }
@@ -26,7 +26,7 @@ void PickUpEffect::update(uint32_t elapsedMs)
     diffPos.X *= progress;
     diffPos.Y *= progress;
 
-    drawTile(diffPos, progress * 10.f);
+    drawTile(diffPos);
 
     m_elapsed += elapsedMs;
 }

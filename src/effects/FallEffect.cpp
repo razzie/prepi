@@ -21,5 +21,5 @@ void FallEffect::update(uint32_t elapsedMs)
 
 bool FallEffect::isFinished() const
 {
-
+    return true;
 }

@@ -362,6 +362,26 @@ core::rect<s32> Level::getView() const
     return {m_offset, m_globals->driver->getScreenSize()};
 }
 
+core::vector2di Level::getScreenPosition(Element* element) const
+{
+    if (element)
+    {
+        return getScreenPosition(element->getPosition());
+    }
+    else
+    {
+        return core::vector2di(0, 0);
+    }
+}
+
+core::vector2di Level::getScreenPosition(core::vector2df pos) const
+{
+    core::vector2di calcPos = {(s32)(pos.X * m_unit), (s32)(pos.Y * m_unit)};
+    calcPos -= m_offset;
+
+    return calcPos;
+}
+
 void Level::update()
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);

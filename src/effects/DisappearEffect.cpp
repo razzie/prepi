@@ -21,5 +21,5 @@ void DisappearEffect::update(uint32_t elapsedMs)
 
 bool DisappearEffect::isFinished() const
 {
-
+    return true;
 }

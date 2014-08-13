@@ -21,5 +21,5 @@ void AppearEffect::update(uint32_t elapsedMs)
 
 bool AppearEffect::isFinished() const
 {
-
+    return true;
 }
