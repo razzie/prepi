@@ -1,6 +1,7 @@
 #ifndef PICKUPEFFECT_H_INCLUDED
 #define PICKUPEFFECT_H_INCLUDED
 
+#include "irrlicht.h"
 #include "effects\EffectManager.h"
 #include "effects\ElementEffect.h"
 
@@ -16,6 +17,8 @@ public:
 
 private:
     uint32_t m_elapsed;
+    irr::core::vector2di m_beginPos;
+    irr::core::vector2di m_endPos;
 };
 
 #endif // PICKUPEFFECT_H_INCLUDED
