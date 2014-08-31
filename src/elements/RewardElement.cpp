@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "Parser.h"
 #include "level\Level.h"
+#include "effects\EffectManager.h"
 #include "elements\RewardElement.h"
 
 using namespace irr;
@@ -34,6 +35,7 @@ RewardElement::RewardElement(Level* level, unsigned id,
 
 RewardElement::~RewardElement()
 {
+    m_level->getEffectManager()->pickUp(this);
 }
 
 unsigned RewardElement::getValue() const

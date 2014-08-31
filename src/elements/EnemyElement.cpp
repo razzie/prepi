@@ -2,6 +2,7 @@
 #include "Globals.h"
 #include "Parser.h"
 #include "level\Level.h"
+#include "effects\EffectManager.h"
 #include "elements\EnemyElement.h"
 
 using namespace irr;
@@ -36,6 +37,7 @@ EnemyElement::EnemyElement(Level* level, unsigned id,
 
 EnemyElement::~EnemyElement()
 {
+    m_level->getEffectManager()->fall(this);
 }
 
 unsigned EnemyElement::getDamage() const

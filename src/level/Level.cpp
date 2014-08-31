@@ -176,6 +176,8 @@ void Level::clearLevel()
 
     for (Element* element : m_elements) delete element;
     m_elements.clear();
+
+    m_effectMgr->reset();
 }
 
 void Level::addElement(Element* element)

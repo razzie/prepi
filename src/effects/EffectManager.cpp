@@ -1,16 +1,14 @@
 #include <ctime>
+#include "Globals.h"
 #include "level\Level.h"
 #include "elements\Element.h"
 #include "elements\PlayerElement.h"
-#include "elements\ParticleElement.h"
 #include "effects\EffectManager.h"
 #include "effects\DamageEffect.h"
+#include "effects\ExplosionEffect.h"
+#include "effects\MoveElementEffect.h"
 #include "effects\AppearEffect.h"
 #include "effects\DisappearEffect.h"
-#include "effects\FallEffect.h"
-#include "effects\PickUpEffect.h"
-
-#define PI 3.14159265358979323846
 
 using namespace irr;
 
@@ -21,12 +19,7 @@ EffectManager::EffectManager(Level* level)
 
 EffectManager::~EffectManager()
 {
-    for (Effect* effect : m_effects)
-    {
-        delete effect;
-    }
-
-    m_effects.clear();
+    reset();
 }
 
 void EffectManager::addEffect(Effect* effect)
@@ -57,10 +50,20 @@ void EffectManager::update(uint32_t elapsedMs)
     }
 }
 
+void EffectManager::reset()
+{
+    for (Effect* effect : m_effects)
+    {
+        delete effect;
+    }
+
+    m_effects.clear();
+}
+
 void EffectManager::playerDamage()
 {
     // adding red screen to effects
-    addEffect(new DamageEffect(m_level));
+    addEffect( new DamageEffect(m_level) );
 
     // adding some blood
     Element* player = m_level->getPlayerElement();
@@ -72,40 +75,28 @@ void EffectManager::playerDamage()
 
 void EffectManager::explosion(irr::core::vector2df pos, float range, irr::video::SColor color)
 {
-    const int angle = 90;
-    unsigned particles = ((10.f - (range * 2)) < 0) ? 1 : (unsigned)(10.f - (range * 2));
-
-    for (int deg = -angle; deg <= angle; deg += particles)
-    {
-        float intensity = 4.f + range + (rand() % (unsigned)(range + 0.5f));
-        float brightness = (float)(rand() % 10) / 10.f;
-        video::SColor particleColor(255,
-                        color.getRed() * brightness,
-                        color.getGreen() * brightness,
-                        color.getBlue() * brightness);
-
-        Element* particle = new ParticleElement(m_level, particleColor, pos, 1000 + rand()%500);
-        particle->setMovementX( sin((float)deg / (2 * PI)) * intensity );
-        particle->setMovementY( cos((float)deg / (2 * PI)) * intensity );
-    }
+    addEffect( new ExplosionEffect(m_level, pos, range, color) );
 }
 
 void EffectManager::appear(Element* element)
 {
-    addEffect(new AppearEffect(element));
+    addEffect( new AppearEffect(element) );
 }
 
 void EffectManager::disappear(Element* element)
 {
-    addEffect(new DisappearEffect(element));
+    addEffect( new DisappearEffect(element) );
 }
 
 void EffectManager::fall(Element* element)
 {
-    addEffect(new FallEffect(element));
+    core::dimension2du screenSize = m_level->getGlobals()->driver->getScreenSize();
+    core::vector2di endPos = m_level->getScreenPosition(element);
+    endPos.Y = screenSize.Height;
+    addEffect( new MoveElementEffect(element, endPos) );
 }
 
 void EffectManager::pickUp(Element* element)
 {
-    addEffect(new PickUpEffect(element));
+    addEffect( new MoveElementEffect(element, core::vector2di(0, 0)) );
 }

@@ -89,10 +89,10 @@
 		<Unit filename="src/effects/EffectManager.h" />
 		<Unit filename="src/effects/ElementEffect.cpp" />
 		<Unit filename="src/effects/ElementEffect.h" />
-		<Unit filename="src/effects/FallEffect.cpp" />
-		<Unit filename="src/effects/FallEffect.h" />
-		<Unit filename="src/effects/PickUpEffect.cpp" />
-		<Unit filename="src/effects/PickUpEffect.h" />
+		<Unit filename="src/effects/ExplosionEffect.cpp" />
+		<Unit filename="src/effects/ExplosionEffect.h" />
+		<Unit filename="src/effects/MoveElementEffect.cpp" />
+		<Unit filename="src/effects/MoveElementEffect.h" />
 		<Unit filename="src/elements/Element.cpp" />
 		<Unit filename="src/elements/Element.h" />
 		<Unit filename="src/elements/EnemyElement.cpp" />

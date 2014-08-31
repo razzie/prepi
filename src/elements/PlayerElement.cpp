@@ -68,8 +68,6 @@ void PlayerElement::takeReward(unsigned reward)
 
 void PlayerElement::takeRewardFrom(RewardElement* reward)
 {
-    m_level->getEffectManager()->pickUp(reward);
-
     takeReward(reward->getValue());
     reward->remove();
 }

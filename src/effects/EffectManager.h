@@ -24,6 +24,7 @@ public:
     ~EffectManager();
     void addEffect(Effect*); // do not use effect pointer after that
     void update(uint32_t elapsedMs);
+    void reset();
 
     void playerDamage();
     void explosion(irr::core::vector2df pos, float range,
