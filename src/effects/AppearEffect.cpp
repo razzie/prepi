@@ -11,7 +11,7 @@ AppearEffect::AppearEffect(Element* element, uint32_t duration)
  , m_duration(duration)
  , m_pos(m_level->getScreenPosition(element))
 {
-    m_element->enable(false);
+    //m_element->enable(false);
 }
 
 AppearEffect::~AppearEffect()
@@ -21,9 +21,12 @@ AppearEffect::~AppearEffect()
 
 void AppearEffect::update(uint32_t elapsedMs)
 {
-    float fade = (float)m_elapsed / (float)m_duration;
+    if (m_elapsed == 0) m_element->enable(false); // called first time
 
-    drawTile(m_pos, m_origScale, 0.f, fade * 255);
+    float fade = (float)m_elapsed / (float)m_duration;
+    if (fade > 1.f) fade = 1.f;
+
+    drawTile(m_pos, m_origScale, 0.f, fade * 255.f);
 
     m_elapsed += elapsedMs;
 }

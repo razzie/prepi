@@ -3,7 +3,7 @@
 #include "behaviors\Behavior.h"
 #include "behaviors\UnstableBehavior.h"
 #include "behaviors\ExplosiveBehavior.h"
-//#include "behaviors\TeleportBehavior.h"
+#include "behaviors\TeleportBehavior.h"
 //#include "behaviors\ResizerBehavior.h"
 
 Behavior::Behavior(Element* element, Type type)
@@ -57,10 +57,10 @@ Behavior* CreateBehavior(Element* element, std::istream& stream)
         case Behavior::Type::EXPLOSIVE:
             return new ExplosiveBehavior(element, stream);
 
-        /*case Behavior::Type::TELEPORT:
+        case Behavior::Type::TELEPORT:
             return new TeleportBehavior(element, stream);
 
-        case Behavior::Type::RESIZER:
+        /*case Behavior::Type::RESIZER:
             return new ResizerBehavior(element, stream);*/
 
         case Behavior::Type::NONE:

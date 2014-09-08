@@ -19,8 +19,8 @@ void ElementEffect::drawTile(irr::core::vector2di screenPos, float scale, float 
 {
     if (m_tileData == nullptr) return;
 
-    unsigned unit = m_level->getUnitSize();
-    unsigned tileSize = m_tileData->tileSize;
+    const unsigned unit = m_level->getUnitSize();
+    const unsigned tileSize = m_tileData->tileSize;
 
     core::rect<s32> srcRect =
         {(s32)(m_imgPos.X * tileSize), (s32)(m_imgPos.Y * tileSize),
@@ -29,6 +29,9 @@ void ElementEffect::drawTile(irr::core::vector2di screenPos, float scale, float 
     core::rect<s32> destRect = {0, 0, (s32)(scale * m_origScale * unit), (s32)(scale * m_origScale * unit)};
     destRect += screenPos;
 
+    const video::SColor color(alpha, 255, 255, 255);
+	const video::SColor tempColors[4] = {color, color, color, color};
+
     video::IVideoDriver* driver = m_level->getGlobals()->driver;
-    driver->draw2DImage(m_tileData->texture, destRect, srcRect, 0, 0, true);
+    driver->draw2DImage(m_tileData->texture, destRect, srcRect, 0, tempColors, true);
 }

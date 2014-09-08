@@ -11,7 +11,7 @@ DisappearEffect::DisappearEffect(Element* element, uint32_t duration)
  , m_duration(duration)
  , m_pos(m_level->getScreenPosition(element))
 {
-    element->enable(false);
+    //m_element->enable(false);
 }
 
 DisappearEffect::~DisappearEffect()
@@ -20,9 +20,12 @@ DisappearEffect::~DisappearEffect()
 
 void DisappearEffect::update(uint32_t elapsedMs)
 {
-    float fade = 1.f - ((float)m_elapsed / (float)m_duration);
+    if (m_elapsed == 0) m_element->enable(false); // called first time
 
-    drawTile(m_pos, m_origScale, 0.f, fade * 255);
+    float fade = 1.f - ((float)m_elapsed / (float)m_duration);
+    if (fade < 0.f) fade = 0.f;
+
+    drawTile(m_pos, m_origScale, 0.f, fade * 255.f);
 
     m_elapsed += elapsedMs;
 }

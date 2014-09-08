@@ -77,12 +77,16 @@
 		<Unit filename="src/behaviors/Behavior.h" />
 		<Unit filename="src/behaviors/ExplosiveBehavior.cpp" />
 		<Unit filename="src/behaviors/ExplosiveBehavior.h" />
+		<Unit filename="src/behaviors/TeleportBehavior.cpp" />
+		<Unit filename="src/behaviors/TeleportBehavior.h" />
 		<Unit filename="src/behaviors/UnstableBehavior.cpp" />
 		<Unit filename="src/behaviors/UnstableBehavior.h" />
 		<Unit filename="src/effects/AppearEffect.cpp" />
 		<Unit filename="src/effects/AppearEffect.h" />
 		<Unit filename="src/effects/DamageEffect.cpp" />
 		<Unit filename="src/effects/DamageEffect.h" />
+		<Unit filename="src/effects/DelayEffect.cpp" />
+		<Unit filename="src/effects/DelayEffect.h" />
 		<Unit filename="src/effects/DisappearEffect.cpp" />
 		<Unit filename="src/effects/DisappearEffect.h" />
 		<Unit filename="src/effects/EffectManager.cpp" />

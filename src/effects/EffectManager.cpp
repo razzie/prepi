@@ -4,6 +4,7 @@
 #include "elements\Element.h"
 #include "elements\PlayerElement.h"
 #include "effects\EffectManager.h"
+#include "effects\DelayEffect.h"
 #include "effects\DamageEffect.h"
 #include "effects\ExplosionEffect.h"
 #include "effects\MoveElementEffect.h"
@@ -85,7 +86,7 @@ void EffectManager::appear(Element* element)
 
 void EffectManager::disappear(Element* element)
 {
-    addEffect( new DisappearEffect(element) );
+    addEffect( new DelayEffect(500, new DisappearEffect(element)) );
 }
 
 void EffectManager::fall(Element* element)
