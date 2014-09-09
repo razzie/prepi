@@ -48,9 +48,20 @@ void TeleportBehavior::setElement(Element* element)
 {
     Behavior::setElement(element);
 
-    if (element && m_sequenceNum > 0)
+    if (element != nullptr)
     {
-        element->enable(false);
+        // calculating random position
+        if (m_randomness > 0.f)
+        {
+            core::vector2df pos = element->getPosition();
+            float angle = (float)(rand() % 1000) / 100.f;
+            pos.X += std::sin(angle) * m_randomness;
+            pos.Y += std::cos(angle) * m_randomness;
+
+            element->setPosition(pos);
+        }
+
+        if (m_sequenceNum > 0) element->enable(false);
     }
 }
 
@@ -84,7 +95,7 @@ void TeleportBehavior::activateNext()
     {
         Element* elem = t->m_element;
 
-        if (elem)
+        if (elem != nullptr)
         {
             //elem->enable(false);
             elem->getLevel()->getEffectManager()->disappear(elem);
@@ -102,19 +113,8 @@ void TeleportBehavior::activateNext()
     {
         Element* elem = t->m_element;
 
-        if (elem)
+        if (elem != nullptr)
         {
-            // calculating random position
-            if (m_randomness > 0.f)
-            {
-                core::vector2df pos = elem->getPosition();
-                float angle = (float)(rand() % 1000) / 100.f;
-                pos.X += std::sin(angle) * m_randomness;
-                pos.Y += std::cos(angle) * m_randomness;
-
-                elem->setPosition(pos);
-            }
-
             //elem->enable(true);
             elem->getLevel()->getEffectManager()->appear(elem);
         }

@@ -16,12 +16,19 @@ AppearEffect::AppearEffect(Element* element, uint32_t duration)
 
 AppearEffect::~AppearEffect()
 {
-    m_element->enable(true);
+    //m_element->enable(true);
 }
 
 void AppearEffect::update(uint32_t elapsedMs)
 {
-    if (m_elapsed == 0) m_element->enable(false); // called first time
+    if (m_elapsed == 0)
+    {
+        m_element->enable(false); // called first time
+    }
+    else if ((m_elapsed + elapsedMs) >= m_duration)
+    {
+        m_element->enable(true); // called last time
+    }
 
     float fade = (float)m_elapsed / (float)m_duration;
     if (fade > 1.f) fade = 1.f;
