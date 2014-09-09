@@ -25,7 +25,7 @@ void DisappearEffect::update(uint32_t elapsedMs)
     float fade = 1.f - ((float)m_elapsed / (float)m_duration);
     if (fade < 0.f) fade = 0.f;
 
-    drawTile(m_pos, m_origScale, 0.f, fade * 255.f);
+    drawTile(m_pos, m_origScale, 0.f, fade * 255);
 
     m_elapsed += elapsedMs;
 }

@@ -26,6 +26,7 @@ TeleportBehavior::TeleportBehavior(Element* element, unsigned sequenceNum, float
  : Behavior(element, Type::TELEPORT)
  , m_sequenceNum(sequenceNum)
  , m_randomness(randomness)
+ , m_triggered(false)
 {
     m_teleports[m_sequenceNum].push_back(this);
 }
@@ -57,17 +58,21 @@ void TeleportBehavior::update(uint32_t)
 {
     if (m_element == nullptr) return;
 
-    m_element->updateCollisions();
-    auto collisions = m_element->getCollisions();
-
-    for (auto collision : collisions)
+    if (!m_triggered)
     {
-        Element* contactElem = collision.getOtherElement();
+        m_element->updateCollisions();
+        auto collisions = m_element->getCollisions();
 
-        if (contactElem->getType() == Element::Type::PLAYER)
+        for (auto collision : collisions)
         {
-            activateNext();
-            return;
+            Element* contactElem = collision.getOtherElement();
+
+            if (contactElem->getType() == Element::Type::PLAYER)
+            {
+                activateNext();
+                m_triggered = true;
+                return;
+            }
         }
     }
 }
@@ -75,8 +80,7 @@ void TeleportBehavior::update(uint32_t)
 void TeleportBehavior::activateNext()
 {
     // hide elements in the current sequence
-    auto& currSeq = m_teleports[m_sequenceNum];
-    for (TeleportBehavior* t : currSeq)
+    for (TeleportBehavior* t : m_teleports[m_sequenceNum])
     {
         Element* elem = t->m_element;
 
@@ -86,7 +90,6 @@ void TeleportBehavior::activateNext()
             elem->getLevel()->getEffectManager()->disappear(elem);
         }
     }
-    currSeq.clear();
 
     // find next sequence
     auto it = m_teleports.find(m_sequenceNum);

@@ -21,6 +21,7 @@ protected:
     static std::map<unsigned, std::vector<TeleportBehavior*>> m_teleports;
     unsigned m_sequenceNum;
     float m_randomness;
+    bool m_triggered;
 };
 
 #endif // TELEPORTBEHAVIOR_H_INCLUDED
