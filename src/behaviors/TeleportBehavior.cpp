@@ -3,29 +3,35 @@
 #include "Parser.h"
 #include "level\Level.h"
 #include "effects\EffectManager.h"
+#include "effects\DelayEffect.h"
+#include "effects\DisappearEffect.h"
 #include "elements\Element.h"
 #include "behaviors\TeleportBehavior.h"
+
+#define ABS(x) ((x) < 0 ? -(x) : (x))
 
 using namespace irr;
 
 std::map<unsigned, std::vector<TeleportBehavior*>> TeleportBehavior::m_teleports;
 
 TeleportBehavior::TeleportBehavior(Element* element, std::istream& stream)
- : TeleportBehavior(element, Parser(stream, ',').getArgs<unsigned, float>())
+ : TeleportBehavior(element, Parser(stream, ',').getArgs<unsigned, float, int>())
 {
 }
 
-TeleportBehavior::TeleportBehavior(Element* element, std::tuple<unsigned, float> data)
+TeleportBehavior::TeleportBehavior(Element* element, std::tuple<unsigned, float, int> data)
  : TeleportBehavior(element,
     std::get<0>(data),
-    std::get<1>(data))
+    std::get<1>(data),
+    std::get<2>(data))
 {
 }
 
-TeleportBehavior::TeleportBehavior(Element* element, unsigned sequenceNum, float randomness)
+TeleportBehavior::TeleportBehavior(Element* element, unsigned sequenceNum, float randomness, int delay)
  : Behavior(element, Type::TELEPORT)
  , m_sequenceNum(sequenceNum)
  , m_randomness(randomness)
+ , m_delay(delay)
  , m_triggered(false)
 {
     m_teleports[m_sequenceNum].push_back(this);
@@ -69,7 +75,8 @@ void TeleportBehavior::update(uint32_t)
 {
     if (m_element == nullptr) return;
 
-    if (!m_triggered)
+    if (!m_triggered ||
+        m_delay > 0) // if the element disappears after the player leaves it, we still need to monitor collision after first touch
     {
         m_element->updateCollisions();
         auto collisions = m_element->getCollisions();
@@ -80,10 +87,16 @@ void TeleportBehavior::update(uint32_t)
 
             if (contactElem->getType() == Element::Type::PLAYER)
             {
-                activateNext();
+                if (m_delay <= 0) activateNext();
                 m_triggered = true;
-                return;
+                return; // return here in case of touch
             }
+        }
+
+        // if we got past the for cycle, that means there is no player touch
+        if (m_triggered && m_delay > 0)
+        {
+            activateNext();
         }
     }
 }
@@ -97,8 +110,9 @@ void TeleportBehavior::activateNext()
 
         if (elem != nullptr)
         {
-            //elem->enable(false);
-            elem->getLevel()->getEffectManager()->disappear(elem);
+            //elem->getLevel()->getEffectManager()->disappear(elem);
+            Effect* disappearEffect = new DelayEffect(ABS(m_delay), new DisappearEffect(elem));
+            elem->getLevel()->getEffectManager()->addEffect(disappearEffect);
         }
     }
 
@@ -115,7 +129,6 @@ void TeleportBehavior::activateNext()
 
         if (elem != nullptr)
         {
-            //elem->enable(true);
             elem->getLevel()->getEffectManager()->appear(elem);
         }
     }

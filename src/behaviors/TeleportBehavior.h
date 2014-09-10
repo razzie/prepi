@@ -9,8 +9,8 @@ class TeleportBehavior : public Behavior
 {
 public:
     TeleportBehavior(Element*, std::istream&);
-    TeleportBehavior(Element*, std::tuple<unsigned, float>);
-    TeleportBehavior(Element*, unsigned sequenceNum, float randomness);
+    TeleportBehavior(Element*, std::tuple<unsigned, float, int>);
+    TeleportBehavior(Element*, unsigned sequenceNum, float randomness, int delay);
     ~TeleportBehavior();
     void setElement(Element*);
     void update(uint32_t elapsedMs);
@@ -21,6 +21,7 @@ protected:
     static std::map<unsigned, std::vector<TeleportBehavior*>> m_teleports;
     unsigned m_sequenceNum;
     float m_randomness;
+    int m_delay;
     bool m_triggered;
 };
 

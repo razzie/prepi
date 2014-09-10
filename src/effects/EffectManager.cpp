@@ -86,7 +86,7 @@ void EffectManager::appear(Element* element)
 
 void EffectManager::disappear(Element* element)
 {
-    addEffect( new DelayEffect(500, new DisappearEffect(element)) );
+    addEffect( new DisappearEffect(element) );
 }
 
 void EffectManager::fall(Element* element)
