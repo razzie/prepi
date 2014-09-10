@@ -11,12 +11,10 @@ AppearEffect::AppearEffect(Element* element, uint32_t duration)
  , m_duration(duration)
  , m_pos(m_level->getScreenPosition(element))
 {
-    //m_element->enable(false);
 }
 
 AppearEffect::~AppearEffect()
 {
-    //m_element->enable(true);
 }
 
 void AppearEffect::update(uint32_t elapsedMs)

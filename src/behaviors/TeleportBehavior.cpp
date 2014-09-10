@@ -32,7 +32,8 @@ TeleportBehavior::TeleportBehavior(Element* element, unsigned sequenceNum, float
  , m_sequenceNum(sequenceNum)
  , m_randomness(randomness)
  , m_delay(delay)
- , m_triggered(false)
+ , m_touched(false)
+ , m_nextActivated(false)
 {
     m_teleports[m_sequenceNum].push_back(this);
 }
@@ -75,40 +76,40 @@ void TeleportBehavior::update(uint32_t)
 {
     if (m_element == nullptr) return;
 
-    if (!m_triggered ||
-        m_delay > 0) // if the element disappears after the player leaves it, we still need to monitor collision after first touch
+    if (m_nextActivated) return;
+
+    m_element->updateCollisions();
+    auto collisions = m_element->getCollisions();
+
+    for (auto collision : collisions)
     {
-        m_element->updateCollisions();
-        auto collisions = m_element->getCollisions();
+        Element* contactElem = collision.getOtherElement();
 
-        for (auto collision : collisions)
+        if (contactElem->getType() == Element::Type::PLAYER)
         {
-            Element* contactElem = collision.getOtherElement();
-
-            if (contactElem->getType() == Element::Type::PLAYER)
-            {
-                if (m_delay <= 0) activateNext();
-                m_triggered = true;
-                return; // return here in case of touch
-            }
+            if (m_delay <= 0) activateNext();
+            m_touched = true;
+            return; // return here in case of touch
         }
+    }
 
-        // if we got past the for cycle, that means there is no player touch
-        if (m_triggered && m_delay > 0)
-        {
-            activateNext();
-        }
+    // if we got past the for cycle, that means there is no player touch
+    if (m_touched && m_delay > 0)
+    {
+        activateNext();
     }
 }
 
 void TeleportBehavior::activateNext()
 {
+    m_nextActivated = true;
+
     // hide elements in the current sequence
     for (TeleportBehavior* t : m_teleports[m_sequenceNum])
     {
         Element* elem = t->m_element;
 
-        if (elem != nullptr)
+        if (elem != nullptr && t->m_delay != 0)
         {
             //elem->getLevel()->getEffectManager()->disappear(elem);
             Effect* disappearEffect = new DelayEffect(ABS(m_delay), new DisappearEffect(elem));

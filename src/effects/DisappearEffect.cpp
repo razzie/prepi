@@ -11,7 +11,6 @@ DisappearEffect::DisappearEffect(Element* element, uint32_t duration)
  , m_duration(duration)
  , m_pos(m_level->getScreenPosition(element))
 {
-    //m_element->enable(false);
 }
 
 DisappearEffect::~DisappearEffect()

@@ -22,7 +22,8 @@ protected:
     unsigned m_sequenceNum;
     float m_randomness;
     int m_delay;
-    bool m_triggered;
+    bool m_touched;
+    bool m_nextActivated;
 };
 
 #endif // TELEPORTBEHAVIOR_H_INCLUDED
