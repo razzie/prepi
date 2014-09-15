@@ -17,8 +17,8 @@ public:
     static constexpr irr::f32 FULL_CLIMBING = 60.0f;
 
     PlayerElement(Level*, std::istream&);
-    PlayerElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, float>);
-    PlayerElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, float);
+    PlayerElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, float, float, BehaviorWrapper>);
+    PlayerElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, float, float, Behavior*);
     unsigned getHealth() const;
     unsigned getMaxHealth() const;
     unsigned getRewards() const;

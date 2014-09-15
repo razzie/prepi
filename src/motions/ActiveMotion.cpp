@@ -7,7 +7,7 @@
 {
 }*/
 
-/*ActiveMotion::ActiveMotion(Element* element, Motion::Type type, std::tuple<uint32_t, uint32_t, bool> data)
+/*ActiveMotion::ActiveMotion(Element* element, Motion::Type type, std::tuple<float, uint32_t, bool> data)
  : ActiveMotion(element, type,
     std::get<0>(data),
     std::get<1>(data),
@@ -15,7 +15,7 @@
 {
 }*/
 
-ActiveMotion::ActiveMotion(Element* element, Motion::Type type, uint32_t speed, uint32_t delay, bool ai)
+ActiveMotion::ActiveMotion(Element* element, Motion::Type type, float speed, uint32_t delay, bool ai)
  : Motion(element, type)
  , m_elapsed(0)
  , m_speed(speed)
@@ -28,7 +28,7 @@ ActiveMotion::~ActiveMotion()
 {
 }
 
-uint32_t ActiveMotion::getSpeed() const
+float ActiveMotion::getSpeed() const
 {
     return m_speed;
 }

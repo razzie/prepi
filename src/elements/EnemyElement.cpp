@@ -9,12 +9,12 @@ using namespace irr;
 
 EnemyElement::EnemyElement(Level* level, std::istream& stream)
  : EnemyElement(level, Parser(stream, ';').getArgs<unsigned, irr::core::vector2di, irr::core::vector2df,
-                                                   float, unsigned, BehaviorWrapper, MotionWrapper>())
+                                                   float, float, BehaviorWrapper, MotionWrapper, unsigned>())
 {
 }
 
 EnemyElement::EnemyElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df,
-                                                    float, unsigned, BehaviorWrapper, MotionWrapper> data)
+                                                    float, float, BehaviorWrapper, MotionWrapper, unsigned> data)
  : EnemyElement(level,
     std::get<0>(data),
     std::get<1>(data),
@@ -22,14 +22,15 @@ EnemyElement::EnemyElement(Level* level, std::tuple<unsigned, irr::core::vector2
     std::get<3>(data),
     std::get<4>(data),
     std::get<5>(data).behavior,
-    std::get<6>(data).motion)
+    std::get<6>(data).motion,
+    std::get<7>(data))
 {
 }
 
 EnemyElement::EnemyElement(Level* level, unsigned id,
                            irr::core::vector2di imgPosition, core::vector2df position,
-                           float animSpeed, unsigned damage, Behavior* behavior, Motion* motion)
- : Element(level, Type::ENEMY, id, imgPosition, position, animSpeed, behavior, motion)
+                           float scale, float animSpeed, Behavior* behavior, Motion* motion, unsigned damage)
+ : Element(level, Type::ENEMY, id, imgPosition, position, scale, animSpeed, behavior, motion)
  , m_damage(damage)
  , m_lastAnimType(TileData::Animation::Type::RIGHT)
 {

@@ -139,7 +139,7 @@ void TileData::drawAnimation(Animation::Type animType, unsigned animSpeed, Level
     auto it = animations.find(imgPos);
     if (it == animations.end())
     {
-        drawTile(level, imgPos, pos);
+        drawTile(level, imgPos, pos, scale);
         return;
     }
 

@@ -100,7 +100,7 @@ void StraightMotion::rebuildPathArray()
         float dist = p.startPoint.getDistanceFrom(p.endPoint); // distance in units
 
         p.startTime = ((i == 0) ? 0 : (m_pathArray[i-1].endTime));
-        p.endTime = p.startTime + (uint32_t)((10000.f * dist) / (float)m_speed); // x speed: x units / 1000 msec
+        p.endTime = p.startTime + (uint32_t)((1000.f * dist) / (float)m_speed); // x speed: x units / 1000 msec
 
         m_pathArray.push_back(p);
     }
@@ -127,11 +127,12 @@ core::vector2df StraightMotion::Path::getPointByTime(uint32_t elapsedMs) const
 std::istream& operator>> (std::istream& stream, StraightMotion::PointArray& pointArray)
 {
     Parser p(stream, ',');
-    while (p.hasNextArg())
+
+    //while (p.hasNextArg())
+    for (unsigned i = 0, num = p.getArg<unsigned>(); i < num; ++i)
     {
         core::vector2df point = p.getArg<core::vector2df>();
         pointArray.push_back(point);
-        //std::cout << "x: " << point.X << ", y: " << point.Y << std::endl;
     }
 
     return stream;

@@ -12,11 +12,11 @@ public:
     enum class Type : unsigned
     {
         NONE = 0,
-        STATIC = 3,
-        DYNAMIC = 4,
-        AUTO = 5,
-        STRAIGHT = 6,
-        CIRCULAR = 7
+        STATIC = 4,
+        DYNAMIC = 5,
+        AUTO = 6,
+        STRAIGHT = 7,
+        CIRCULAR = 8
     };
 
     Motion(Element*, Type = Type::NONE);

@@ -51,7 +51,7 @@ struct Version
     }
 };
 
-static const Version prepiVersion {1, 2};
+static const Version prepiVersion {1, 4};
 static const b2Vec2 gravity(0.0f, 5.f);
 static const int32 velocityIterations = 8;
 static const int32 positionIterations = 3;
@@ -137,17 +137,19 @@ void Level::loadLevel(std::string file)
     }
 
     // elements
+    unsigned line = 0;
     while(p.nextLine())
     {
         if (f.peek() == '#') continue; // skip comments
 
         try
         {
+            ++line;
             CreateElement(this, f);
         }
         catch (const std::exception& e)
         {
-            std::cout << "Failed to add element to level (" << e.what() << ")" << std::endl;
+            std::cout << "Failed to add element " << line << " to level (" << e.what() << ")" << std::endl;
         }
     }
 

@@ -11,23 +11,25 @@
 using namespace irr;
 
 PlayerElement::PlayerElement(Level* level, std::istream& stream)
- : PlayerElement(level, Parser(stream, ';').getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, float>())
+ : PlayerElement(level, Parser(stream, ';').getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, float, float, BehaviorWrapper>())
 {
 }
 
-PlayerElement::PlayerElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, float> data)
+PlayerElement::PlayerElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, float, float, BehaviorWrapper> data)
  : PlayerElement(level,
     std::get<0>(data),
     std::get<1>(data),
     std::get<2>(data),
-    std::get<3>(data))
+    std::get<3>(data),
+    std::get<4>(data),
+    std::get<5>(data).behavior)
 {
 }
 
 PlayerElement::PlayerElement(Level* level, unsigned id,
                              irr::core::vector2di imgPosition, core::vector2df position,
-                             float animSpeed)
- : Element(level, Type::PLAYER, id, imgPosition, position, 1.0f, nullptr, new Motion(this, Motion::Type::DYNAMIC))
+                             float scale, float animSpeed, Behavior* behavior)
+ : Element(level, Type::PLAYER, id, imgPosition, position, scale, animSpeed, behavior, new Motion(this, Motion::Type::DYNAMIC))
  , m_health(100)
  , m_rewards(0)
  , m_speed(2.f)

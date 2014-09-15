@@ -4,7 +4,7 @@
 #include "behaviors\UnstableBehavior.h"
 
 UnstableBehavior::UnstableBehavior(Element* element, std::istream& stream)
- : UnstableBehavior(element, Parser(stream, ',').getArg<bool>())
+ : UnstableBehavior(element, Parser(stream, ',').getArg<int>()) // <bool> doesn't work
 {
 }
 

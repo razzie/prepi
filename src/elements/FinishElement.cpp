@@ -7,23 +7,25 @@
 using namespace irr;
 
 FinishElement::FinishElement(Level* level, std::istream& stream)
- : FinishElement(level, Parser(stream, ';').getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, float>())
+ : FinishElement(level, Parser(stream, ';').getArgs<unsigned, irr::core::vector2di, irr::core::vector2df, float, float, BehaviorWrapper>())
 {
 }
 
-FinishElement::FinishElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, float> data)
+FinishElement::FinishElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, float, float, BehaviorWrapper> data)
  : FinishElement(level,
     std::get<0>(data),
     std::get<1>(data),
     std::get<2>(data),
-    std::get<3>(data))
+    std::get<3>(data),
+    std::get<4>(data),
+    std::get<5>(data).behavior)
 {
 }
 
 FinishElement::FinishElement(Level* level, unsigned id,
                              irr::core::vector2di imgPosition, core::vector2df position,
-                             float animSpeed)
- : Element(level, Type::FINISH, id, imgPosition, position, animSpeed, nullptr, new Motion(this, Motion::Type::STATIC))
+                             float scale, float animSpeed, Behavior* behavior)
+ : Element(level, Type::FINISH, id, imgPosition, position, scale, animSpeed, behavior, new Motion(this, Motion::Type::STATIC))
 {
 }
 

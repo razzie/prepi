@@ -6,11 +6,11 @@
 using namespace irr;
 
 AutoMotion::AutoMotion(Element* element, std::istream& stream)
- : AutoMotion(element, Parser(stream, ',').getArgs<uint32_t, uint32_t, bool, Direction>())
+ : AutoMotion(element, Parser(stream, ',').getArgs<float, uint32_t, bool, Direction>())
 {
 }
 
-AutoMotion::AutoMotion(Element* element, std::tuple<uint32_t, uint32_t, bool, Direction> data)
+AutoMotion::AutoMotion(Element* element, std::tuple<float, uint32_t, bool, Direction> data)
  : AutoMotion(element,
     std::get<0>(data),
     std::get<1>(data),
@@ -19,7 +19,7 @@ AutoMotion::AutoMotion(Element* element, std::tuple<uint32_t, uint32_t, bool, Di
 {
 }
 
-AutoMotion::AutoMotion(Element* element, uint32_t speed, uint32_t delay, bool ai, Direction direction)
+AutoMotion::AutoMotion(Element* element, float speed, uint32_t delay, bool ai, Direction direction)
  : ActiveMotion(element, Type::AUTO, speed, delay, ai)
  , m_direction(direction)
 {
@@ -52,6 +52,10 @@ void AutoMotion::update(uint32_t elapsedMs)
     m_element->updateCollisions();
     for (const Collision& collision : m_element->getCollisions())
     {
+        Element* contactElem = collision.getOtherElement();
+
+        if (contactElem->getType() == Element::Type::PARTICLE) continue;
+
         Collision::Direction direction = Collision::getDirectionFromAngle( collision.getOtherElementAngle(), 45.f );
         switch (direction)
         {
@@ -70,18 +74,14 @@ void AutoMotion::update(uint32_t elapsedMs)
             default:
                 break;
         }
-
-        collision.getOtherElement()->drawDebugBox();
     }
 
     if (isOnGround)
     {
-        float speed = (float)m_speed / 10.f;
-
         if (m_direction == Direction::LEFT)
-            m_element->setMovementX(-speed);
+            m_element->setMovementX(-m_speed);
         else
-            m_element->setMovementX(speed);
+            m_element->setMovementX(m_speed);
     }
 }
 

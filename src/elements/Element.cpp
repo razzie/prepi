@@ -12,8 +12,21 @@
 
 using namespace irr;
 
-Element* CreateElement(Level* level, std::istream& stream)
+void getLine(std::istream& input, std::ostream& output)
 {
+    while (input && input.peek() != '\n')
+    {
+        output << (char)input.get();
+    }
+
+    //output << std::endl;
+}
+
+Element* CreateElement(Level* level, std::istream& input)
+{
+    std::stringstream stream;
+    getLine(input, stream);
+
     Element::Type type = Parser(stream, ';').getArg<Element::Type>();
 
     switch (type)
@@ -39,13 +52,13 @@ Element* CreateElement(Level* level, std::istream& stream)
 }
 
 Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgPosition, core::vector2df position,
-                 float animSpeed, Behavior* behavior, Motion* motion)
+                 float scale, float animSpeed, Behavior* behavior, Motion* motion)
  : m_level(level)
  , m_type(type)
  , m_id(id)
  , m_imgPosition(imgPosition)
  , m_position(position)
- , m_scale(1.0f)
+ , m_scale(scale)
  , m_animSpeed((animSpeed < 0.1f) ? 0.1f : animSpeed)
  , m_behavior(behavior)
  , m_motion(motion)

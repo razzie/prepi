@@ -8,12 +8,12 @@ using namespace irr;
 
 RewardElement::RewardElement(Level* level, std::istream& stream)
  : RewardElement(level, Parser(stream, ';').getArgs<unsigned, irr::core::vector2di, irr::core::vector2df,
-                                                    float, unsigned, BehaviorWrapper, MotionWrapper>())
+                                                    float, float, BehaviorWrapper, MotionWrapper, unsigned>())
 {
 }
 
 RewardElement::RewardElement(Level* level, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df,
-                                                      float, unsigned, BehaviorWrapper, MotionWrapper> data)
+                                                      float, float, BehaviorWrapper, MotionWrapper, unsigned> data)
  : RewardElement(level,
     std::get<0>(data),
     std::get<1>(data),
@@ -21,14 +21,15 @@ RewardElement::RewardElement(Level* level, std::tuple<unsigned, irr::core::vecto
     std::get<3>(data),
     std::get<4>(data),
     std::get<5>(data).behavior,
-    std::get<6>(data).motion)
+    std::get<6>(data).motion,
+    std::get<7>(data))
 {
 }
 
 RewardElement::RewardElement(Level* level, unsigned id,
                              irr::core::vector2di imgPosition, core::vector2df position,
-                             float animSpeed, unsigned value, Behavior* behavior, Motion* motion)
- : Element(level, Type::REWARD, id, imgPosition, position, animSpeed, behavior, motion)
+                             float scale, float animSpeed, Behavior* behavior, Motion* motion, unsigned value)
+ : Element(level, Type::REWARD, id, imgPosition, position, scale, animSpeed, behavior, motion)
  , m_value(value)
 {
 }
