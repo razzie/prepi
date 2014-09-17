@@ -77,6 +77,8 @@
 		<Unit filename="src/behaviors/Behavior.h" />
 		<Unit filename="src/behaviors/ExplosiveBehavior.cpp" />
 		<Unit filename="src/behaviors/ExplosiveBehavior.h" />
+		<Unit filename="src/behaviors/ResizerBehavior.cpp" />
+		<Unit filename="src/behaviors/ResizerBehavior.h" />
 		<Unit filename="src/behaviors/TeleportBehavior.cpp" />
 		<Unit filename="src/behaviors/TeleportBehavior.h" />
 		<Unit filename="src/behaviors/UnstableBehavior.cpp" />
