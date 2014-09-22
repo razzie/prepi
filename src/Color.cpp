@@ -16,9 +16,9 @@ void randomizeColor(irr::video::SColor& color, uint8_t randomness)
 
 void randomizeColor(irr::video::SColor& color, uint8_t randR, uint8_t randG, uint8_t randB)
 {
-    int R = color.getRed() + (rand() % randR) - (randR / 2);
-    int G = color.getGreen() + (rand() % randG) - (randG / 2);
-    int B = color.getBlue() + (rand() % randB) - (randB / 2);
+    int R = color.getRed() + (rand() % MAX(1, randR)) - (randR / 2);
+    int G = color.getGreen() + (rand() % MAX(1, randG)) - (randG / 2);
+    int B = color.getBlue() + (rand() % MAX(1, randB)) - (randB / 2);
     color.setRed( BETWEEN(R, 0, 255) );
     color.setGreen( BETWEEN(G, 0, 255) );
     color.setBlue( BETWEEN(B, 0, 255) );
