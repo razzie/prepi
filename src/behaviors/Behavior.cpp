@@ -5,6 +5,7 @@
 #include "behaviors\ExplosiveBehavior.h"
 #include "behaviors\TeleportBehavior.h"
 #include "behaviors\ResizerBehavior.h"
+#include "behaviors\LeafEffectBehavior.h"
 
 Behavior::Behavior(Element* element, Type type)
  : m_type(type)
@@ -63,6 +64,9 @@ Behavior* CreateBehavior(Element* element, std::istream& stream)
         case Behavior::Type::RESIZER:
             return new ResizerBehavior(element, stream);
 
+        case Behavior::Type::LEAF_EFFECT:
+            return new LeafEffectBehavior(element, stream);
+
         case Behavior::Type::NONE:
         default:
             return nullptr;
@@ -81,6 +85,8 @@ std::istream& operator>> (std::istream& stream, Behavior::Type& m)
         case 2: // EXPLOSIVE
         case 3: // TELEPORT
         case 4: // RESIZER
+        case 5: // LEAF_EFFECT
+        // case 6: // CONTAINER
             m = static_cast<Behavior::Type>(behavior);
             break;
 

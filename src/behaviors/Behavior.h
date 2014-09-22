@@ -15,7 +15,9 @@ public:
         UNSTABLE = 1,
         EXPLOSIVE = 2,
         TELEPORT = 3,
-        RESIZER = 4
+        RESIZER = 4,
+        LEAF_EFFECT = 5
+        //CONTAINER = 6
     };
 
     Behavior(Element*, Type = Type::NONE);

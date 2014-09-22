@@ -61,6 +61,8 @@
 		</Linker>
 		<Unit filename="src/Collision.cpp" />
 		<Unit filename="src/Collision.h" />
+		<Unit filename="src/Color.cpp" />
+		<Unit filename="src/Color.h" />
 		<Unit filename="src/EventListener.cpp" />
 		<Unit filename="src/EventListener.h" />
 		<Unit filename="src/GUI.cpp" />
@@ -77,6 +79,8 @@
 		<Unit filename="src/behaviors/Behavior.h" />
 		<Unit filename="src/behaviors/ExplosiveBehavior.cpp" />
 		<Unit filename="src/behaviors/ExplosiveBehavior.h" />
+		<Unit filename="src/behaviors/LeafEffectBehavior.cpp" />
+		<Unit filename="src/behaviors/LeafEffectBehavior.h" />
 		<Unit filename="src/behaviors/ResizerBehavior.cpp" />
 		<Unit filename="src/behaviors/ResizerBehavior.h" />
 		<Unit filename="src/behaviors/TeleportBehavior.cpp" />
@@ -97,6 +101,8 @@
 		<Unit filename="src/effects/ElementEffect.h" />
 		<Unit filename="src/effects/ExplosionEffect.cpp" />
 		<Unit filename="src/effects/ExplosionEffect.h" />
+		<Unit filename="src/effects/LeafEffect.cpp" />
+		<Unit filename="src/effects/LeafEffect.h" />
 		<Unit filename="src/effects/MoveElementEffect.cpp" />
 		<Unit filename="src/effects/MoveElementEffect.h" />
 		<Unit filename="src/elements/Element.cpp" />
