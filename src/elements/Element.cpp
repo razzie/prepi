@@ -235,7 +235,10 @@ void Element::setMovementY(f32 yMov)
 
 core::rectf Element::getBoundingBox() const
 {
-    return m_boundingBox;
+    core::rectf box = m_boundingBox;
+    core::dimension2df dim = box.LowerRightCorner - box.UpperLeftCorner;
+    box.LowerRightCorner = box.UpperLeftCorner + (dim * m_scale);
+    return box;
 }
 
 b2Body* Element::getBody()

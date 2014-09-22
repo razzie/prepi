@@ -11,7 +11,7 @@ class Level;
 class LeafEffect : public Effect
 {
 public:
-    LeafEffect(Element*, irr::video::SColor, irr::core::vector2df);
+    LeafEffect(Element*, irr::video::SColor, irr::core::vector2df velocity, float length = 5.f);
     ~LeafEffect();
     void update(uint32_t elapsedMs);
     bool isFinished() const;
@@ -29,7 +29,7 @@ private:
     static irr::video::ITexture* m_leafTexture;
     Level* m_level;
     irr::video::SColor m_color;
-    irr::core::vector2df m_direction;
+    irr::core::vector2df m_velocity;
     irr::core::rectf m_box;
     uint32_t m_duration;
     uint32_t m_elapsed;

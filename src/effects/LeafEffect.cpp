@@ -6,7 +6,7 @@
 #include "Color.h"
 #include "effects\LeafEffect.h"
 
-#define DEFAULT_LEAF_NUM 3
+#define DEFAULT_LEAF_NUM 1.5f
 
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 
@@ -20,11 +20,11 @@ float rand_float(float f)
 
 video::ITexture* LeafEffect::m_leafTexture = nullptr;
 
-LeafEffect::LeafEffect(Element* element, video::SColor color, core::vector2df direction)
+LeafEffect::LeafEffect(Element* element, video::SColor color, core::vector2df velocity, float length)
  : m_level(nullptr)
  , m_color(color)
- , m_direction(direction)
- , m_duration((1.f / MAX(direction.getLength(), 0.1f)) * 1000)
+ , m_velocity(velocity)
+ , m_duration((1.f / MAX(velocity.getLength(), 0.1f)) * 500.f * length)
  , m_elapsed(0)
 {
     if (element != nullptr)
@@ -39,13 +39,13 @@ LeafEffect::LeafEffect(Element* element, video::SColor color, core::vector2df di
         }
     }
 
-    const int leafNum = DEFAULT_LEAF_NUM * m_box.getArea();
+    const int leafNum = MAX(1, (float)DEFAULT_LEAF_NUM * std::sqrt(m_box.getArea()));
 
     for (int i = 0; i < leafNum; ++i)
     {
         Leaf leaf;
-        leaf.m_position.X = m_box.UpperLeftCorner.X + rand_float(m_box.getWidth());
-        leaf.m_position.Y = m_box.UpperLeftCorner.Y + rand_float(m_box.getHeight());
+        leaf.m_position.X = m_box.UpperLeftCorner.X + rand_float(m_box.getWidth() - 0.18f) + 0.08f;
+        leaf.m_position.Y = m_box.UpperLeftCorner.Y + rand_float(m_box.getHeight() - 0.18f) + 0.08f;
         leaf.m_color = m_color;
         randomizeColor(leaf.m_color, 128);
         leaf.m_begin = rand() % 500;
@@ -72,13 +72,12 @@ void LeafEffect::update(uint32_t elapsedMs)
         {
             // update leaf position
             float speed = (float)elapsedMs / 1000.f;
-            core::vector2df movement = m_direction;
-            movement.X += m_direction.X + (sin((leaf.m_randomSeed + m_elapsed) / 256) * 0.5f);
-            movement.Y += m_direction.Y + (cos((leaf.m_randomSeed + m_elapsed) / 256) * 0.5f);
+            core::vector2df movement = m_velocity;
+            movement.X += m_velocity.X + (sin((leaf.m_randomSeed + m_elapsed) / 256) * 0.5f);
+            movement.Y += m_velocity.Y + (cos((leaf.m_randomSeed + m_elapsed) / 256) * 0.5f);
             leaf.m_position += movement * speed;
 
             // update leaf color and alpha
-            // randomizeColor(leaf.m_color, 32);
             if (m_elapsed < (leaf.m_begin + 255))
             {
                 leaf.m_color.setAlpha(m_elapsed - leaf.m_begin);
