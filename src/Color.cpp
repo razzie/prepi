@@ -1,12 +1,33 @@
-#include <stdexcept>
+#include <ctime>
 //#include <cctype>
+#include <stdexcept>
 #include "Color.h"
 
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
+#define BETWEEN(x, min, max) ( MAX(0, MIN(255, (x))) )
+
 using namespace irr;
+
+void randomizeColor(irr::video::SColor& color, uint8_t randomness)
+{
+    randomizeColor(color, randomness, randomness, randomness);
+}
+
+void randomizeColor(irr::video::SColor& color, uint8_t randR, uint8_t randG, uint8_t randB)
+{
+    int R = color.getRed() + (rand() % randR) - (randR / 2);
+    int G = color.getGreen() + (rand() % randG) - (randG / 2);
+    int B = color.getBlue() + (rand() % randB) - (randB / 2);
+    color.setRed( BETWEEN(R, 0, 255) );
+    color.setGreen( BETWEEN(G, 0, 255) );
+    color.setBlue( BETWEEN(B, 0, 255) );
+}
 
 std::istream& operator>> (std::istream& stream, irr::video::SColor& color)
 {
     char c[6];
+    uint8_t n[6];
 
     if (stream.peek() == '#') stream.ignore();
 
@@ -19,17 +40,31 @@ std::istream& operator>> (std::istream& stream, irr::video::SColor& color)
     {
         for (int i = 0; i < 6; ++i)
         {
-            if (!(c[i] >= 'a' && c[i] <= 'f')
+            if (c[i] >= 'a' && c[i] <= 'f')
+            {
+                n[i] = c[i] - 'a' + 10;
+            }
+            else if (c[i] >= 'A' && c[i] <= 'F')
+            {
+                n[i] = c[i] - 'A' + 10;
+            }
+            else if (c[i] >= '0' && c[i])
+            {
+                n[i] = c[i] - '0';
+            }
+            else
+            /*if (!(c[i] >= 'a' && c[i] <= 'f')
                 && !(c[i] >= 'A' && c[i] <= 'F')
-                && !(c[i] >= '0' && c[i]))
+                && !(c[i] >= '0' && c[i]))*/
             {
                 throw std::runtime_error("wrong color code");
             }
         }
 
-        color.setRed(c[0]*255 + c[1]);
-        color.setGreen(c[2]*255 + c[3]);
-        color.setBlue(c[4]*255 + c[5]);
+        color.setAlpha(255);
+        color.setRed(n[0]*16 + n[1]);
+        color.setGreen(n[2]*16 + n[3]);
+        color.setBlue(n[4]*16 + n[5]);
     }
     else
     {

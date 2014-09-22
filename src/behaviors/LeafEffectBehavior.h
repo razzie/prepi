@@ -18,6 +18,7 @@ public:
 protected:
     irr::video::SColor m_color;
     irr::core::vector2df m_direction;
+    uint32_t m_genSpeed;
     uint32_t m_elapsed;
 };
 

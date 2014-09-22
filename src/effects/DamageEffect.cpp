@@ -12,7 +12,7 @@ DamageEffect::DamageEffect(Level* level)
  : m_level(level)
  , m_elapsed(0)
 {
-    if (!m_texture)
+    if (m_texture == nullptr)
     {
         video::IVideoDriver* driver = m_level->getGlobals()->driver;
         m_texture = driver->getTexture("../media/damage.png");

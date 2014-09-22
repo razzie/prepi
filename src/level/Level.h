@@ -1,7 +1,7 @@
 #ifndef LEVEL_H_INCLUDED
 #define LEVEL_H_INCLUDED
 
-#include <list>
+#include <vector>
 #include <string>
 #include "irrlicht.h"
 #include "tinythread.h"
@@ -64,9 +64,9 @@ private:
     irr::core::dimension2du m_dimension;
     unsigned m_unit;
     Background* m_bg;
-    std::list<Element*> m_elements;
-    std::list<Element*> m_elemInsertionQueue;
-    std::list<Element*> m_elemDeletionQueue;
+    std::vector<Element*> m_elements;
+    std::vector<Element*> m_elemInsertionQueue;
+    std::vector<Element*> m_elemDeletionQueue;
     PlayerElement* m_player;
     unsigned m_rewardSum;
     Timer m_timer;

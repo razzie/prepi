@@ -6,6 +6,8 @@
 #include "effects\LeafEffect.h"
 #include "behaviors\LeafEffectBehavior.h"
 
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
+
 using namespace irr;
 
 LeafEffectBehavior::LeafEffectBehavior(Element* element, std::istream& stream)
@@ -24,6 +26,7 @@ LeafEffectBehavior::LeafEffectBehavior(Element* element, video::SColor color, co
  : Behavior(element, Type::LEAF_EFFECT)
  , m_color(color)
  , m_direction(direction)
+ , m_genSpeed((1.f / MAX(direction.getLength(), 0.1f)) * 200)
  , m_elapsed(0)
 {
 }
@@ -38,7 +41,7 @@ void LeafEffectBehavior::update(uint32_t elapsedMs)
 
     m_elapsed += elapsedMs;
 
-    if (m_elapsed >= 1000)
+    if (m_elapsed >= m_genSpeed)
     {
         m_elapsed = 0;
 
