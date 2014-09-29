@@ -60,7 +60,8 @@ Level::Level(Globals* globals, std::string tileset)
  , m_tileset(new TileSet(globals, tileset))
  , m_physics(new b2World(gravity))
  , m_effectMgr(new EffectManager(this))
- , m_offset(0,0)
+ , m_offset(0, 0)
+ , m_camMovement(0, 0)
  , m_unit(64)
  , m_bg(new Background(this))
  , m_player(nullptr)
@@ -263,25 +264,26 @@ void Level::processDeletionQueue()
     m_elemDeletionQueue.clear();
 }
 
-void Level::updateView()
+void Level::updateView(uint32_t elapsedMs)
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
 
     core::dimension2du screenSize = m_globals->driver->getScreenSize();
     core::dimension2du levelSize = {m_dimension.Width * m_unit, m_dimension.Height * m_unit};
+    core::vector2di offset;
 
     // if level width is small enough, positioning it to center
     if (levelSize.Width < screenSize.Width)
     {
         int delta = (screenSize.Width - levelSize.Width) / 2;
-        m_offset.X = -delta;
+        offset.X = -delta;
     }
 
     // if level height is small enough, positioning it to center
     if (levelSize.Height < screenSize.Height)
     {
         int delta = (screenSize.Height - levelSize.Height) / 2;
-        m_offset.Y = -delta;
+        offset.Y = -delta;
     }
 
     if (m_player)
@@ -295,27 +297,56 @@ void Level::updateView()
         if (levelSize.Width >= screenSize.Width)
         {
             // moving player to the horizontal center of the screen
-            m_offset.X = plBox.UpperLeftCorner.X + (plBox.getWidth() / 2);
+            offset.X = plBox.UpperLeftCorner.X + (plBox.getWidth() / 2);
 
             // align the level if an edge is out of the screen
-            if (m_offset.X < 0)
-                m_offset.X = 0;
-            else if (m_offset.X > (s32)(levelSize.Width - screenSize.Width))
-                m_offset.X = (s32)(levelSize.Width - screenSize.Width);
+            if (offset.X < 0)
+                offset.X = 0;
+            else if (offset.X > (s32)(levelSize.Width - screenSize.Width))
+                offset.X = (s32)(levelSize.Width - screenSize.Width);
         }
 
         if (levelSize.Height >= screenSize.Height)
         {
             // moving player to the vertical center of the screen
-            m_offset.Y = plBox.UpperLeftCorner.Y + (plBox.getHeight() / 2);
+            offset.Y = plBox.UpperLeftCorner.Y + (plBox.getHeight() / 2);
 
             // align the level if an edge is out of the screen
-            if (m_offset.Y < 0)
-                m_offset.Y = 0;
-            else if (m_offset.Y > (s32)(s32)(levelSize.Height - screenSize.Height))
-                m_offset.Y = (s32)(levelSize.Height - screenSize.Height);
+            if (offset.Y < 0)
+                offset.Y = 0;
+            else if (offset.Y > (s32)(s32)(levelSize.Height - screenSize.Height))
+                offset.Y = (s32)(levelSize.Height - screenSize.Height);
         }
     }
+
+    const float camSpeed = (float)elapsedMs / 2000.f;
+
+    // brake when the X view if close enough
+    if (m_offset.X > (offset.X - 16) &&
+        m_offset.X < (offset.X + 16))
+    {
+        m_camMovement.X /= 2;
+    }
+    // or speed up cam movement
+    else
+    {
+        m_camMovement.X += camSpeed * (offset.X - m_offset.X);
+    }
+
+    // brake when the Y view if close enough
+    if (m_offset.Y > (offset.Y - 16) &&
+        m_offset.Y < (offset.Y + 16))
+    {
+        m_camMovement.Y /= 2;
+    }
+    // or speed up cam movement
+    else
+    {
+        m_camMovement.Y += camSpeed * (offset.Y - m_offset.Y);
+    }
+
+    // actually moving the camera
+    m_offset += m_camMovement;
 }
 
 bool Level::isElementOnScreen(Element* element)
@@ -390,16 +421,16 @@ void Level::update()
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
 
     // getting elapsed time since the last update
-    unsigned elapsedTime = m_timer.getElapsed();
+    unsigned elapsedMs = m_timer.getElapsed();
 
     // adding elements from insertion queue
     processInsertionQueue();
 
     // updating physics
-    m_physics->Step((float)elapsedTime/250, velocityIterations, positionIterations);
+    m_physics->Step((float)elapsedMs/250, velocityIterations, positionIterations);
 
     // updating view
-    updateView();
+    updateView(elapsedMs);
 
     // drawing background
     m_bg->draw();
@@ -414,7 +445,7 @@ void Level::update()
         }
 
         // first update the elements (position sync, player moving, etc)
-        element->update(elapsedTime);
+        element->update(elapsedMs);
 
         // do not draw if outside of screen
         if (isElementOnScreen(element))
@@ -424,7 +455,7 @@ void Level::update()
     }
 
     // rendering effects
-    m_effectMgr->update(elapsedTime);
+    m_effectMgr->update(elapsedMs);
 
     // remove elements queued for deletion
     processDeletionQueue();

@@ -1,6 +1,7 @@
 #ifndef LEVEL_H_INCLUDED
 #define LEVEL_H_INCLUDED
 
+#include <cstdint>
 #include <vector>
 #include <string>
 #include "irrlicht.h"
@@ -50,7 +51,7 @@ protected:
     PlayerElement* findPlayer();
     void processInsertionQueue();
     void processDeletionQueue();
-    void updateView();
+    void updateView(uint32_t elapsedMs);
     bool isElementOnScreen(Element*);
 
 private:
@@ -61,6 +62,7 @@ private:
     EffectManager* m_effectMgr;
     std::string m_levelFile;
     irr::core::vector2di m_offset;
+    irr::core::vector2di m_camMovement;
     irr::core::dimension2du m_dimension;
     unsigned m_unit;
     Background* m_bg;
