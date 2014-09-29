@@ -18,7 +18,7 @@ public:
 private:
     uint32_t m_elapsed;
     uint32_t m_duration;
-    irr::core::vector2di m_pos;
+    irr::core::vector2df m_pos;
 };
 
 #endif // DISAPPEAREFFECT_H_INCLUDED
