@@ -40,6 +40,7 @@ protected:
     unsigned m_rewards;
     irr::f32 m_speed;
     irr::f32 m_climbTreshold;
+    irr::core::vector2df m_prevVelocity;
     std::map<EnemyElement*, Timer> m_damageList;
     TileData::Animation::Type m_lastAnimType;
     bool m_standbyAnim;

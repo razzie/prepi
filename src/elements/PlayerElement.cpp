@@ -34,6 +34,7 @@ PlayerElement::PlayerElement(Level* level, unsigned id,
  , m_rewards(0)
  , m_speed(2.f)
  , m_climbTreshold(FULL_CLIMBING)
+ , m_prevVelocity(0.f, 0.f)
  , m_lastAnimType(TileData::Animation::Type::RIGHT)
 {
 }
@@ -143,6 +144,7 @@ void PlayerElement::update(uint32_t elapsedMs)
 
             case Element::Type::REWARD:
                 takeRewardFrom(static_cast<RewardElement*>(contactElem));
+                m_body->SetLinearVelocity({m_prevVelocity.X, m_prevVelocity.Y});
                 break;
 
             case Element::Type::PARTICLE:
@@ -178,7 +180,7 @@ void PlayerElement::update(uint32_t elapsedMs)
 
     if (l->isUp() && isContactUnder)
     {
-        movement.y = -m_speed * 2.2f;
+        movement.y = -m_speed * 2.5f;
     }
     else if (l->isDown())
     {
@@ -204,6 +206,7 @@ void PlayerElement::update(uint32_t elapsedMs)
     }
 
     m_body->SetLinearVelocity(movement);
+    m_prevVelocity = core::vector2df(movement.x, movement.y);
 }
 
 void PlayerElement::draw()
