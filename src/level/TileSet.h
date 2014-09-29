@@ -21,7 +21,7 @@ struct TileData
 {
     struct Animation
     {
-        enum Type
+        enum class Type : unsigned
         {
             RIGHT = 0,
             LEFT,
@@ -39,6 +39,18 @@ struct TileData
         unsigned frameCount;
     };
 
+    class AnimationType // helps conversion between unsigned and Animation::Type
+    {
+    private:
+        unsigned m_animType;
+
+    public:
+        AnimationType(unsigned animType) : m_animType(animType) {}
+        AnimationType(Animation::Type animType) : m_animType(static_cast<unsigned>(animType)) {}
+        operator unsigned() const { return m_animType; }
+        operator Animation::Type() const { return static_cast<Animation::Type>(m_animType); }
+    };
+
     std::string fileName;
     irr::video::ITexture* texture;
     unsigned tileSize;
@@ -49,13 +61,15 @@ struct TileData
 
     Shape getBoundingShape(irr::core::vector2di imgPosition) const;
     b2Body* createBody(Element*) const;
+    irr::core::vector2di getImagePosition(unsigned imgNum) const;
     Animation* getAnimation(irr::core::vector2di imgPos);
     const Animation* getAnimation(irr::core::vector2di imgPos) const;
 
-    void drawTile(Level* level, irr::core::vector2di imgPos, irr::core::vector2df pos, float scale = 1.0f) const;
-    void drawAnimation(Animation::Type animType, unsigned animSpeed, Level* level,
+    void drawTile(Level* level, irr::core::vector2di imgPos, irr::core::vector2df pos,
+                  float scale = 1.0f, irr::video::SColor = {255, 255, 255, 255}) const;
+    void drawAnimation(AnimationType animType, unsigned animSpeed, Level* level,
                        irr::core::vector2di imgPos, irr::core::vector2df pos,
-                       float scale = 1.0f, bool standby = false) const;
+                       float scale = 1.0f, bool standby = false, irr::video::SColor = {255, 255, 255, 255}) const;
 };
 
 class TileSet
@@ -79,6 +93,7 @@ public:
     const TileData* getRewardData(unsigned id, SearchType = SearchType::EXACT) const;
     const TileData* getPlayerData(unsigned id, SearchType = SearchType::EXACT) const;
     const TileData* getFinishData(unsigned id, SearchType = SearchType::EXACT) const;
+    const TileData* getParticleData(unsigned id, SearchType = SearchType::EXACT) const;
     const TileData* getData(Element::Type type, unsigned id, SearchType = SearchType::EXACT) const;
 
 private:
@@ -91,6 +106,7 @@ private:
     mutable std::map<unsigned, TileData> m_rewards;
     mutable std::map<unsigned, TileData> m_players;
     mutable std::map<unsigned, TileData> m_finishes;
+    mutable std::map<unsigned, TileData> m_particles;
 
     bool fillTileData(std::string dirName, std::string fileName, unsigned& id, TileData&) const;
     void findTileData(std::string dirName, std::map<unsigned, TileData>&) const;

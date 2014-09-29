@@ -26,10 +26,9 @@ struct Version
 
     inline friend std::istream& operator>> (std::istream& is, Version& ver)
     {
-        char unused;
-        is >> unused; // skipping 'v'
+        is.ignore(); // skipping 'v'
         is >> ver.major;
-        is >> unused; // skipping '.'
+        is.ignore(); // skipping '.'
         is >> ver.minor;
         return is;
     }
@@ -51,7 +50,7 @@ struct Version
     }
 };
 
-static const Version prepiVersion {1, 4};
+static const Version prepiVersion {1, 5};
 static const b2Vec2 gravity(0.0f, 5.f);
 static const int32 velocityIterations = 8;
 static const int32 positionIterations = 3;

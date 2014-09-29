@@ -28,7 +28,7 @@ public:
         REWARD = 2,
         PLAYER = 3,
         FINISH = 4,
-        PARTICLE = 999
+        PARTICLE = 5
     };
 
     //Element(Level*, std::istream&);

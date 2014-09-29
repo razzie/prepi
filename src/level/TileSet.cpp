@@ -2,11 +2,11 @@
 #include <fstream>
 #include "Box2D\Box2D.h"
 #include "Globals.h"
+#include "Parser.h"
 #include "Level.h"
 #include "TileSet.h"
-//#include "Element.h"
-//#include "Motion.h"
-#include "Parser.h"
+#include "elements\Element.h"
+#include "motions\Motion.h"
 
 using namespace irr;
 
@@ -99,6 +99,15 @@ b2Body* TileData::createBody(Element* element) const
     return body;
 }
 
+core::vector2di TileData::getImagePosition(unsigned imgNum) const
+{
+    //unsigned tileId = (tileDimension.X * imgPosition.Y) + imgPosition.X;
+    core::vector2di imgPos(0, 0);
+    imgPos.Y = imgNum / tileDimension.X;
+    imgPos.X = imgNum % tileDimension.X;
+    return imgPos;
+}
+
 TileData::Animation* TileData::getAnimation(irr::core::vector2di imgPos)
 {
     auto it = animations.find(imgPos);
@@ -117,8 +126,11 @@ const TileData::Animation* TileData::getAnimation(irr::core::vector2di imgPos) c
         return nullptr;
 }
 
-void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df pos, float scale) const
+void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df pos, float scale, irr::video::SColor color) const
 {
+    video::IVideoDriver* driver = level->getGlobals()->driver;
+    core::recti screen({0,0}, driver->getScreenSize());
+
     core::rect<s32> srcRect =
         {(s32)(imgPos.X * tileSize), (s32)(imgPos.Y * tileSize),
         (s32)((imgPos.X + 1) * tileSize), (s32)((imgPos.Y + 1) * tileSize)};
@@ -126,20 +138,24 @@ void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df po
     unsigned unit = level->getUnitSize();
     core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
 
+    video::SColor colors[4] = {color, color, color, color};
     core::rect<s32> destRect = {0, 0, (s32)(scale * unit), (s32)(scale * unit)};
     destRect += calcPos;
     destRect -= level->getViewOffset();
 
-    level->getGlobals()->driver->draw2DImage(texture, destRect, srcRect, 0, 0, true);
+    if (screen.isRectCollided(destRect))
+    {
+        driver->draw2DImage(texture, destRect, srcRect, 0, colors, true);
+    }
 }
 
-void TileData::drawAnimation(Animation::Type animType, unsigned animSpeed, Level* level, core::vector2di imgPos,
-                             core::vector2df pos, float scale, bool standby) const
+void TileData::drawAnimation(AnimationType animType, unsigned animSpeed, Level* level, core::vector2di imgPos,
+                             core::vector2df pos, float scale, bool standby, irr::video::SColor color) const
 {
     auto it = animations.find(imgPos);
     if (it == animations.end())
     {
-        drawTile(level, imgPos, pos, scale);
+        drawTile(level, imgPos, pos, scale, color);
         return;
     }
 
@@ -165,14 +181,21 @@ void TileData::drawAnimation(Animation::Type animType, unsigned animSpeed, Level
         {(s32)(frame * tileSize), (s32)((unsigned)animType * tileSize),
          (s32)((frame + 1) * tileSize), (s32)(((unsigned)animType + 1) * tileSize)};
 
+    video::IVideoDriver* driver = level->getGlobals()->driver;
+    core::recti screen({0,0}, driver->getScreenSize());
+
     unsigned unit = level->getUnitSize();
     core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
 
+    video::SColor colors[4] = {color, color, color, color};
     core::rect<s32> destRect = {0, 0, (s32)(scale * unit), (s32)(scale * unit)};
     destRect += calcPos;
     destRect -= level->getViewOffset();
 
-    level->getGlobals()->driver->draw2DImage(anim->texture, destRect, srcRect, 0, 0, true);
+    if (screen.isRectCollided(destRect))
+    {
+        driver->draw2DImage(anim->texture, destRect, srcRect, 0, colors, true);
+    }
 }
 
 
@@ -190,6 +213,7 @@ TileSet::TileSet(Globals* globals, std::string name)
     findTileData(basedir + "reward/", m_rewards);
     findTileData(basedir + "player/", m_players);
     findTileData(basedir + "finish/", m_finishes);
+    findTileData(basedir + "particle/", m_particles);
     findAnimationData(basedir + "animations/");
 }
 
@@ -355,6 +379,32 @@ const TileData* TileSet::getFinishData(unsigned id, SearchType search) const
         if (search == SearchType::NEXT) ++id;
 
         for (auto& it : m_finishes)
+        {
+            if (it.first >= id) return &(it.second);
+        }
+
+        return nullptr;
+    }
+}
+
+const TileData* TileSet::getParticleData(unsigned id, SearchType search) const
+{
+    if (search == SearchType::EXACT)
+    {
+        auto it = m_particles.find(id);
+        if (it != m_particles.end())
+        {
+            TileData* data = &(it->second);
+            return data;
+        }
+        else
+            return nullptr;
+    }
+    else
+    {
+        if (search == SearchType::NEXT) ++id;
+
+        for (auto& it : m_particles)
         {
             if (it.first >= id) return &(it.second);
         }

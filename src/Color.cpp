@@ -1,5 +1,4 @@
 #include <ctime>
-//#include <cctype>
 #include <stdexcept>
 #include "Color.h"
 
@@ -16,12 +15,14 @@ void randomizeColor(irr::video::SColor& color, uint8_t randomness)
 
 void randomizeColor(irr::video::SColor& color, uint8_t randR, uint8_t randG, uint8_t randB)
 {
-    int R = color.getRed() + (rand() % MAX(1, randR)) - (randR / 2);
-    int G = color.getGreen() + (rand() % MAX(1, randG)) - (randG / 2);
-    int B = color.getBlue() + (rand() % MAX(1, randB)) - (randB / 2);
+#define RAND_VALUE(interval) ((rand() % BETWEEN((interval), 1, 255)) - (BETWEEN((interval), 1, 255) / 2))
+    int R = color.getRed() + RAND_VALUE(randR);
+    int G = color.getGreen() + RAND_VALUE(randG);
+    int B = color.getBlue() + RAND_VALUE(randB);
     color.setRed( BETWEEN(R, 0, 255) );
     color.setGreen( BETWEEN(G, 0, 255) );
     color.setBlue( BETWEEN(B, 0, 255) );
+#undef RAND_VALUE
 }
 
 std::istream& operator>> (std::istream& stream, irr::video::SColor& color)
@@ -53,9 +54,6 @@ std::istream& operator>> (std::istream& stream, irr::video::SColor& color)
                 n[i] = c[i] - '0';
             }
             else
-            /*if (!(c[i] >= 'a' && c[i] <= 'f')
-                && !(c[i] >= 'A' && c[i] <= 'F')
-                && !(c[i] >= '0' && c[i]))*/
             {
                 throw std::runtime_error("wrong color code");
             }

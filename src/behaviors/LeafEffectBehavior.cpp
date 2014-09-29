@@ -11,21 +11,25 @@
 using namespace irr;
 
 LeafEffectBehavior::LeafEffectBehavior(Element* element, std::istream& stream)
- : LeafEffectBehavior(element, Parser(stream, ',').getArgs<video::SColor, core::vector2df>())
+ : LeafEffectBehavior(element, Parser(stream, ',').getArgs<unsigned, video::SColor, core::vector2df, float>())
 {
 }
 
-LeafEffectBehavior::LeafEffectBehavior(Element* element, std::tuple<video::SColor, core::vector2df> data)
+LeafEffectBehavior::LeafEffectBehavior(Element* element, std::tuple<unsigned, video::SColor, core::vector2df, float> data)
  : LeafEffectBehavior(element,
     std::get<0>(data),
-    std::get<1>(data))
+    std::get<1>(data),
+    std::get<2>(data),
+    std::get<3>(data))
 {
 }
 
-LeafEffectBehavior::LeafEffectBehavior(Element* element, video::SColor color, core::vector2df direction)
+LeafEffectBehavior::LeafEffectBehavior(Element* element, unsigned image, video::SColor color, core::vector2df direction, float length)
  : Behavior(element, Type::LEAF_EFFECT)
+ , m_image(image)
  , m_color(color)
  , m_direction(direction)
+ , m_length(length)
  , m_genSpeed((1.f / MAX(direction.getLength(), 0.1f)) * 200)
  , m_elapsed(0)
 {
@@ -45,7 +49,7 @@ void LeafEffectBehavior::update(uint32_t elapsedMs)
     {
         m_elapsed = 0;
 
-        Effect* leafEffect = new LeafEffect(m_element, m_color, m_direction);
+        Effect* leafEffect = new LeafEffect(m_element, m_image, m_color, m_direction, m_length);
         m_element->getLevel()->getEffectManager()->addEffect(leafEffect);
     }
 }

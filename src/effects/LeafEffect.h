@@ -7,11 +7,12 @@
 
 class Element;
 class Level;
+class TileData;
 
 class LeafEffect : public Effect
 {
 public:
-    LeafEffect(Element*, irr::video::SColor, irr::core::vector2df velocity, float length = 5.f);
+    LeafEffect(Element*, unsigned image, irr::video::SColor, irr::core::vector2df velocity, float length);
     ~LeafEffect();
     void update(uint32_t elapsedMs);
     bool isFinished() const;
@@ -26,8 +27,9 @@ private:
         uint32_t m_randomSeed;
     };
 
-    static irr::video::ITexture* m_leafTexture;
     Level* m_level;
+    const TileData* m_tileData;
+    irr::core::vector2di m_imgPos; // leaf tile
     irr::video::SColor m_color;
     irr::core::vector2df m_velocity;
     irr::core::rectf m_box;
