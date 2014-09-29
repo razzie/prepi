@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <cmath>
+#include "Box2D\Box2D.h"
 #include "Parser.h"
 #include "motions\CircularMotion.h"
 #include "elements\Element.h"
@@ -90,11 +92,21 @@ void CircularMotion::update(uint32_t elapsedMs)
         elapsedSec = (float)(travelInterval - (alignedElapsedMs - travelInterval)) / 1000.f;
     }
 
+    // calculating new position
     float scale = m_element->getScale();
     core::vector2df pos = m_center;
     pos.X += m_radius * std::sin(m_startAngleRad + m_angleSpeedRad * elapsedSec);
     pos.Y += m_radius * std::cos(m_startAngleRad + m_angleSpeedRad * elapsedSec);
     pos -= core::vector2df(scale / 2.f, scale / 2.f); // pos points to the center of element, moving it to the top-left corner
 
+    // calculating velocity vector
+    core::vector2df velocity = m_element->getPosition(); // it will be rotated by 90 or -90 degrees first
+    std::swap(velocity.X, velocity.Y);
+    if (m_speed < 0) velocity.X *= -1;
+    else velocity.Y *= -1;
+    velocity.normalize();
+    velocity *= m_angleSpeedRad; // radius is missing, but it's better this way
+
     m_element->setPosition(pos);
+    m_element->getBody()->SetLinearVelocity({velocity.X, velocity.Y});
 }

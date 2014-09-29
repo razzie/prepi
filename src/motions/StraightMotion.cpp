@@ -1,5 +1,6 @@
 #include <string>
 #include <sstream>
+#include "Box2D\Box2D.h"
 #include "Parser.h"
 #include "motions\StraightMotion.h"
 #include "elements\Element.h"
@@ -56,7 +57,7 @@ void StraightMotion::update(uint32_t elapsedMs)
 {
     m_elapsed += elapsedMs;
 
-    if (m_elapsed <= m_delay) return;
+    if (m_elapsed <= m_delay || m_element == nullptr) return;
 
     uint32_t travelInterval = m_pathArray[m_pathArray.size()-1].endTime;
     uint32_t alignedElapsedMs;
@@ -78,7 +79,12 @@ void StraightMotion::update(uint32_t elapsedMs)
         if (path.startTime <= alignedElapsedMs &&
             path.endTime > alignedElapsedMs)
         {
-            m_element->setPosition(path.getPointByTime(alignedElapsedMs));
+            core::vector2df pos = path.getPointByTime(alignedElapsedMs);
+            core::vector2df velocity = pos - m_element->getPosition();
+
+            m_element->setPosition(pos);
+            m_element->getBody()->SetLinearVelocity({velocity.X, velocity.Y});
+
             break;
         }
     }
