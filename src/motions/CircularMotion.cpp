@@ -57,18 +57,24 @@ void CircularMotion::setElement(Element* element)
 {
     Motion::setElement(element);
 
-    core::vector2df pos = element->getPosition();
-    double startAngle = -((pos - m_center).getAngleTrig()) + 90.f;
+    if (element != nullptr)
+    {
+        float scale = element->getScale();
+        core::vector2df pos = element->getPosition();
+        pos += core::vector2df(scale / 2.f, scale / 2.f); // let's move the element's (top-left) origo to its center
 
-    m_radius = pos.getDistanceFrom(m_center);
-    m_startAngleRad = startAngle / 180.f * PI;
+        double startAngle = -((pos - m_center).getAngleTrig()) + 90.f;
+
+        m_radius = pos.getDistanceFrom(m_center);
+        m_startAngleRad = startAngle / 180.f * PI;
+    }
 }
 
 void CircularMotion::update(uint32_t elapsedMs)
 {
     m_elapsed += elapsedMs;
 
-    if (m_elapsed <= m_delay) return;
+    if (m_elapsed <= m_delay || m_element == nullptr) return;
 
     uint32_t travelInterval = 1000 * m_angle / m_speed;
     uint32_t alignedElapsedMs = (m_elapsed - m_delay) % (travelInterval * 2);
@@ -84,8 +90,11 @@ void CircularMotion::update(uint32_t elapsedMs)
         elapsedSec = (float)(travelInterval - (alignedElapsedMs - travelInterval)) / 1000.f;
     }
 
-    m_element->setPosition({
-        m_center.X + m_radius * std::sin(m_startAngleRad + m_angleSpeedRad * elapsedSec),
-        m_center.Y + m_radius * std::cos(m_startAngleRad + m_angleSpeedRad * elapsedSec)
-        });
+    float scale = m_element->getScale();
+    core::vector2df pos = m_center;
+    pos.X += m_radius * std::sin(m_startAngleRad + m_angleSpeedRad * elapsedSec);
+    pos.Y += m_radius * std::cos(m_startAngleRad + m_angleSpeedRad * elapsedSec);
+    pos -= core::vector2df(scale / 2.f, scale / 2.f); // pos points to the center of element, moving it to the top-left corner
+
+    m_element->setPosition(pos);
 }

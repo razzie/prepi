@@ -132,6 +132,7 @@ std::istream& operator>> (std::istream& stream, StraightMotion::PointArray& poin
     for (unsigned i = 0, num = p.getArg<unsigned>(); i < num; ++i)
     {
         core::vector2df point = p.getArg<core::vector2df>();
+        point -= core::vector2df(0.5f, 0.5f); // element coordinate is at the upper left corner, not at center
         pointArray.push_back(point);
     }
 
