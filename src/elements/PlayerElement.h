@@ -30,6 +30,7 @@ public:
     void die();
     void setSpeed(irr::f32);
     void setClimbingMode(irr::f32);
+    void setImmortal(uint32_t msec);
     void update(uint32_t elapsedMs);
     void draw();
 
@@ -42,6 +43,8 @@ protected:
     irr::f32 m_climbTreshold;
     irr::core::vector2df m_prevVelocity;
     std::map<EnemyElement*, Timer> m_damageList;
+    unsigned m_injury;
+    uint32_t m_immortalLeft;
     TileData::Animation::Type m_lastAnimType;
     bool m_standbyAnim;
 };

@@ -35,6 +35,8 @@ PlayerElement::PlayerElement(Level* level, unsigned id,
  , m_speed(2.f)
  , m_climbTreshold(FULL_CLIMBING)
  , m_prevVelocity(0.f, 0.f)
+ , m_injury(0)
+ , m_immortalLeft(0)
  , m_lastAnimType(TileData::Animation::Type::RIGHT)
 {
 }
@@ -77,7 +79,10 @@ void PlayerElement::takeRewardFrom(RewardElement* reward)
 
 void PlayerElement::takeDamage(unsigned dmg)
 {
+    if (m_immortalLeft > 0) return;
+
     m_level->getEffectManager()->playerDamage();
+    m_injury = 255;
 
     if (dmg >= m_health)
     {
@@ -118,6 +123,11 @@ void PlayerElement::setSpeed(f32 speed)
 void PlayerElement::setClimbingMode(irr::f32 climbTreshold)
 {
     m_climbTreshold = climbTreshold;
+}
+
+void PlayerElement::setImmortal(uint32_t msec)
+{
+    m_immortalLeft = msec;
 }
 
 void PlayerElement::update(uint32_t elapsedMs)
@@ -207,10 +217,17 @@ void PlayerElement::update(uint32_t elapsedMs)
 
     m_body->SetLinearVelocity(movement);
     m_prevVelocity = core::vector2df(movement.x, movement.y);
+
+    if (elapsedMs > m_injury) m_injury = 0;
+    else m_injury -= elapsedMs;
+
+    if (elapsedMs > m_immortalLeft) m_immortalLeft = 0;
+    else m_immortalLeft -= elapsedMs;
 }
 
 void PlayerElement::draw()
 {
     m_tileData->drawAnimation(m_lastAnimType, (unsigned)(m_animSpeed * 10), m_level, m_imgPosition,
-                              m_position, m_scale, m_standbyAnim);
+                              m_position, m_scale, m_standbyAnim,
+                              video::SColor(255, 255, 255 - m_injury, 255 - m_injury));
 }

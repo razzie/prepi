@@ -89,6 +89,12 @@ int main()
                         if (player) player->setClimbingMode(climbTreshold);
                      });
 
+    se->add_function("GodMode", [&](unsigned sec)
+                     {
+                        PlayerElement* player = level1.getPlayerElement();
+                        if (player) player->setImmortal(sec * 1000);
+                     });
+
     se->add_function("exit", [&]{ quit = true; });
 
     gg::console* con = g.app->create_console();
