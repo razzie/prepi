@@ -62,16 +62,16 @@ private:
     EffectManager* m_effectMgr;
     std::string m_levelFile;
     irr::core::vector2di m_offset;
-    irr::core::vector2di m_camMovement;
     irr::core::dimension2du m_dimension;
     unsigned m_unit;
     Background* m_bg;
     std::vector<Element*> m_elements;
     std::vector<Element*> m_elemInsertionQueue;
     std::vector<Element*> m_elemDeletionQueue;
+    Timer m_timer;
     PlayerElement* m_player;
     unsigned m_rewardSum;
-    Timer m_timer;
+    irr::core::vector2di m_camMovement;
 };
 
 #endif // LEVEL_H_INCLUDED

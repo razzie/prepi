@@ -61,11 +61,11 @@ Level::Level(Globals* globals, std::string tileset)
  , m_physics(new b2World(gravity))
  , m_effectMgr(new EffectManager(this))
  , m_offset(0, 0)
- , m_camMovement(0, 0)
  , m_unit(64)
  , m_bg(new Background(this))
  , m_player(nullptr)
  , m_rewardSum(0)
+ , m_camMovement(0, 0)
 {
 }
 
@@ -298,55 +298,52 @@ void Level::updateView(uint32_t elapsedMs)
         {
             // moving player to the horizontal center of the screen
             offset.X = plBox.UpperLeftCorner.X + (plBox.getWidth() / 2);
-
-            // align the level if an edge is out of the screen
-            if (offset.X < 0)
-                offset.X = 0;
-            else if (offset.X > (s32)(levelSize.Width - screenSize.Width))
-                offset.X = (s32)(levelSize.Width - screenSize.Width);
         }
 
         if (levelSize.Height >= screenSize.Height)
         {
             // moving player to the vertical center of the screen
             offset.Y = plBox.UpperLeftCorner.Y + (plBox.getHeight() / 2);
-
-            // align the level if an edge is out of the screen
-            if (offset.Y < 0)
-                offset.Y = 0;
-            else if (offset.Y > (s32)(s32)(levelSize.Height - screenSize.Height))
-                offset.Y = (s32)(levelSize.Height - screenSize.Height);
         }
     }
 
-    const float camSpeed = (float)elapsedMs / 2000.f;
+    // speed up camera in the direction of the new target position
+    const float camSpeed = (float)elapsedMs / 1200.f;
+    m_camMovement.X += camSpeed * (offset.X - m_offset.X) + 1;
+    m_camMovement.Y += camSpeed * (offset.Y - m_offset.Y) + 1;
 
-    // brake when the X view if close enough
-    if (m_offset.X > (offset.X - 16) &&
-        m_offset.X < (offset.X + 16))
+    // 'fast braking' if camera is too fast and left the target position behind
+    if ((m_camMovement.X > 0 && m_offset.X > offset.X) ||
+        (m_camMovement.X < 0 && m_offset.X < offset.X))
     {
-        m_camMovement.X /= 2;
+        m_camMovement.X -= (m_camMovement.X / 8);
     }
-    // or speed up cam movement
-    else
+    if ((m_camMovement.Y > 0 && m_offset.Y > offset.Y) ||
+        (m_camMovement.Y < 0 && m_offset.Y < offset.Y))
     {
-        m_camMovement.X += camSpeed * (offset.X - m_offset.X);
+        m_camMovement.Y -= (m_camMovement.Y / 8);
     }
 
-    // brake when the Y view if close enough
-    if (m_offset.Y > (offset.Y - 16) &&
-        m_offset.Y < (offset.Y + 16))
-    {
-        m_camMovement.Y /= 2;
-    }
-    // or speed up cam movement
-    else
-    {
-        m_camMovement.Y += camSpeed * (offset.Y - m_offset.Y);
-    }
+    // light braking if the fast braking is not accurate enough
+    if (m_camMovement.X > 0) m_camMovement.X -= 1;
+    else if (m_camMovement.X < 0) m_camMovement.X += 1;
+    if (m_camMovement.Y > 0) m_camMovement.Y -= 1;
+    else if (m_camMovement.Y < 0) m_camMovement.Y += 1;
 
     // actually moving the camera
     m_offset += m_camMovement;
+
+    // align the level if an edge is out of the screen
+    if (m_offset.X < 0)
+        m_offset.X = 0;
+    else if (m_offset.X > (s32)(levelSize.Width - screenSize.Width))
+        m_offset.X = (s32)(levelSize.Width - screenSize.Width);
+
+    // align the level if an edge is out of the screen
+    if (m_offset.Y < 0)
+        m_offset.Y = 0;
+    else if (m_offset.Y > (s32)(s32)(levelSize.Height - screenSize.Height))
+        m_offset.Y = (s32)(levelSize.Height - screenSize.Height);
 }
 
 bool Level::isElementOnScreen(Element* element)
