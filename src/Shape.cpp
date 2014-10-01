@@ -1,3 +1,4 @@
+#include "Box2D\Box2D.h"
 #include "Shape.h"
 
 using namespace irr;
@@ -68,4 +69,48 @@ core::rectf Shape::getBoxData() const
 Shape::SphereData Shape::getSphereData() const
 {
     return m_sphereData;
+}
+
+void Shape::addToBody(b2Body* body, float scale) const
+{
+    b2FixtureDef fixtureDef;
+    fixtureDef.density = 1.0f;
+    fixtureDef.friction = 0.5f;
+
+    switch (m_type)
+    {
+        case Shape::Type::BOX:
+            {
+                core::rectf boundingBox = m_boxData;
+                boundingBox.UpperLeftCorner *= scale;
+                boundingBox.LowerRightCorner *= scale;
+
+                b2PolygonShape boxShape;
+                boxShape.SetAsBox(boundingBox.getWidth()/2 - 0.01f, boundingBox.getHeight()/2 - 0.01f,
+                                   { boundingBox.getWidth()/2 - (1.f - boundingBox.UpperLeftCorner.X),
+                                     boundingBox.getHeight()/2 - (1.f - boundingBox.UpperLeftCorner.Y) },
+                                   0.f);
+
+                fixtureDef.shape = &boxShape;
+                body->CreateFixture(&fixtureDef);
+                break;
+            }
+
+        case Shape::Type::SPHERE:
+            {
+                Shape::SphereData boundingSphere = m_sphereData;
+                boundingSphere.radius *= scale;
+                boundingSphere.center *= scale;
+
+                b2CircleShape circleShape;
+                circleShape.m_p.Set(boundingSphere.center.X - 1.f, boundingSphere.center.Y - 1.f);
+                circleShape.m_radius = boundingSphere.radius - 0.02f;
+
+                fixtureDef.shape = &circleShape;
+                body->CreateFixture(&fixtureDef);
+                break;
+            }
+    }
+
+    return;
 }

@@ -3,6 +3,8 @@
 
 #include "irrlicht.h"
 
+class b2Body;
+
 class Shape
 {
 public:
@@ -30,6 +32,7 @@ public:
     Type getType() const;
     irr::core::rectf getBoxData() const;
     SphereData getSphereData() const;
+    void addToBody(b2Body* body, float scale = 1.0f) const;
 
 private:
     Type m_type;

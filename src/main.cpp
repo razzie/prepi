@@ -117,7 +117,7 @@ int main()
             con->open();
 
         if (g.eventListener->isLeftMouseDown())
-            new ParticleElement(&level1, irr::video::SColor(~0), g.eventListener->getMousePosition() + level1.getViewOffset());
+            new ParticleElement(&level1, 0, level1.getRealPosition(g.eventListener->getMousePosition()), 0.16f);
 
         level1.update();
         gui.update();

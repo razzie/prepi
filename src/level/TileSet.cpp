@@ -42,8 +42,10 @@ b2Body* TileData::createBody(Element* element) const
 {
     b2Body* body = nullptr;
     Motion::Type motionType = element->getMotionType();
+    Element::Type elementType = element->getType();
 
-    if (motionType != Motion::Type::NONE)
+    if (motionType != Motion::Type::NONE ||
+        elementType == Element::Type::PARTICLE)
     {
         Shape shape = element->getTileData()->getBoundingShape(element->getImagePosition());
         core::vector2df position = element->getPosition();
@@ -51,49 +53,13 @@ b2Body* TileData::createBody(Element* element) const
 
         b2BodyDef bodyDef;
         bodyDef.type = motionTypeToBodyType(motionType);
+        if (elementType == Element::Type::PARTICLE) bodyDef.type = b2_dynamicBody;
         bodyDef.position.Set(position.X, position.Y);
         bodyDef.fixedRotation = true; // do not rotate!
         bodyDef.userData = element;
+
         body = element->getLevel()->getPhysics()->CreateBody(&bodyDef);
-
-        b2FixtureDef fixtureDef;
-        fixtureDef.density = 1.0f;
-        fixtureDef.friction = 0.5f;
-
-        switch (shape.getType())
-        {
-            case Shape::Type::BOX:
-                {
-                    core::rectf boundingBox = shape.getBoxData();
-                    boundingBox.UpperLeftCorner *= scale;
-                    boundingBox.LowerRightCorner *= scale;
-
-                    b2PolygonShape boxShape;
-                    boxShape.SetAsBox(boundingBox.getWidth()/2 - 0.01f, boundingBox.getHeight()/2 - 0.01f,
-                                       { boundingBox.getWidth()/2 - (1.f - boundingBox.UpperLeftCorner.X),
-                                         boundingBox.getHeight()/2 - (1.f - boundingBox.UpperLeftCorner.Y) },
-                                       0.f);
-
-                    fixtureDef.shape = &boxShape;
-                    body->CreateFixture(&fixtureDef);
-                    break;
-                }
-
-            case Shape::Type::SPHERE:
-                {
-                    Shape::SphereData boundingSphere = shape.getSphereData();
-                    boundingSphere.radius *= scale;
-                    boundingSphere.center *= scale;
-
-                    b2CircleShape circleShape;
-                    circleShape.m_p.Set(boundingSphere.center.X - 1.f, boundingSphere.center.Y - 1.f);
-                    circleShape.m_radius = boundingSphere.radius - 0.02f;
-
-                    fixtureDef.shape = &circleShape;
-                    body->CreateFixture(&fixtureDef);
-                    break;
-                }
-        }
+        shape.addToBody(body, scale);
     }
 
     return body;
@@ -101,7 +67,6 @@ b2Body* TileData::createBody(Element* element) const
 
 core::vector2di TileData::getImagePosition(unsigned imgNum) const
 {
-    //unsigned tileId = (tileDimension.X * imgPosition.Y) + imgPosition.X;
     core::vector2di imgPos(0, 0);
     imgPos.Y = imgNum / tileDimension.X;
     imgPos.X = imgNum % tileDimension.X;

@@ -4,11 +4,13 @@
 #include "irrlicht.h"
 #include "Element.h"
 
+class TileData;
+
 class ParticleElement : public Element
 {
 public:
-    ParticleElement(Level*, irr::video::SColor, irr::core::vector2df pos, unsigned life = 5000);
-    ParticleElement(Level*, irr::video::SColor, irr::core::vector2di pixPos, unsigned life = 5000);
+    ParticleElement(Level*, unsigned image, irr::core::vector2df pos, float scale,
+                    irr::video::SColor = irr::video::SColor(~0), unsigned life = 5000);
     ~ParticleElement();
     irr::video::SColor getColor() const;
     void setColor(irr::video::SColor);
@@ -16,9 +18,9 @@ public:
     virtual void draw();
 
 private:
+    unsigned m_image;
     irr::video::SColor m_color;
     unsigned m_life;
-    float m_size;
     uint32_t m_elapsed;
 };
 

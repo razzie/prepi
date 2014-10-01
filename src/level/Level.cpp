@@ -413,6 +413,12 @@ core::vector2di Level::getScreenPosition(core::vector2df pos) const
     return calcPos;
 }
 
+core::vector2df Level::getRealPosition(irr::core::vector2di screenPos) const
+{
+    screenPos += m_offset;
+    return core::vector2df((float)screenPos.X / (float)m_unit, (float)screenPos.Y / (float)m_unit);
+}
+
 void Level::update()
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);

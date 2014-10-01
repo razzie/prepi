@@ -31,7 +31,7 @@ LeafEffect::LeafEffect(Element* element, unsigned image, video::SColor color, co
     {
         m_level = element->getLevel();
 
-        m_tileData = m_level->getTileSet()->getParticleData(1);
+        m_tileData = m_level->getTileSet()->getParticleData(2);
         if (m_tileData != nullptr)
         {
             m_imgPos = m_tileData->getImagePosition(image);

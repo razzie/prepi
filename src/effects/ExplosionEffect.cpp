@@ -32,7 +32,7 @@ void ExplosionEffect::update(uint32_t/* elapsedMs*/)
                         m_color.getGreen() * brightness,
                         m_color.getBlue() * brightness);
 
-        Element* particle = new ParticleElement(m_level, particleColor, m_pos, 1000 + rand()%500);
+        Element* particle = new ParticleElement(m_level, 0, m_pos, 0.08f, particleColor, 1000 + rand()%500);
         particle->setMovementX( sin((float)deg / (2 * PI)) * intensity );
         particle->setMovementY( cos((float)deg / (2 * PI)) * intensity );
     }

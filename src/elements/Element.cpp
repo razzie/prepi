@@ -63,13 +63,14 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
  , m_behavior(behavior)
  , m_motion(motion)
  , m_tileData(level->getTileSet()->getData(type, id))
-// , m_body(nullptr)
+ , m_body(nullptr)
  , m_enabled(true)
 {
-    m_boundingBox = m_tileData->getBoundingShape(imgPosition).getBoxData();
-
     if (m_tileData != nullptr)
+    {
+        m_boundingBox = m_tileData->getBoundingShape(imgPosition).getBoxData();
         m_body = m_tileData->createBody(this);
+    }
 
     m_level->addElement(this);
 
@@ -84,7 +85,7 @@ Element::Element(Level* level, Type type, core::vector2df position)
  : m_level(level)
  , m_type(type)
  , m_id(0)
-// , m_imgPosition({0,0})
+ , m_imgPosition(0, 0)
  , m_position(position)
  , m_scale(1.0f)
  , m_animSpeed(1.0f)
@@ -99,7 +100,7 @@ Element::Element(Level* level, Type type, core::vector2df position)
 
 Element::~Element()
 {
-    if (m_body)
+    if (m_body != nullptr)
     {
         m_level->getPhysics()->DestroyBody(m_body);
         m_body = nullptr;
@@ -280,19 +281,19 @@ void Element::update(uint32_t elapsedMs)
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
 
-    if (m_body)
+    if (m_body != nullptr)
     {
         b2Vec2 pos = m_body->GetPosition();
         m_position.X = pos.x;
         m_position.Y = pos.y;
     }
 
-    if (m_motion)
+    if (m_motion != nullptr)
     {
         m_motion->update(elapsedMs);
     }
 
-    if (m_behavior)
+    if (m_behavior != nullptr)
     {
         m_behavior->update(elapsedMs);
     }
@@ -302,18 +303,23 @@ void Element::draw()
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
 
-    if (m_tileData)
+    if (m_tileData != nullptr)
+    {
         m_tileData->drawTile(m_level, m_imgPosition, m_position, m_scale);
+    }
     else
+    {
         drawDebugBox();
+    }
 }
 
 void Element::drawDebugBox() const
 {
     unsigned unit = m_level->getUnitSize();
+
     core::rectf box(m_boundingBox.UpperLeftCorner * m_scale, m_boundingBox.LowerRightCorner * m_scale);
     box += m_position;
-    //core::rectf box = m_boundingBox + m_position;
+
     core::recti pixelBox( (s32)(box.UpperLeftCorner.X * unit),  (s32)(box.UpperLeftCorner.Y * unit),
                           (s32)(box.LowerRightCorner.X * unit), (s32)(box.LowerRightCorner.Y * unit) );
     pixelBox -= m_level->getViewOffset();

@@ -43,6 +43,7 @@ public:
     irr::core::rect<irr::s32> getView() const;
     irr::core::vector2di getScreenPosition(Element*) const;
     irr::core::vector2di getScreenPosition(irr::core::vector2df) const;
+    irr::core::vector2df getRealPosition(irr::core::vector2di screenPos) const;
     void update();
 
 protected:
