@@ -35,6 +35,7 @@ public:
     void pickUp(Element*);
     void leafs(irr::core::rectf box, unsigned image, irr::video::SColor = irr::video::SColor(255, 0, 255, 0),
                irr::core::vector2df velocity = {0.5f, 0.f}, float length = 5.f);
+    void smoke(Element*);
     void smoke(irr::core::vector2df pos, float scale = 1.0f);
 
 protected:

@@ -105,6 +105,8 @@
 		<Unit filename="src/effects/LeafEffect.h" />
 		<Unit filename="src/effects/MoveElementEffect.cpp" />
 		<Unit filename="src/effects/MoveElementEffect.h" />
+		<Unit filename="src/effects/SmokeEffect.cpp" />
+		<Unit filename="src/effects/SmokeEffect.h" />
 		<Unit filename="src/elements/Element.cpp" />
 		<Unit filename="src/elements/Element.h" />
 		<Unit filename="src/elements/EnemyElement.cpp" />

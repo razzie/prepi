@@ -38,7 +38,8 @@ EnemyElement::EnemyElement(Level* level, unsigned id,
 
 EnemyElement::~EnemyElement()
 {
-    m_level->getEffectManager()->fall(this);
+    //m_level->getEffectManager()->fall(this);
+    m_level->getEffectManager()->smoke(this);
 }
 
 unsigned EnemyElement::getDamage() const

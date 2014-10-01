@@ -36,7 +36,6 @@ void DamageEffect::update(uint32_t elapsedMs)
         video::SColor((uint8_t)alpha, 255, 255, 255),
         video::SColor((uint8_t)alpha, 255, 255, 255) };
 
-    //driver->draw2DRectangle(video::SColor((uint8_t)alpha, 255, 0, 0), screen);
     driver->draw2DImage(m_texture, screen, core::recti({0, 0}, m_texture->getSize()), 0, color, true);
 
     m_elapsed += elapsedMs;

@@ -11,7 +11,7 @@
 #include "effects\AppearEffect.h"
 #include "effects\DisappearEffect.h"
 #include "effects\LeafEffect.h"
-//#include "effects\SmokeEffect.h"
+#include "effects\SmokeEffect.h"
 
 using namespace irr;
 
@@ -109,7 +109,12 @@ void EffectManager::leafs(core::rectf box, unsigned image, video::SColor color, 
     addEffect( new LeafEffect(m_level, box, image, color, velocity, length) );
 }
 
+void EffectManager::smoke(Element* element)
+{
+    addEffect( new SmokeEffect(m_level, element->getPosition() + element->getBoundingBox().getCenter(), element->getScale()) );
+}
+
 void EffectManager::smoke(core::vector2df pos, float scale)
 {
-    // addEffect( new SmokeEffect(m_level, pos, scale) );
+    addEffect( new SmokeEffect(m_level, pos, scale) );
 }

@@ -185,6 +185,11 @@ void PlayerElement::update(uint32_t elapsedMs)
         }
     }
 
+    if (isContactUnder && m_prevVelocity.Y > 2.0f)
+    {
+        m_level->getEffectManager()->smoke(m_position + core::vector2df(m_scale / 2, m_scale), 0.25f);
+    }
+
     EventListener* l = m_level->getGlobals()->eventListener;
     b2Vec2 movement = m_body->GetLinearVelocity();
 

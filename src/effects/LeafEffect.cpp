@@ -63,10 +63,8 @@ void LeafEffect::update(uint32_t elapsedMs)
 {
     if (m_level == nullptr) return;
 
-    for (auto it = m_leafs.begin(), end = m_leafs.end(); it != end; ++it)
+    for (auto& leaf : m_leafs)
     {
-        Leaf& leaf = *it;
-
         // update parameters only when the leaf is visible
         if (m_elapsed >= leaf.m_begin && m_elapsed <= leaf.m_duration)
         {
@@ -77,7 +75,7 @@ void LeafEffect::update(uint32_t elapsedMs)
             movement.Y += m_velocity.Y + (cos((leaf.m_randomSeed + m_elapsed) / 256) * 0.5f);
             leaf.m_position += movement * speed;
 
-            // update leaf color and alpha
+            // update leaf alpha
             if (m_elapsed < (leaf.m_begin + 255))
             {
                 leaf.m_color.setAlpha(m_elapsed - leaf.m_begin);
