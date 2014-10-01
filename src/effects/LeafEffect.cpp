@@ -19,25 +19,24 @@ float rand_float(float f)
 }
 
 LeafEffect::LeafEffect(Element* element, unsigned image, video::SColor color, core::vector2df velocity, float length)
- : m_level(nullptr)
+ : LeafEffect(element->getLevel(), element->getBoundingBox() + element->getPosition(), image, color, velocity, length)
+{
+}
+
+LeafEffect::LeafEffect(Level* level, irr::core::rectf box, unsigned image, video::SColor color, core::vector2df velocity, float length)
+ : m_level(level)
  , m_tileData(nullptr)
  , m_imgPos(0, 0)
  , m_color(color)
  , m_velocity(velocity)
+ , m_box(box)
  , m_duration((1.f / MAX(velocity.getLength(), 0.1f)) * 500.f * length)
  , m_elapsed(0)
 {
-    if (element != nullptr)
+    m_tileData = m_level->getTileSet()->getParticleData(2);
+    if (m_tileData != nullptr)
     {
-        m_level = element->getLevel();
-
-        m_tileData = m_level->getTileSet()->getParticleData(2);
-        if (m_tileData != nullptr)
-        {
-            m_imgPos = m_tileData->getImagePosition(image);
-        }
-
-        m_box = element->getBoundingBox() + element->getPosition();
+        m_imgPos = m_tileData->getImagePosition(image);
     }
 
     const int leafNum = MAX(1, (float)DEFAULT_LEAF_NUM * std::sqrt(m_box.getArea()));

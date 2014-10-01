@@ -13,6 +13,7 @@ class LeafEffect : public Effect
 {
 public:
     LeafEffect(Element*, unsigned image, irr::video::SColor, irr::core::vector2df velocity, float length);
+    LeafEffect(Level*, irr::core::rectf box, unsigned image, irr::video::SColor, irr::core::vector2df velocity, float length);
     ~LeafEffect();
     void update(uint32_t elapsedMs);
     bool isFinished() const;

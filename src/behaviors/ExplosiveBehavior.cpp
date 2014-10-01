@@ -57,7 +57,7 @@ void ExplosiveBehavior::update(uint32_t elapsedMs)
 
             // explosion effect
             core::vector2df explosionPos = m_element->getPosition() + m_element->getBoundingBox().getCenter();
-            m_element->getLevel()->getEffectManager()->explosion(explosionPos, m_range, video::SColor(0, 255, 155, 0));
+            m_element->getLevel()->getEffectManager()->explosion(explosionPos, 0, m_range, 0.16f, video::SColor(0, 255, 155, 0));
 
             // remove exploded element from scene
             m_element->remove();

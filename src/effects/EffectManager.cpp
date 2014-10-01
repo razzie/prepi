@@ -10,7 +10,8 @@
 #include "effects\MoveElementEffect.h"
 #include "effects\AppearEffect.h"
 #include "effects\DisappearEffect.h"
-//#include "effects\LeafEffect.h"
+#include "effects\LeafEffect.h"
+//#include "effects\SmokeEffect.h"
 
 using namespace irr;
 
@@ -71,13 +72,13 @@ void EffectManager::playerDamage()
     Element* player = m_level->getPlayerElement();
     if (player)
     {
-        explosion(player->getPosition() + player->getBoundingBox().getCenter(), 0.5f);
+        explosion(player->getPosition() + player->getBoundingBox().getCenter(), 0, 0.20f, 0.10f);
     }
 }
 
-void EffectManager::explosion(irr::core::vector2df pos, float range, irr::video::SColor color)
+void EffectManager::explosion(irr::core::vector2df pos, unsigned image, float scale, float particleSize, irr::video::SColor color)
 {
-    addEffect( new ExplosionEffect(m_level, pos, range, color) );
+    addEffect( new ExplosionEffect(m_level, pos, image, scale, particleSize, color) );
 }
 
 void EffectManager::appear(Element* element)
@@ -101,4 +102,14 @@ void EffectManager::fall(Element* element)
 void EffectManager::pickUp(Element* element)
 {
     addEffect( new MoveElementEffect(element, core::vector2di(0, 0)) );
+}
+
+void EffectManager::leafs(core::rectf box, unsigned image, video::SColor color, core::vector2df velocity, float length)
+{
+    addEffect( new LeafEffect(m_level, box, image, color, velocity, length) );
+}
+
+void EffectManager::smoke(core::vector2df pos, float scale)
+{
+    // addEffect( new SmokeEffect(m_level, pos, scale) );
 }

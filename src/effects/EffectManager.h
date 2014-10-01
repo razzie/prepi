@@ -27,12 +27,15 @@ public:
     void reset();
 
     void playerDamage();
-    void explosion(irr::core::vector2df pos, float range,
+    void explosion(irr::core::vector2df pos, unsigned image, float scale, float particleSize = 0.16f,
                    irr::video::SColor color = irr::video::SColor(255, 255, 0, 0));
     void appear(Element*);
     void disappear(Element*);
     void fall(Element*);
     void pickUp(Element*);
+    void leafs(irr::core::rectf box, unsigned image, irr::video::SColor = irr::video::SColor(255, 0, 255, 0),
+               irr::core::vector2df velocity = {0.5f, 0.f}, float length = 5.f);
+    void smoke(irr::core::vector2df pos, float scale = 1.0f);
 
 protected:
     mutable tthread::recursive_mutex m_mutex;

@@ -9,7 +9,7 @@ class Level;
 class ExplosionEffect : public Effect
 {
 public:
-    ExplosionEffect(Level*, irr::core::vector2df pos, float range,
+    ExplosionEffect(Level*, irr::core::vector2df pos, unsigned image, float scale, float particleSize = 0.16f,
                     irr::video::SColor color = irr::video::SColor(255, 255, 0, 0));
     ~ExplosionEffect();
     void update(uint32_t elapsedMs);
@@ -18,7 +18,9 @@ public:
 private:
     Level* m_level;
     irr::core::vector2df m_pos;
-    float m_range;
+    unsigned m_image;
+    float m_scale;
+    float m_pSize;
     irr::video::SColor m_color;
 };
 
