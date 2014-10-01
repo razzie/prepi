@@ -221,7 +221,7 @@ void PlayerElement::update(uint32_t elapsedMs)
     }
 
     m_body->SetLinearVelocity(movement);
-    m_prevVelocity = core::vector2df(movement.x, movement.y);
+    m_prevVelocity.set(movement.x, movement.y);
 
     if (elapsedMs > m_injury) m_injury = 0;
     else m_injury -= elapsedMs;
