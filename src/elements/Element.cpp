@@ -68,7 +68,8 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
 {
     if (m_tileData != nullptr)
     {
-        m_boundingBox = m_tileData->getBoundingShape(imgPosition).getBoxData();
+        m_shape = m_tileData->getBoundingShape(imgPosition);
+        m_shape *= m_scale;
         m_body = m_tileData->createBody(this);
     }
 
@@ -234,12 +235,14 @@ void Element::setMovementY(f32 yMov)
     m_body->SetLinearVelocity({x, yMov});
 }
 
+const Shape& Element::getShape() const
+{
+    return m_shape;
+}
+
 core::rectf Element::getBoundingBox() const
 {
-    core::rectf box = m_boundingBox;
-    core::dimension2df dim = box.LowerRightCorner - box.UpperLeftCorner;
-    box.LowerRightCorner = box.UpperLeftCorner + (dim * m_scale);
-    return box;
+    return m_shape.getBoxData();
 }
 
 b2Body* Element::getBody()
@@ -309,22 +312,8 @@ void Element::draw()
     }
     else
     {
-        drawDebugBox();
+        m_shape.draw(m_level, m_position);
     }
-}
-
-void Element::drawDebugBox() const
-{
-    unsigned unit = m_level->getUnitSize();
-
-    core::rectf box(m_boundingBox.UpperLeftCorner * m_scale, m_boundingBox.LowerRightCorner * m_scale);
-    box += m_position;
-
-    core::recti pixelBox( (s32)(box.UpperLeftCorner.X * unit),  (s32)(box.UpperLeftCorner.Y * unit),
-                          (s32)(box.LowerRightCorner.X * unit), (s32)(box.LowerRightCorner.Y * unit) );
-    pixelBox -= m_level->getViewOffset();
-
-    m_level->getGlobals()->driver->draw2DRectangleOutline(pixelBox);
 }
 
 

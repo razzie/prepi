@@ -368,13 +368,9 @@ bool Level::isElementOnScreen(Element* element)
 {
     core::dimension2du screenSize = m_globals->driver->getScreenSize();
 
-    // calculating translated bounding box
-    core::rectf box = element->getBoundingBox() + element->getPosition();
-    core::recti pixelBox( (s32)(box.UpperLeftCorner.X * m_unit),  (s32)(box.UpperLeftCorner.Y * m_unit),
-                          (s32)(box.LowerRightCorner.X * m_unit), (s32)(box.LowerRightCorner.Y * m_unit) );
-    pixelBox -= m_offset;
+    core::rectf box = element->getBoundingBox();// + element->getPosition();
+    core::recti pixelBox(getScreenPosition(element), core::vector2di(m_unit * box.getWidth(), m_unit * box.getHeight()));
 
-    // do not draw if outside of screen
     return pixelBox.isRectCollided( {{0, 0}, screenSize} );
 }
 
@@ -472,6 +468,7 @@ void Level::update()
         if (isElementOnScreen(element))
         {
             element->draw();
+            //element->getShape().draw(this, element->getPosition());
         }
     }
 

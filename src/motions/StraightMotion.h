@@ -3,13 +3,12 @@
 
 #include <vector>
 #include "irrlicht.h"
+#include "Shape.h" // for PointArray
 #include "ActiveMotion.h"
 
 class StraightMotion : public ActiveMotion
 {
 public:
-    typedef std::vector<irr::core::vector2df> PointArray;
-
     StraightMotion(Element*, std::istream&);
     StraightMotion(Element*, std::tuple<uint32_t, uint32_t, bool, PointArray>);
     StraightMotion(Element*, uint32_t speed, uint32_t delay, bool ai, PointArray);
@@ -36,7 +35,5 @@ private:
     std::vector<Path> m_pathArray;
     bool m_circularMode;
 };
-
-std::istream& operator>> (std::istream&, StraightMotion::PointArray&);
 
 #endif // STRAIGHTMOTION_H_INCLUDED

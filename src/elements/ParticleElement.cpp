@@ -19,7 +19,8 @@ ParticleElement::ParticleElement(Level* level, unsigned image, core::vector2df p
     if (m_tileData != nullptr)
     {
         m_imgPosition = m_tileData->getImagePosition(image);
-        m_boundingBox = m_tileData->getBoundingShape(m_imgPosition).getBoxData();
+        m_shape = m_tileData->getBoundingShape(m_imgPosition);
+        m_shape *= m_scale;
         m_body = m_tileData->createBody(this);
     }
 }

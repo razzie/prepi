@@ -6,6 +6,7 @@
 #include <vector>
 #include "irrlicht.h"
 #include "tinythread.h"
+#include "Shape.h"
 #include "Collision.h"
 #include "motions\Motion.h"
 #include "behaviors\Behavior.h"
@@ -63,6 +64,7 @@ public:
     void setMovementX(irr::f32);
     void setMovementY(irr::f32);
 
+    const Shape& getShape() const;
     irr::core::rectf getBoundingBox() const;
     b2Body* getBody();
 
@@ -74,9 +76,7 @@ public:
     void remove();
 
     virtual void update(uint32_t elapsedMs);
-
     virtual void draw();
-    void drawDebugBox() const;
 
 protected:
     Element(Level*, Type, irr::core::vector2df);
@@ -92,7 +92,7 @@ protected:
     float m_animSpeed;
     Behavior* m_behavior;
     Motion* m_motion;
-    irr::core::rectf m_boundingBox;
+    Shape m_shape;
     const TileData* m_tileData;
     b2Body* m_body;
     std::vector<Collision> m_collisions;

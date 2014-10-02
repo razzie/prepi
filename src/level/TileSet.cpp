@@ -425,31 +425,8 @@ bool TileSet::fillTileData(std::string dirName, std::string fileName, unsigned& 
         {
             // set up special bounding boxes
             do {
-                unsigned id;
-                unsigned shape;
-                std::tie(id, shape) = bbParser.getArgs<unsigned, unsigned>();
-
-                switch (shape)
-                {
-                    case Shape::Type::BOX:
-                        {
-                            core::rectf boundingBox;
-                            std::tie(boundingBox.UpperLeftCorner, boundingBox.LowerRightCorner) = bbParser.getArgs<core::vector2df, core::vector2df>();
-                            data.boundings[id] = boundingBox;
-                            break;
-                        }
-
-                    case Shape::Type::SPHERE:
-                        {
-                            Shape::SphereData boundingSphere;
-                            std::tie(boundingSphere.center, boundingSphere.radius) = bbParser.getArgs<core::vector2df, f32>();
-                            data.boundings[id] = boundingSphere;
-                            break;
-                        }
-
-                    default:
-                        break;
-                }
+                unsigned id = bbParser.getArg<unsigned>();
+                data.boundings[id] = bbParser.getArg<Shape>();
             }
             while (bbParser.nextLine());
         }

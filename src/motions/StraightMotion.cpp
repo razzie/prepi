@@ -33,12 +33,12 @@ StraightMotion::~StraightMotion()
 {
 }
 
-StraightMotion::PointArray& StraightMotion::getPointArray()
+PointArray& StraightMotion::getPointArray()
 {
     return m_pointArray;
 }
 
-const StraightMotion::PointArray& StraightMotion::getPointArray() const
+const PointArray& StraightMotion::getPointArray() const
 {
     return m_pointArray;
 }
@@ -47,7 +47,8 @@ void StraightMotion::setElement(Element* element)
 {
     Motion::setElement(element);
 
-    m_pointArray.insert(m_pointArray.begin(), element->getPosition()); // push to front
+    for (auto& p : m_pointArray) p -= core::vector2df(0.5f, 0.5f); // element coordinate is at the upper left corner, not at center
+    m_pointArray.insert(m_pointArray.begin(), element->getPosition()); // push player position to front
     rebuildPathArray();
 
     m_circularMode = (m_pointArray.front() == m_pointArray.back());
@@ -128,19 +129,4 @@ core::vector2df StraightMotion::Path::getPointByTime(uint32_t elapsedMs) const
     midPoint += (pathMovement * ((float)elapsed / (float)duration));
 
     return midPoint;
-}
-
-std::istream& operator>> (std::istream& stream, StraightMotion::PointArray& pointArray)
-{
-    Parser p(stream, ',');
-
-    //while (p.hasNextArg())
-    for (unsigned i = 0, num = p.getArg<unsigned>(); i < num; ++i)
-    {
-        core::vector2df point = p.getArg<core::vector2df>();
-        point -= core::vector2df(0.5f, 0.5f); // element coordinate is at the upper left corner, not at center
-        pointArray.push_back(point);
-    }
-
-    return stream;
 }
