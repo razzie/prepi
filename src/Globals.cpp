@@ -25,6 +25,7 @@ Globals::Globals()
  : device(createIrrlichtDevice())
  , driver(device->getVideoDriver())
  , smgr(device->getSceneManager())
+ , guienv(device->getGUIEnvironment())
  , eventListener(new EventListener())
  , app(gg::application::create("prepi"))
 {

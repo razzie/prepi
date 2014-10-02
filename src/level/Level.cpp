@@ -308,7 +308,7 @@ void Level::updateView(uint32_t elapsedMs)
     }
 
     // speed up camera in the direction of the new target position
-    const float camSpeed = (float)elapsedMs / 1200.f;
+    const float camSpeed = (float)elapsedMs / 2000.f;
     m_camMovement.X += camSpeed * (offset.X - m_offset.X) + 1;
     m_camMovement.Y += camSpeed * (offset.Y - m_offset.Y) + 1;
 
@@ -337,30 +337,18 @@ void Level::updateView(uint32_t elapsedMs)
     if (levelSize.Width >= screenSize.Width)
     {
         if (m_offset.X < 0)
-        {
             m_offset.X = 0;
-            m_camMovement.set(0.f, 0.f);
-        }
         else if (m_offset.X > (s32)(levelSize.Width - screenSize.Width))
-        {
             m_offset.X = (s32)(levelSize.Width - screenSize.Width);
-            m_camMovement.set(0.f, 0.f);
-        }
     }
 
     // align the level if an edge is out of the screen
     if (levelSize.Height >= screenSize.Height)
     {
         if (m_offset.Y < 0)
-        {
             m_offset.Y = 0;
-            m_camMovement.set(0.f, 0.f);
-        }
         else if (m_offset.Y > (s32)(s32)(levelSize.Height - screenSize.Height))
-        {
             m_offset.Y = (s32)(levelSize.Height - screenSize.Height);
-            m_camMovement.set(0.f, 0.f);
-        }
     }
 }
 

@@ -1,7 +1,7 @@
 #ifndef DELAYEFFECT_H_INCLUDED
 #define DELAYEFFECT_H_INCLUDED
 
-#include "effects\EffectManager.h"
+#include "effects\Effect.h"
 
 class Level;
 

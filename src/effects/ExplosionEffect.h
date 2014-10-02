@@ -2,15 +2,15 @@
 #define EXPLOSIONEFFECT_H_INCLUDED
 
 #include "irrlicht.h"
-#include "effects\EffectManager.h"
+#include "effects\Effect.h"
 
 class Level;
 
 class ExplosionEffect : public Effect
 {
 public:
-    ExplosionEffect(Level*, irr::core::vector2df pos, unsigned image, float scale, float particleSize = 0.16f,
-                    irr::video::SColor color = irr::video::SColor(255, 255, 0, 0));
+    ExplosionEffect(Level*, irr::core::vector2df pos, unsigned image, float scale,
+                    float particleSize = 0.16f, irr::video::SColor color = {255, 255, 0, 0});
     ~ExplosionEffect();
     void update(uint32_t elapsedMs);
     bool isFinished() const;

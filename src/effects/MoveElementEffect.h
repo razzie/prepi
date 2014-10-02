@@ -2,7 +2,6 @@
 #define MOVEELEMENTEFFECT_H_INCLUDED
 
 #include "irrlicht.h"
-#include "effects\EffectManager.h"
 #include "effects\ElementEffect.h"
 
 class Element;

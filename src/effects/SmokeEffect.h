@@ -2,7 +2,7 @@
 #define SMOKEEFFECT_H_INCLUDED
 
 #include <vector>
-#include "effects\EffectManager.h"
+#include "effects\Effect.h"
 
 class Level;
 

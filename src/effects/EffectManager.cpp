@@ -6,6 +6,7 @@
 #include "effects\EffectManager.h"
 #include "effects\DelayEffect.h"
 #include "effects\DamageEffect.h"
+#include "effects\TextEffect.h"
 #include "effects\ExplosionEffect.h"
 #include "effects\MoveElementEffect.h"
 #include "effects\AppearEffect.h"
@@ -74,6 +75,11 @@ void EffectManager::playerDamage()
     {
         explosion(player->getPosition() + player->getBoundingBox().getCenter(), 0, 0.20f, 0.10f);
     }
+}
+
+void EffectManager::text(const wchar_t* text, core::vector2df pos, video::SColor color)
+{
+    addEffect( new TextEffect(m_level, text, pos, color) );
 }
 
 void EffectManager::explosion(irr::core::vector2df pos, unsigned image, float scale, float particleSize, irr::video::SColor color)

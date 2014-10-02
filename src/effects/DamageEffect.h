@@ -2,7 +2,7 @@
 #define DAMAGEEFFECT_H_INCLUDED
 
 #include "irrlicht.h"
-#include "effects\EffectManager.h"
+#include "effects\Effect.h"
 
 class Level;
 

@@ -10,7 +10,7 @@ class ParticleElement : public Element
 {
 public:
     ParticleElement(Level*, unsigned image, irr::core::vector2df pos, float scale,
-                    irr::video::SColor = irr::video::SColor(~0), unsigned life = 5000);
+                    irr::video::SColor = {255, 255, 255, 255}, unsigned life = 5000);
     ~ParticleElement();
     irr::video::SColor getColor() const;
     void setColor(irr::video::SColor);

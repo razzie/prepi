@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "irrlicht.h"
-#include "effects\EffectManager.h"
+#include "effects\Effect.h"
 
 class Element;
 class Level;
