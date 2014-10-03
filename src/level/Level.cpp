@@ -337,18 +337,30 @@ void Level::updateView(uint32_t elapsedMs)
     if (levelSize.Width >= screenSize.Width)
     {
         if (m_offset.X < 0)
+        {
             m_offset.X = 0;
+            m_camMovement.X = 0;
+        }
         else if (m_offset.X > (s32)(levelSize.Width - screenSize.Width))
+        {
             m_offset.X = (s32)(levelSize.Width - screenSize.Width);
+            m_camMovement.X = 0;
+        }
     }
 
     // align the level if an edge is out of the screen
     if (levelSize.Height >= screenSize.Height)
     {
         if (m_offset.Y < 0)
+        {
             m_offset.Y = 0;
+            m_camMovement.Y = 0;
+        }
         else if (m_offset.Y > (s32)(s32)(levelSize.Height - screenSize.Height))
+        {
             m_offset.Y = (s32)(levelSize.Height - screenSize.Height);
+            m_camMovement.Y = 0;
+        }
     }
 }
 
