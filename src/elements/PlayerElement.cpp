@@ -38,6 +38,7 @@ PlayerElement::PlayerElement(Level* level, unsigned id,
  , m_injury(0)
  , m_immortalLeft(0)
  , m_lastAnimType(TileData::Animation::Type::RIGHT)
+ , m_onLadder(false)
 {
 }
 
@@ -139,9 +140,20 @@ void PlayerElement::setImmortal(uint32_t msec)
     m_immortalLeft = msec;
 }
 
+void PlayerElement::onLadder()
+{
+    m_onLadder = true;
+}
+
 void PlayerElement::update(uint32_t elapsedMs)
 {
     Element::update(elapsedMs);
+
+    // restore gravity after a ladder
+    if (m_body->GetGravityScale() == 0.f)
+    {
+        m_body->SetGravityScale(1.f);
+    }
 
     bool cohesion = false; // if there is cohesion, the player can jump
     bool leftContact = false;
@@ -206,13 +218,34 @@ void PlayerElement::update(uint32_t elapsedMs)
     EventListener* l = m_level->getGlobals()->eventListener;
     b2Vec2 movement = m_body->GetLinearVelocity();
 
-    if (l->isUp() && cohesion)
+    if (m_onLadder)
     {
-        movement.y = -m_speed * 2.5f;
+        m_onLadder = false;
+        m_body->SetGravityScale(0.f); // disable gravity;
+
+        if (l->isUp())
+        {
+            movement.y = -m_speed;
+        }
+        else if (l->isDown())
+        {
+            movement.y = m_speed;
+        }
+        else
+        {
+            movement.y = 0.f;
+        }
     }
-    else if (l->isDown())
+    else
     {
-        movement.y += m_speed / 2.f;
+        if (l->isUp() && cohesion)
+        {
+            movement.y = -m_speed * 2.5f;
+        }
+        else if (l->isDown())
+        {
+            movement.y += m_speed / 2.f;
+        }
     }
 
     if (l->isLeft() && (cohesion || !leftContact))

@@ -8,7 +8,7 @@
 #include "behaviors\LeafEffectBehavior.h"
 //#include "behaviors\ContainerBehavior.h"
 //#include "behaviors\VentilatorBehavior.h"
-//#include "behaviors\LadderBehavior.h"
+#include "behaviors\LadderBehavior.h"
 
 Behavior::Behavior(Element* element, Type type)
  : m_type(type)
@@ -76,8 +76,8 @@ Behavior* CreateBehavior(Element* element, std::istream& stream)
         //case Behavior::Type::VENTILATOR:
         //    return new VentilatorBehavior(element, stream);
 
-        //case Behavior::Type::LADDER:
-        //    return new LadderBehavior(element, stream);
+        case Behavior::Type::LADDER:
+            return new LadderBehavior(element);
 
         case Behavior::Type::CLIMBING:
             return new Behavior(element, Behavior::Type::CLIMBING);

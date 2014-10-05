@@ -76,11 +76,6 @@ std::istream& operator>> (std::istream& stream, Motion::Type& m)
 
     switch (motion)
     {
-        case 1: // BACK
-        case 3: // FORE
-            m = Motion::Type::NONE;
-            break;
-
         case 4: // STATIC
         case 5: // DYNAMIC
         case 6: // AUTO
@@ -89,8 +84,10 @@ std::istream& operator>> (std::istream& stream, Motion::Type& m)
             m = static_cast<Motion::Type>(motion);
             break;
 
+        case 1: // BACK
+        case 3: // FORE
         default:
-            m = Motion::Type::STATIC;
+            m = Motion::Type::NONE;
     }
 
     return stream;

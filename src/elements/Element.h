@@ -59,11 +59,11 @@ public:
     const Motion* getMotion() const;
     Motion::Type getMotionType() const;
 
-    const TileData* getTileData() const;
-
+    irr::core::vector2df getMovement() const;
     void setMovementX(irr::f32);
     void setMovementY(irr::f32);
 
+    const TileData* getTileData() const;
     const Shape& getShape() const;
     irr::core::rectf getBoundingBox() const;
     b2Body* getBody();

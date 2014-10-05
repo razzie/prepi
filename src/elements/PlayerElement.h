@@ -8,6 +8,7 @@
 
 class EnemyElement;
 class RewardElement;
+class LadderBehavior;
 
 class PlayerElement : public Element
 {
@@ -32,6 +33,9 @@ public:
 protected:
     ~PlayerElement();
 
+    friend class LadderBehavior;
+    void onLadder();
+
     unsigned m_health;
     unsigned m_rewards;
     irr::f32 m_speed;
@@ -41,6 +45,7 @@ protected:
     uint32_t m_immortalLeft;
     TileData::Animation::Type m_lastAnimType;
     bool m_standbyAnim;
+    bool m_onLadder;
 };
 
 #endif // PLAYERELEMENT_H_INCLUDED

@@ -51,14 +51,13 @@ struct Version
 };
 
 static const Version prepiVersion {1, 5};
-static const b2Vec2 gravity(0.0f, 5.f);
-static const int32 velocityIterations = 8;
-static const int32 positionIterations = 3;
+
+float gravity = 5.f; // should not be static!
 
 Level::Level(Globals* globals, std::string tileset)
  : m_globals(globals)
  , m_tileset(new TileSet(globals, tileset))
- , m_physics(new b2World(gravity))
+ , m_physics(new b2World( {0.f, gravity} ))
  , m_effectMgr(new EffectManager(this))
  , m_offset(0, 0)
  , m_unit(64)
@@ -444,6 +443,8 @@ void Level::update()
     processInsertionQueue();
 
     // updating physics
+    static const int32 velocityIterations = 8;
+    static const int32 positionIterations = 3;
     m_physics->Step((float)elapsedMs/250, velocityIterations, positionIterations);
 
     // updating view

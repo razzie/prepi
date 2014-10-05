@@ -215,15 +215,24 @@ Motion::Type Element::getMotionType() const
         return m_motion->getType();
 }
 
-const TileData* Element::getTileData() const
+core::vector2df Element::getMovement() const
 {
-    return m_tileData;
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+
+    if (m_body == nullptr)
+    {
+        return {0.f, 0.f};
+    }
+    else
+    {
+        b2Vec2 movement = m_body->GetLinearVelocity();
+        return {movement.x, movement.y};
+    }
 }
 
 void Element::setMovementX(f32 xMov)
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
-
     f32 y = m_body->GetLinearVelocity().y;
     m_body->SetLinearVelocity({xMov, y});
 }
@@ -233,6 +242,11 @@ void Element::setMovementY(f32 yMov)
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
     f32 x = m_body->GetLinearVelocity().x;
     m_body->SetLinearVelocity({x, yMov});
+}
+
+const TileData* Element::getTileData() const
+{
+    return m_tileData;
 }
 
 const Shape& Element::getShape() const
