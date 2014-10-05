@@ -83,12 +83,6 @@ int main()
                          if (player) player->setSpeed(speed);
                      });
 
-    se->add_function("setClimbingThreshold", [&](irr::f32 climbTreshold)
-                     {
-                        PlayerElement* player = level1.getPlayerElement();
-                        if (player) player->setClimbingMode(climbTreshold);
-                     });
-
     se->add_function("GodMode", [&](unsigned sec)
                      {
                         PlayerElement* player = level1.getPlayerElement();

@@ -16,8 +16,11 @@ public:
         EXPLOSIVE = 2,
         TELEPORT = 3,
         RESIZER = 4,
-        LEAF_EFFECT = 5
-        //CONTAINER = 6
+        LEAF_EFFECT = 5,
+        CONTAINER = 6,
+        VENTILATOR = 7,
+        LADDER = 8,
+        CLIMBING = 9
     };
 
     Behavior(Element*, Type = Type::NONE);

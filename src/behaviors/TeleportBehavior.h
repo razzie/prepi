@@ -3,7 +3,7 @@
 
 #include <tuple>
 #include <map>
-#include "Behavior.h"
+#include "behaviors\Behavior.h"
 
 class TeleportBehavior : public Behavior
 {

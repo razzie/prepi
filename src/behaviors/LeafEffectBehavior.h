@@ -3,7 +3,7 @@
 
 #include <tuple>
 #include "irrlicht.h"
-#include "Behavior.h"
+#include "behaviors\Behavior.h"
 
 class LeafEffectBehavior : public Behavior
 {

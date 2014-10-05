@@ -34,8 +34,7 @@ PlayerElement::PlayerElement(Level* level, unsigned id,
  , m_health(100)
  , m_rewards(0)
  , m_speed(2.f)
- , m_climbTreshold(FULL_CLIMBING)
- , m_prevVelocity(0.f, 0.f)
+ , m_lastVelocity(0.f, 0.f)
  , m_injury(0)
  , m_immortalLeft(0)
  , m_lastAnimType(TileData::Animation::Type::RIGHT)
@@ -135,11 +134,6 @@ void PlayerElement::setSpeed(f32 speed)
     m_speed = speed;
 }
 
-void PlayerElement::setClimbingMode(irr::f32 climbTreshold)
-{
-    m_climbTreshold = climbTreshold;
-}
-
 void PlayerElement::setImmortal(uint32_t msec)
 {
     m_immortalLeft = msec;
@@ -149,9 +143,9 @@ void PlayerElement::update(uint32_t elapsedMs)
 {
     Element::update(elapsedMs);
 
-    bool isContactUnder = false;
-    bool isContactLeft = false;
-    bool isContactRight = false;
+    bool cohesion = false; // if there is cohesion, the player can jump
+    bool leftContact = false;
+    bool rightContact = false;
 
     updateCollisions();
 
@@ -167,7 +161,7 @@ void PlayerElement::update(uint32_t elapsedMs)
 
             case Element::Type::REWARD:
                 takeRewardFrom(static_cast<RewardElement*>(contactElem));
-                m_body->SetLinearVelocity({m_prevVelocity.X, m_prevVelocity.Y});
+                m_body->SetLinearVelocity({m_lastVelocity.X, m_lastVelocity.Y});
                 break;
 
             case Element::Type::PARTICLE:
@@ -178,27 +172,33 @@ void PlayerElement::update(uint32_t elapsedMs)
                 break;
         }
 
-        //switch (collision.getOtherElementDirection())
-        switch ( Collision::getDirectionFromAngle(collision.getOtherElementAngle(), 90.f - m_climbTreshold) )
+        switch (collision.getOtherElementDirection())
+        //switch ( Collision::getDirectionFromAngle(collision.getOtherElementAngle(), 90.f - m_climbTreshold) )
         {
             case Collision::Direction::BOTTOM:
-                isContactUnder = true;
+                cohesion = true;
                 break;
 
             case Collision::Direction::RIGHT:
-                isContactRight = true;
+                rightContact = true;
                 break;
 
             case Collision::Direction::LEFT:
-                isContactLeft = true;
+                leftContact = true;
                 break;
 
             default:
                 break;
         }
+
+        if ((leftContact || rightContact) &&
+            contactElem->getBehaviorType() == Behavior::Type::CLIMBING)
+        {
+            cohesion = true;
+        }
     }
 
-    if (isContactUnder && m_prevVelocity.Y > 2.0f)
+    if (cohesion && m_lastVelocity.Y > 2.0f)
     {
         m_level->getEffectManager()->smoke(m_position + core::vector2df(m_scale / 2, m_scale), 0.25f);
     }
@@ -206,7 +206,7 @@ void PlayerElement::update(uint32_t elapsedMs)
     EventListener* l = m_level->getGlobals()->eventListener;
     b2Vec2 movement = m_body->GetLinearVelocity();
 
-    if (l->isUp() && isContactUnder)
+    if (l->isUp() && cohesion)
     {
         movement.y = -m_speed * 2.5f;
     }
@@ -215,13 +215,13 @@ void PlayerElement::update(uint32_t elapsedMs)
         movement.y += m_speed / 2.f;
     }
 
-    if (l->isLeft() && (isContactUnder || !isContactLeft))
+    if (l->isLeft() && (cohesion || !leftContact))
     {
         movement.x = -m_speed;
         m_lastAnimType = TileData::Animation::Type::LEFT;
         m_standbyAnim = false;
     }
-    else if (l->isRight() && (isContactUnder || !isContactRight))
+    else if (l->isRight() && (cohesion || !rightContact))
     {
         movement.x = m_speed;
         m_lastAnimType = TileData::Animation::Type::RIGHT;
@@ -234,7 +234,7 @@ void PlayerElement::update(uint32_t elapsedMs)
     }
 
     m_body->SetLinearVelocity(movement);
-    m_prevVelocity.set(movement.x, movement.y);
+    m_lastVelocity.set(movement.x, movement.y);
 
     if (elapsedMs > m_injury) m_injury = 0;
     else m_injury -= elapsedMs;

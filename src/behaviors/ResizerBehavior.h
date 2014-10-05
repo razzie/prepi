@@ -1,7 +1,7 @@
 #ifndef RESIZERBEHAVIOR_H_INCLUDED
 #define RESIZERBEHAVIOR_H_INCLUDED
 
-#include "Behavior.h"
+#include "behaviors\Behavior.h"
 
 class ResizerBehavior : public Behavior
 {

@@ -2,7 +2,7 @@
 #define EXPLOSIVEBEHAVIOR_H_INCLUDED
 
 #include <tuple>
-#include "Behavior.h"
+#include "behaviors\Behavior.h"
 
 class ExplosiveBehavior : public Behavior
 {

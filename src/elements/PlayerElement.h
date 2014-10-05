@@ -12,10 +12,6 @@ class RewardElement;
 class PlayerElement : public Element
 {
 public:
-    static constexpr irr::f32 NO_CLIMBING   = 0.0f;
-    static constexpr irr::f32 HALF_CLIMBING = 30.0f;
-    static constexpr irr::f32 FULL_CLIMBING = 60.0f;
-
     PlayerElement(Level*, std::istream&);
     PlayerElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, float, float, BehaviorWrapper>);
     PlayerElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, float, float, Behavior*);
@@ -29,7 +25,6 @@ public:
     void takeDamageFrom(EnemyElement*);
     void die();
     void setSpeed(irr::f32);
-    void setClimbingMode(irr::f32);
     void setImmortal(uint32_t msec);
     void update(uint32_t elapsedMs);
     void draw();
@@ -40,8 +35,7 @@ protected:
     unsigned m_health;
     unsigned m_rewards;
     irr::f32 m_speed;
-    irr::f32 m_climbTreshold;
-    irr::core::vector2df m_prevVelocity;
+    irr::core::vector2df m_lastVelocity;
     std::map<EnemyElement*, Timer> m_damageList;
     unsigned m_injury;
     uint32_t m_immortalLeft;

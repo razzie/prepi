@@ -6,6 +6,9 @@
 #include "behaviors\TeleportBehavior.h"
 #include "behaviors\ResizerBehavior.h"
 #include "behaviors\LeafEffectBehavior.h"
+//#include "behaviors\ContainerBehavior.h"
+//#include "behaviors\VentilatorBehavior.h"
+//#include "behaviors\LadderBehavior.h"
 
 Behavior::Behavior(Element* element, Type type)
  : m_type(type)
@@ -67,6 +70,18 @@ Behavior* CreateBehavior(Element* element, std::istream& stream)
         case Behavior::Type::LEAF_EFFECT:
             return new LeafEffectBehavior(element, stream);
 
+        //case Behavior::Type::CONTAINER:
+        //    return new ContainerBehavior(element, stream);
+
+        //case Behavior::Type::VENTILATOR:
+        //    return new VentilatorBehavior(element, stream);
+
+        //case Behavior::Type::LADDER:
+        //    return new LadderBehavior(element, stream);
+
+        case Behavior::Type::CLIMBING:
+            return new Behavior(element, Behavior::Type::CLIMBING);
+
         case Behavior::Type::NONE:
         default:
             return nullptr;
@@ -86,7 +101,10 @@ std::istream& operator>> (std::istream& stream, Behavior::Type& m)
         case 3: // TELEPORT
         case 4: // RESIZER
         case 5: // LEAF_EFFECT
-        // case 6: // CONTAINER
+        case 6: // CONTAINER
+        case 7: // VENTILATOR
+        case 8: // LADDER
+        case 9: // CLIMBING
             m = static_cast<Behavior::Type>(behavior);
             break;
 
