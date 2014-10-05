@@ -58,9 +58,10 @@ void Collision::getElementCollisions(Element* element, std::vector<Collision>& c
 {
     if (clearPrevious) collisions.clear();
 
-    b2ContactEdge* edges = element->getBody()->GetContactList();
+    b2Body* body = element->getBody();
+    if (body == nullptr) return;
 
-    for (b2ContactEdge* edge = edges; edge != NULL; edge = edge->next)
+    for (b2ContactEdge* edge = body->GetContactList(); edge != NULL; edge = edge->next)
     {
         if (!edge->contact->IsTouching())
             continue;

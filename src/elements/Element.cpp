@@ -280,7 +280,7 @@ void Element::enable(bool enabled)
     //if (m_enabled == enabled) return;
 
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
-    m_body->SetActive(enabled);
+    if (m_body != nullptr) m_body->SetActive(enabled);
     m_enabled = enabled;
 }
 
