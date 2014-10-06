@@ -6,7 +6,7 @@
 #include "behaviors\TeleportBehavior.h"
 #include "behaviors\ResizerBehavior.h"
 #include "behaviors\LeafEffectBehavior.h"
-//#include "behaviors\ContainerBehavior.h"
+#include "behaviors\ContainerBehavior.h"
 //#include "behaviors\VentilatorBehavior.h"
 #include "behaviors\LadderBehavior.h"
 
@@ -70,8 +70,8 @@ Behavior* CreateBehavior(Element* element, std::istream& stream)
         case Behavior::Type::LEAF_EFFECT:
             return new LeafEffectBehavior(element, stream);
 
-        //case Behavior::Type::CONTAINER:
-        //    return new ContainerBehavior(element, stream);
+        case Behavior::Type::CONTAINER:
+            return new ContainerBehavior(element, stream);
 
         //case Behavior::Type::VENTILATOR:
         //    return new VentilatorBehavior(element, stream);

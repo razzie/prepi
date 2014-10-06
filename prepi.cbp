@@ -77,6 +77,8 @@
 		<Unit filename="src/Timer.h" />
 		<Unit filename="src/behaviors/Behavior.cpp" />
 		<Unit filename="src/behaviors/Behavior.h" />
+		<Unit filename="src/behaviors/ContainerBehavior.cpp" />
+		<Unit filename="src/behaviors/ContainerBehavior.h" />
 		<Unit filename="src/behaviors/ExplosiveBehavior.cpp" />
 		<Unit filename="src/behaviors/ExplosiveBehavior.h" />
 		<Unit filename="src/behaviors/LadderBehavior.cpp" />
