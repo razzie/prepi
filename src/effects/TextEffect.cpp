@@ -8,17 +8,26 @@ using namespace irr;
 
 gui::IGUIFont* TextEffect::m_font = nullptr;
 
-TextEffect::TextEffect(Level* level, const wchar_t* text, core::vector2df pos, video::SColor color)
+TextEffect::TextEffect(Level* level, irr::core::stringw text, core::vector2df pos, video::SColor color)
  : m_level(level)
  , m_text(text)
  , m_position(pos)
  , m_color(color)
+ , m_duration(0)
  , m_elapsed(0)
 {
+    // load font bitmap if not loaded yet
     if (m_font == nullptr)
     {
         m_font = m_level->getGlobals()->guienv->getFont("../media/font.png");
     }
+
+    // calculating text dimension (including line breaks) + duration
+    core::dimension2du dim(0, 0);// = m_font->getDimension(m_text.c_str());
+    m_textBox.UpperLeftCorner.set(-dim.Width / 2, -dim.Height);
+    m_textBox.LowerRightCorner.set(dim.Width / 2, 0);
+
+    m_duration = DURATION;
 }
 
 TextEffect::~TextEffect()
@@ -32,23 +41,23 @@ void TextEffect::update(uint32_t elapsedMs)
     {
         m_color.setAlpha(m_elapsed);
     }
-    else if (m_elapsed >= (DURATION - 255))
+    else if (m_elapsed >= (m_duration - 255))
     {
-        m_color.setAlpha(DURATION - m_elapsed);
+        m_color.setAlpha(m_duration - m_elapsed);
     }
 
     // calculate data for drawing
     core::vector2di pos = m_level->getScreenPosition(m_position);
     pos.Y -= m_elapsed / 10;
-    core::recti box(pos.X - 100, pos.Y - 20, pos.X + 100, pos.Y + 20);
+    //core::recti box(pos.X - 100, pos.Y - 20, pos.X + 100, pos.Y + 20);
 
     // draw
-    m_font->draw(m_text.c_str(), box, m_color, true, true);
+    m_font->draw(m_text, m_textBox + pos, m_color, true, false);
 
     m_elapsed += elapsedMs;
 }
 
 bool TextEffect::isFinished() const
 {
-    return (m_elapsed >= DURATION);
+    return (m_elapsed >= m_duration);
 }

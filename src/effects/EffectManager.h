@@ -19,7 +19,8 @@ public:
     void reset();
 
     void playerDamage();
-    void text(const wchar_t*, irr::core::vector2df, irr::video::SColor = {255, 255, 255, 255});
+    void text(const char*, Element*, irr::video::SColor = {255, 255, 255, 255});
+    void text(const wchar_t*, Element*, irr::video::SColor = {255, 255, 255, 255});
     void explosion(irr::core::vector2df pos, unsigned image, float scale, float particleSize = 0.16f,
                    irr::video::SColor color = {255, 255, 0, 0});
     void appear(Element*);

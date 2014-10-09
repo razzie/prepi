@@ -89,6 +89,8 @@
 		<Unit filename="src/behaviors/ResizerBehavior.h" />
 		<Unit filename="src/behaviors/TeleportBehavior.cpp" />
 		<Unit filename="src/behaviors/TeleportBehavior.h" />
+		<Unit filename="src/behaviors/TextBehavior.cpp" />
+		<Unit filename="src/behaviors/TextBehavior.h" />
 		<Unit filename="src/behaviors/UnstableBehavior.cpp" />
 		<Unit filename="src/behaviors/UnstableBehavior.h" />
 		<Unit filename="src/effects/AppearEffect.cpp" />

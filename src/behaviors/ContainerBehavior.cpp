@@ -9,7 +9,13 @@ using namespace irr;
 
 ContainerBehavior::ContainerBehavior(Element* element, std::istream& stream)
  : Behavior(element, Type::CONTAINER)
- , m_elemData( Parser(stream, '"').getArg<std::string>() )
+ , m_elemData(Parser(stream, '"').getString())
+{
+}
+
+ContainerBehavior::ContainerBehavior(Element* element, std::string elemData)
+ : Behavior(element, Type::CONTAINER)
+ , m_elemData(elemData)
 {
 }
 

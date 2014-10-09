@@ -7,8 +7,10 @@
 #include "behaviors\ResizerBehavior.h"
 #include "behaviors\LeafEffectBehavior.h"
 #include "behaviors\ContainerBehavior.h"
-//#include "behaviors\VentilatorBehavior.h"
+//#include "behaviors\TrapBehavior.h"
 #include "behaviors\LadderBehavior.h"
+#include "behaviors\TextBehavior.h"
+//#include "behaviors\FanBehavior.h"
 
 Behavior::Behavior(Element* element, Type type)
  : m_type(type)
@@ -73,14 +75,23 @@ Behavior* CreateBehavior(Element* element, std::istream& stream)
         case Behavior::Type::CONTAINER:
             return new ContainerBehavior(element, stream);
 
-        //case Behavior::Type::VENTILATOR:
-        //    return new VentilatorBehavior(element, stream);
+        //case Behavior::Type::TRAP:
+        //    return new TrapBehavior(element, stream);
 
         case Behavior::Type::LADDER:
             return new LadderBehavior(element);
 
         case Behavior::Type::CLIMBING:
             return new Behavior(element, Behavior::Type::CLIMBING);
+
+        case Behavior::Type::TEXT:
+            return new TextBehavior(element, stream);
+
+        //case Behavior::Type::FAN:
+        //    return new FanBehavior(element, stream);
+
+        case Behavior::Type::CHECKPOINT:
+            return new Behavior(element, Behavior::Type::CHECKPOINT);
 
         case Behavior::Type::NONE:
         default:
@@ -102,9 +113,12 @@ std::istream& operator>> (std::istream& stream, Behavior::Type& m)
         case 4: // RESIZER
         case 5: // LEAF_EFFECT
         case 6: // CONTAINER
-        case 7: // VENTILATOR
+        case 7: // TRAP
         case 8: // LADDER
         case 9: // CLIMBING
+        case 10: // TEXT
+        case 11: // FAN
+        case 12: // CHECKPOINT
             m = static_cast<Behavior::Type>(behavior);
             break;
 

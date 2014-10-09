@@ -77,8 +77,15 @@ void EffectManager::playerDamage()
     }
 }
 
-void EffectManager::text(const wchar_t* text, core::vector2df pos, video::SColor color)
+void EffectManager::text(const char* text, Element* element, video::SColor color)
 {
+    core::vector2df pos = element->getPosition() + element->getBoundingBox().getCenter() + core::vector2df(0, -element->getScale() / 2.f);
+    addEffect( new TextEffect(m_level, text, pos, color) );
+}
+
+void EffectManager::text(const wchar_t* text, Element* element, video::SColor color)
+{
+    core::vector2df pos = element->getPosition() + element->getBoundingBox().getCenter() + core::vector2df(0, -element->getScale() / 2.f);
     addEffect( new TextEffect(m_level, text, pos, color) );
 }
 

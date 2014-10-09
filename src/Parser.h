@@ -31,6 +31,26 @@ public:
         return t;
     }
 
+    // special getter for " enclosed strings
+    std::string getString()
+    {
+        std::string s;
+        if (m_stream->peek() == '"')
+        {
+            m_stream->ignore(); // ignore string begin mark
+            while (*m_stream)
+            {
+                if (m_stream->peek() != '"')
+                {
+                    m_stream->ignore(); // ignore string end mark
+                    return s;
+                }
+                s += m_stream->get();
+            }
+        }
+        throw std::runtime_error("string parse error");
+    }
+
     // get multiple arguments (recursive template)
     template<class Arg>
     std::tuple<Arg> getArgs()

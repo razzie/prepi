@@ -18,9 +18,12 @@ public:
         RESIZER = 4,
         LEAF_EFFECT = 5,
         CONTAINER = 6,
-        VENTILATOR = 7,
+        TRAP = 7,
         LADDER = 8,
-        CLIMBING = 9
+        CLIMBING = 9,
+        TEXT = 10,
+        FAN = 11,
+        CHECKPOINT = 12
     };
 
     Behavior(Element*, Type = Type::NONE);

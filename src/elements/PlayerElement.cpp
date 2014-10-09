@@ -66,7 +66,7 @@ void PlayerElement::takeHealth(unsigned health)
     wchar_t text[10];
     swprintf(text, 10, L"+%u", health);
 
-    m_level->getEffectManager()->text(text, m_position + core::vector2df(m_scale / 2.f, 0.5f), {255, 0, 255, 0});
+    m_level->getEffectManager()->text(text, this, {255, 0, 255, 0});
 
     m_health += health;
     if (m_health > getMaxHealth()) m_health = getMaxHealth();
@@ -77,7 +77,7 @@ void PlayerElement::takeReward(unsigned reward)
     wchar_t text[10];
     swprintf(text, 10, L"+%u", reward);
 
-    m_level->getEffectManager()->text(text, m_position + core::vector2df(m_scale / 2.f, 0.5f), {255, 255, 255, 0});
+    m_level->getEffectManager()->text(text, this, {255, 255, 255, 0});
 
     m_rewards += reward;
 }
@@ -96,7 +96,7 @@ void PlayerElement::takeDamage(unsigned dmg)
     swprintf(text, 10, L"-%u", dmg);
 
     m_level->getEffectManager()->playerDamage();
-    m_level->getEffectManager()->text(text, m_position + core::vector2df(m_scale / 2.f, 0.5f), {255, 255, 0, 0});
+    m_level->getEffectManager()->text(text, this, {255, 255, 0, 0});
     m_injury = 255;
 
     if (dmg >= m_health)
@@ -127,7 +127,8 @@ void PlayerElement::takeDamageFrom(EnemyElement* enemy)
 
 void PlayerElement::die()
 {
-    std::cout << "Player died!" << std::endl;
+    m_level->getEffectManager()->text("DEAD", this, {255, 255, 0, 0});
+    //std::cout << "Player died!" << std::endl;
 }
 
 void PlayerElement::setSpeed(f32 speed)
