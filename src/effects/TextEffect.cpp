@@ -23,11 +23,21 @@ TextEffect::TextEffect(Level* level, irr::core::stringw text, core::vector2df po
     }
 
     // calculating text dimension (including line breaks) + duration
-    core::dimension2du dim(0, 0);// = m_font->getDimension(m_text.c_str());
+    core::dimension2du kerning(m_font->getKerningWidth(), m_font->getKerningHeight());
+    core::dimension2du dim(0, kerning.Height);
+
+    for (unsigned i = 0, len = m_text.size(); i < len; ++i)
+    {
+        if (m_text[i] == '\n')
+            dim.Height += kerning.Height;
+        else
+            dim.Width += kerning.Width;
+    }
+
     m_textBox.UpperLeftCorner.set(-dim.Width / 2, -dim.Height);
     m_textBox.LowerRightCorner.set(dim.Width / 2, 0);
 
-    m_duration = DURATION;
+    m_duration = m_text.size() * 200;
 }
 
 TextEffect::~TextEffect()

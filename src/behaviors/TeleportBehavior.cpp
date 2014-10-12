@@ -78,23 +78,12 @@ void TeleportBehavior::update(uint32_t)
 
     if (m_nextActivated) return;
 
-    m_element->updateCollisions();
-    auto collisions = m_element->getCollisions();
-
-    for (auto collision : collisions)
+    if (m_element->isPlayerCollided())
     {
-        Element* contactElem = collision.getOtherElement();
-
-        if (contactElem->getType() == Element::Type::PLAYER)
-        {
-            if (m_delay <= 0) activateNext();
-            m_touched = true;
-            return; // return here in case of touch
-        }
+        if (m_delay <= 0) activateNext();
+        m_touched = true;
     }
-
-    // if we got past the for cycle, that means there is no player touch
-    if (m_touched && m_delay > 0)
+    else if (m_touched && m_delay > 0)
     {
         activateNext();
     }

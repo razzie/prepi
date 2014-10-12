@@ -27,29 +27,19 @@ void ContainerBehavior::update(uint32_t)
 {
     if (m_element == nullptr) return;
 
-    m_element->updateCollisions();
-    auto& collisions = m_element->getCollisions();
-
-    for (auto collision : collisions)
+    if (m_element->isPlayerCollided())
     {
-        Element* contactElem = collision.getOtherElement();
-
-        if (contactElem->getType() == Element::Type::PLAYER)
+        try
         {
-            try
-            {
-                std::stringstream ss(m_elemData);
-                CreateElement(m_element->getLevel(), ss);
-            }
-            catch (std::exception& e)
-            {
-                std::cout << "Failed to create contained element: " << m_elemData << " (" << e.what() << ")" << std::endl;
-            }
-
-            m_element->getLevel()->getEffectManager()->fall(m_element);
-            m_element->remove();
-
-            return;
+            std::stringstream ss(m_elemData);
+            CreateElement(m_element->getLevel(), ss);
         }
+        catch (std::exception& e)
+        {
+            std::cout << "Failed to create contained element: " << m_elemData << " (" << e.what() << ")" << std::endl;
+        }
+
+        m_element->getLevel()->getEffectManager()->fall(m_element);
+        m_element->remove();
     }
 }

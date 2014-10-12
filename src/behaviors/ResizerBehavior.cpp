@@ -1,5 +1,7 @@
 #include "Parser.h"
 #include "elements\Element.h"
+#include "elements\PlayerElement.h"
+#include "level\Level.h"
 #include "behaviors\ResizerBehavior.h"
 
 ResizerBehavior::ResizerBehavior(Element* element, std::istream& stream)
@@ -21,18 +23,9 @@ void ResizerBehavior::update(uint32_t elapsedMs)
 {
     if (m_element == nullptr) return;
 
-    m_element->updateCollisions();
-    auto collisions = m_element->getCollisions();
-
-    for (auto collision : collisions)
+    if (m_element->isPlayerCollided())
     {
-        Element* contactElem = collision.getOtherElement();
-
-        if (contactElem->getType() == Element::Type::PLAYER)
-        {
-            contactElem->setScale(m_scale);
-            m_element->remove();
-            return;
-        }
+        m_element->getLevel()->getPlayerElement()->setScale(m_scale);
+        m_element->remove();
     }
 }

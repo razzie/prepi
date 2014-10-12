@@ -65,18 +65,9 @@ void ExplosiveBehavior::update(uint32_t elapsedMs)
     }
     else
     {
-        m_element->updateCollisions();
-        auto collisions = m_element->getCollisions();
-
-        for (auto collision : collisions)
+        if (m_element->isPlayerCollided())
         {
-            Element* contactElem = collision.getOtherElement();
-
-            if (contactElem->getType() == Element::Type::PLAYER)
-            {
-                m_triggered = true;
-                return;
-            }
+            m_triggered = true;
         }
     }
 }

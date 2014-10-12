@@ -92,11 +92,7 @@ void PlayerElement::takeDamage(unsigned dmg)
 {
     if (m_immortalLeft > 0) return;
 
-    wchar_t text[10];
-    swprintf(text, 10, L"-%u", dmg);
-
     m_level->getEffectManager()->playerDamage();
-    m_level->getEffectManager()->text(text, this, {255, 255, 0, 0});
     m_injury = 255;
 
     if (dmg >= m_health)
@@ -106,6 +102,10 @@ void PlayerElement::takeDamage(unsigned dmg)
     }
     else
     {
+        wchar_t text[10];
+        swprintf(text, 10, L"-%u", dmg);
+        m_level->getEffectManager()->text(text, this, {255, 255, 0, 0});
+
         m_health -= dmg;
     }
 }

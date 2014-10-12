@@ -21,16 +21,8 @@ void LadderBehavior::update(uint32_t)
 {
     if (m_element == nullptr) return;
 
-    Level* level = m_element->getLevel();
-    PlayerElement* player = level->getPlayerElement();
-
-    if (player == nullptr) return;
-
-    core::rectf playerBox = player->getBoundingBox() + player->getPosition();
-    core::rectf ladderBox = m_element->getBoundingBox() + m_element->getPosition();
-
-    if (ladderBox.isRectCollided(playerBox))
+    if (m_element->isPlayerCollided())
     {
-        player->onLadder();
+        m_element->getLevel()->getPlayerElement()->onLadder();
     }
 }

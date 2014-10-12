@@ -39,24 +39,17 @@ void TextBehavior::update(uint32_t)
 {
     if (m_element == nullptr) return;
 
-    m_element->updateCollisions();
-    auto collisions = m_element->getCollisions();
-
-    for (auto collision : collisions)
+    if (m_element->isPlayerCollided())
     {
-        Element* contactElem = collision.getOtherElement();
-
-        if (contactElem->getType() == Element::Type::PLAYER)
+        if (!m_triggered)
         {
-            if (!m_triggered)
-            {
-                m_element->getLevel()->getEffectManager()->text(m_text.c_str(), m_element, m_color);
-            }
-
-            m_triggered = true;
-            return;
+            m_element->getLevel()->getEffectManager()->text(m_text.c_str(), m_element, m_color);
         }
-    }
 
-    m_triggered = false;
+        m_triggered = true;
+    }
+    else
+    {
+        m_triggered = false;
+    }
 }

@@ -275,6 +275,47 @@ const std::vector<Collision>& Element::getCollisions() const
     return m_collisions;
 }
 
+bool Element::isPlayerCollided()
+{
+    updateCollisions();
+
+    // calling const version of this function
+    return (const_cast<const Element*>(this)->isPlayerCollided());
+}
+
+bool Element::isPlayerCollided() const
+{
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+
+    // there is no box2d body, checking collision based on bounding boxes
+    if (m_body == nullptr)
+    {
+        PlayerElement* player = m_level->getPlayerElement();
+
+        if (player == nullptr) return false;
+
+        core::rectf playerBox = player->getBoundingBox() + player->m_position;
+        core::rectf elementBox = getBoundingBox() + m_position;
+
+        return (elementBox.isRectCollided(playerBox));
+    }
+    // retrieving box2d collisions (more accurate)
+    else
+    {
+        for (auto collision : m_collisions)
+        {
+            Element* contactElem = collision.getOtherElement();
+
+            if (contactElem->getType() == Element::Type::PLAYER)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
 void Element::enable(bool enabled)
 {
     //if (m_enabled == enabled) return;

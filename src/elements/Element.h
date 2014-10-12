@@ -70,6 +70,8 @@ public:
 
     void updateCollisions();
     const std::vector<Collision>& getCollisions() const;
+    bool isPlayerCollided();
+    bool isPlayerCollided() const;
 
     void enable(bool enabled = true);
     bool isEnabled() const;

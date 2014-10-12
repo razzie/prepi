@@ -23,26 +23,17 @@ void UnstableBehavior::update(uint32_t elapsedMs)
 {
     if (m_element == nullptr || m_triggered) return; // no element or already triggered (fallen down)
 
-    m_element->updateCollisions();
-    auto collisions = m_element->getCollisions();
-
-    for (auto collision : collisions)
+    if (m_element->isPlayerCollided())
     {
-        Element* contactElem = collision.getOtherElement();
-
-        if (contactElem->getType() == Element::Type::PLAYER)
+        if (m_disappear)
         {
-            if (m_disappear)
-            {
-                m_element->remove();
-            }
-            else
-            {
-                m_element->getBody()->SetType(b2_dynamicBody);
-            }
-
-            m_triggered = true;
-            return;
+            m_element->remove();
         }
+        else
+        {
+            m_element->getBody()->SetType(b2_dynamicBody);
+        }
+
+        m_triggered = true;
     }
 }
