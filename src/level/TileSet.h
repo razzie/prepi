@@ -70,6 +70,9 @@ struct TileData
     void drawAnimation(AnimationType animType, unsigned animSpeed, Level* level,
                        irr::core::vector2di imgPos, irr::core::vector2df pos,
                        float scale = 1.0f, bool standby = false, irr::video::SColor = {255, 255, 255, 255}) const;
+    void drawContinuousAnimation(unsigned startPoint, unsigned animSpeed, Level* level,
+                                 irr::core::vector2di imgPos, irr::core::vector2df pos,
+                                 float scale = 1.0f, irr::video::SColor = {255, 255, 255, 255}) const;
 };
 
 class TileSet

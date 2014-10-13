@@ -163,6 +163,43 @@ void TileData::drawAnimation(AnimationType animType, unsigned animSpeed, Level* 
     }
 }
 
+void TileData::drawContinuousAnimation(unsigned startPoint, unsigned animSpeed, Level* level, core::vector2di imgPos,
+                                       core::vector2df pos, float scale, irr::video::SColor color) const
+{
+    auto it = animations.find(imgPos);
+    if (it == animations.end())
+    {
+        drawTile(level, imgPos, pos, scale, color);
+        return;
+    }
+
+    const Animation* anim = &(it->second);
+    unsigned tileCount = anim->frameCount * anim->animCount;
+    uint32_t elapsedMs = level->getTileSet()->getAnimationTimer()->peekElapsed();
+    unsigned frame = (elapsedMs / (1000 / animSpeed) + startPoint) % tileCount;
+
+    core::vector2di tile(frame % anim->frameCount, frame / anim->frameCount);
+    core::rect<s32> srcRect =
+        {(s32)(tile.X * tileSize), (s32)(tile.Y * tileSize),
+         (s32)((tile.X + 1) * tileSize), (s32)((tile.Y + 1) * tileSize)};
+
+    video::IVideoDriver* driver = level->getGlobals()->driver;
+    core::recti screen({0,0}, driver->getScreenSize());
+
+    unsigned unit = level->getUnitSize();
+    core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
+
+    video::SColor colors[4] = {color, color, color, color};
+    core::rect<s32> destRect = {0, 0, (s32)(scale * unit), (s32)(scale * unit)};
+    destRect += calcPos;
+    destRect -= level->getViewOffset();
+
+    if (screen.isRectCollided(destRect))
+    {
+        driver->draw2DImage(anim->texture, destRect, srcRect, 0, colors, true);
+    }
+}
+
 
 TileSet::TileSet(Globals* globals, std::string name)
  : m_globals(globals)
@@ -511,6 +548,10 @@ void TileSet::findAnimationData(std::string dirName) const
 
                     case Element::Type::FINISH:
                         elemTypeTiles = &m_finishes;
+                        break;
+
+                    case Element::Type::PARTICLE:
+                        elemTypeTiles = &m_particles;
                         break;
 
                     default:

@@ -6,7 +6,7 @@
 #include "Color.h"
 #include "effects\LeafEffect.h"
 
-#define DEFAULT_LEAF_NUM 1.5f
+#define DEFAULT_LEAF_NUM 4.5f
 
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 
@@ -86,7 +86,7 @@ void LeafEffect::update(uint32_t elapsedMs)
             }
 
             // drawing leaf
-            m_tileData->drawAnimation(0, 5, m_level, m_imgPos, leaf.m_position, 0.25f, false, leaf.m_color);
+            m_tileData->drawContinuousAnimation(leaf.m_randomSeed, 10, m_level, m_imgPos, leaf.m_position, 0.25f, leaf.m_color);
         }
     }
 
