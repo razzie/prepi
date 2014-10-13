@@ -1,8 +1,7 @@
+#include <iostream>
 #include "Globals.h"
 #include "level\Level.h"
 #include "effects\TextEffect.h"
-
-#define DURATION 1000
 
 using namespace irr;
 
@@ -10,10 +9,7 @@ gui::IGUIFont* TextEffect::m_font = nullptr;
 
 TextEffect::TextEffect(Level* level, irr::core::stringw text, core::vector2df pos, video::SColor color)
  : m_level(level)
- , m_text(text)
  , m_position(pos)
- , m_color(color)
- , m_duration(0)
  , m_elapsed(0)
 {
     // load font bitmap if not loaded yet
@@ -22,22 +18,23 @@ TextEffect::TextEffect(Level* level, irr::core::stringw text, core::vector2df po
         m_font = m_level->getGlobals()->guienv->getFont("../media/font.png");
     }
 
-    // calculating text dimension (including line breaks) + duration
-    core::dimension2du kerning(m_font->getKerningWidth(), m_font->getKerningHeight());
-    core::dimension2du dim(0, kerning.Height);
-
-    for (unsigned i = 0, len = m_text.size(); i < len; ++i)
+    // splitting the text by new line characters
+    m_texts.push_back({{}, color, 0, 1000});
+    for (unsigned i = 0, len = text.size(); i < len; ++i)
     {
-        if (m_text[i] == '\n')
-            dim.Height += kerning.Height;
+        if (text[i] == '\n')
+        {
+            m_texts.push_back({{}, color, 0, 1000});
+        }
         else
-            dim.Width += kerning.Width;
+        {
+            Text& t = m_texts.back();
+            t.m_text += text[i];
+            t.m_duration += 100;
+        }
     }
 
-    m_textBox.UpperLeftCorner.set(-dim.Width / 2, -dim.Height);
-    m_textBox.LowerRightCorner.set(dim.Width / 2, 0);
-
-    m_duration = m_text.size() * 200;
+    m_currText = m_texts.begin();
 }
 
 TextEffect::~TextEffect()
@@ -46,28 +43,36 @@ TextEffect::~TextEffect()
 
 void TextEffect::update(uint32_t elapsedMs)
 {
-    // update alpha channel
+    Text& t = *m_currText;
+
+    t.m_posDelta -= elapsedMs / 16;
+
     if (m_elapsed <= 255)
     {
-        m_color.setAlpha(m_elapsed);
+        t.m_color.setAlpha(m_elapsed);
+        t.m_posDelta -= elapsedMs / 8;
     }
-    else if (m_elapsed >= (m_duration - 255))
+    else if (m_elapsed >= (t.m_duration - 255))
     {
-        m_color.setAlpha(m_duration - m_elapsed);
+        t.m_color.setAlpha(t.m_duration - m_elapsed);
+        t.m_posDelta -= elapsedMs / 8;
     }
 
-    // calculate data for drawing
     core::vector2di pos = m_level->getScreenPosition(m_position);
-    pos.Y -= m_elapsed / 10;
-    //core::recti box(pos.X - 100, pos.Y - 20, pos.X + 100, pos.Y + 20);
+    pos.Y += t.m_posDelta / 4;
 
-    // draw
-    m_font->draw(m_text, m_textBox + pos, m_color, true, false);
+    m_font->draw(t.m_text, {pos, pos}, t.m_color, true, true);
 
     m_elapsed += elapsedMs;
+
+    if (m_elapsed > t.m_duration)
+    {
+        m_elapsed -= t.m_duration;
+        ++m_currText;
+    }
 }
 
 bool TextEffect::isFinished() const
 {
-    return (m_elapsed >= m_duration);
+    return (m_currText == m_texts.end());
 }

@@ -1,6 +1,7 @@
 #ifndef TEXTEFFECT_H_INCLUDED
 #define TEXTEFFECT_H_INCLUDED
 
+#include <vector>
 #include "irrlicht.h"
 #include "effects\Effect.h"
 
@@ -15,15 +16,19 @@ public:
     bool isFinished() const;
 
 private:
-    void setupTextBox();
+    struct Text
+    {
+        irr::core::stringw m_text;
+        irr::video::SColor m_color;
+        int m_posDelta;
+        uint32_t m_duration;
+    };
 
     static irr::gui::IGUIFont* m_font;
     Level* m_level;
-    irr::core::stringw m_text;
+    std::vector<Text> m_texts;
+    std::vector<Text>::iterator m_currText;
     irr::core::vector2df m_position;
-    irr::video::SColor m_color;
-    irr::core::recti m_textBox;
-    uint32_t m_duration;
     uint32_t m_elapsed;
 };
 

@@ -12,7 +12,7 @@ class TextBehavior : public Behavior
 {
 public:
     TextBehavior(Element*, std::istream&);
-    //TextBehavior(Element*, std::tuple<std::string, irr::video::SColor>);
+    TextBehavior(Element*, std::tuple<std::string, irr::video::SColor>);
     TextBehavior(Element*, std::string, irr::video::SColor);
     ~TextBehavior();
     //void setElement(Element*);

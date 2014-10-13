@@ -8,20 +8,16 @@
 using namespace irr;
 
 TextBehavior::TextBehavior(Element* element, std::istream& stream)
-// : TextBehavior(element, Parser(stream, ',').getArgs<std::string, video::SColor>())
- : Behavior(element, Type::TEXT)
+ : TextBehavior(element, Parser(stream, ',').getArgs<std::string, video::SColor>())
 {
-    Parser p(stream, ',');
-    m_text = p.getString();
-    m_color = p.getArg<video::SColor>();
 }
 
-/*TextBehavior::TextBehavior(Element* element, std::tuple<std::string, video::SColor> data)
+TextBehavior::TextBehavior(Element* element, std::tuple<std::string, video::SColor> data)
  : TextBehavior(element,
     std::get<0>(data),
     std::get<1>(data))
 {
-}*/
+}
 
 TextBehavior::TextBehavior(Element* element, std::string text, video::SColor color)
  : Behavior(element, Type::TEXT)

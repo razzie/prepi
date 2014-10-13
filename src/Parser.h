@@ -9,6 +9,7 @@ class Parser
     std::istream* m_stream;
     std::stringstream m_string;
     std::locale m_origLoc;
+    char m_delimiter;
 
 public:
     Parser(std::istream&, char delimiter);
@@ -22,33 +23,24 @@ public:
     // has next arg in this line
     bool hasNextArg() const;
 
+    // special getter for " enclosed strings
+    std::string getString();
+
     // get one argument
     template<class T>
-    T getArg()
+    typename std::enable_if<!std::is_same<T, std::string>::value, T>::type
+        getArg()
     {
         T t;
         if ( !(*m_stream >> t) ) throw std::runtime_error("out of args");
         return t;
     }
 
-    // special getter for " enclosed strings
-    std::string getString()
+    template<class T>
+    typename std::enable_if<std::is_same<T, std::string>::value, T>::type
+        getArg()
     {
-        std::string s;
-        if (m_stream->peek() == '"')
-        {
-            m_stream->ignore(); // ignore string begin mark
-            while (*m_stream)
-            {
-                if (m_stream->peek() != '"')
-                {
-                    m_stream->ignore(); // ignore string end mark
-                    return s;
-                }
-                s += m_stream->get();
-            }
-        }
-        throw std::runtime_error("string parse error");
+        return getString();
     }
 
     // get multiple arguments (recursive template)
