@@ -81,6 +81,8 @@
 		<Unit filename="src/behaviors/ContainerBehavior.h" />
 		<Unit filename="src/behaviors/ExplosiveBehavior.cpp" />
 		<Unit filename="src/behaviors/ExplosiveBehavior.h" />
+		<Unit filename="src/behaviors/FanBehavior.cpp" />
+		<Unit filename="src/behaviors/FanBehavior.h" />
 		<Unit filename="src/behaviors/LadderBehavior.cpp" />
 		<Unit filename="src/behaviors/LadderBehavior.h" />
 		<Unit filename="src/behaviors/LeafEffectBehavior.cpp" />

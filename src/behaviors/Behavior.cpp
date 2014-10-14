@@ -10,7 +10,7 @@
 //#include "behaviors\TrapBehavior.h"
 #include "behaviors\LadderBehavior.h"
 #include "behaviors\TextBehavior.h"
-//#include "behaviors\FanBehavior.h"
+#include "behaviors\FanBehavior.h"
 
 Behavior::Behavior(Element* element, Type type)
  : m_type(type)
@@ -87,8 +87,8 @@ Behavior* CreateBehavior(Element* element, std::istream& stream)
         case Behavior::Type::TEXT:
             return new TextBehavior(element, stream);
 
-        //case Behavior::Type::FAN:
-        //    return new FanBehavior(element, stream);
+        case Behavior::Type::FAN:
+            return new FanBehavior(element, stream);
 
         case Behavior::Type::CHECKPOINT:
             return new Behavior(element, Behavior::Type::CHECKPOINT);
