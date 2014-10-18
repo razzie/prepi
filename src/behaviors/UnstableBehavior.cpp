@@ -10,7 +10,6 @@ UnstableBehavior::UnstableBehavior(Element* element, std::istream& stream)
 
 UnstableBehavior::UnstableBehavior(Element* element, bool disappear)
  : Behavior(element, Type::UNSTABLE)
- , m_triggered(false)
  , m_disappear(disappear)
 {
 }
@@ -21,7 +20,7 @@ UnstableBehavior::~UnstableBehavior()
 
 void UnstableBehavior::update(uint32_t elapsedMs)
 {
-    if (m_element == nullptr || m_triggered) return; // no element or already triggered (fallen down)
+    if (m_element == nullptr) return;
 
     if (m_element->isPlayerCollided())
     {
@@ -29,11 +28,11 @@ void UnstableBehavior::update(uint32_t elapsedMs)
         {
             m_element->remove();
         }
-        else
+        else if (m_element->getBody() != nullptr)
         {
             m_element->getBody()->SetType(b2_dynamicBody);
         }
 
-        m_triggered = true;
+        delete this;
     }
 }

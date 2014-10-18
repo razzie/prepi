@@ -85,7 +85,6 @@ void FanBehavior::update(uint32_t elapsedMs)
 
     /*Level* level = m_element->getLevel();
     video::IVideoDriver* driver = level->getGlobals()->driver;
-
     driver->draw2DLine(level->getScreenPosition(fanPos + m_points[0]), level->getScreenPosition(fanPos + m_points[1]));
     driver->draw2DLine(level->getScreenPosition(fanPos + m_points[1]), level->getScreenPosition(fanPos + m_points[2]));
     driver->draw2DLine(level->getScreenPosition(fanPos + m_points[2]), level->getScreenPosition(fanPos + m_points[3]));
@@ -100,8 +99,6 @@ void FanBehavior::update(uint32_t elapsedMs)
         isPointRight({fanPos + m_points[2], fanPos + m_points[3]}, playerPos) &&
         isPointRight({fanPos + m_points[3], fanPos + m_points[0]}, playerPos))*/
     {
-        std::cout << "Player in fan range" << std::endl;
-
         float speed = (float)elapsedMs / 100.f;
         float dist = fanPos.getDistanceFrom(playerPos) / (RANGE * 2.f) + 0.01f; // shouldn't be 0
         core::vector2df accel = speed * m_velocity / dist;

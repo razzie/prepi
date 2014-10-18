@@ -7,7 +7,7 @@
 #include "behaviors\ResizerBehavior.h"
 #include "behaviors\LeafEffectBehavior.h"
 #include "behaviors\ContainerBehavior.h"
-//#include "behaviors\TrapBehavior.h"
+#include "behaviors\TrapBehavior.h"
 #include "behaviors\LadderBehavior.h"
 #include "behaviors\TextBehavior.h"
 #include "behaviors\FanBehavior.h"
@@ -75,8 +75,8 @@ Behavior* CreateBehavior(Element* element, std::istream& stream)
         case Behavior::Type::CONTAINER:
             return new ContainerBehavior(element, stream);
 
-        //case Behavior::Type::TRAP:
-        //    return new TrapBehavior(element, stream);
+        case Behavior::Type::TRAP:
+            return new TrapBehavior(element);
 
         case Behavior::Type::LADDER:
             return new LadderBehavior(element);

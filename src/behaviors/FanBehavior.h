@@ -5,8 +5,6 @@
 #include "irrlicht.h"
 #include "behaviors\Behavior.h"
 
-class Element;
-
 class FanBehavior : public Behavior
 {
 public:
