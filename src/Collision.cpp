@@ -72,9 +72,9 @@ void Collision::getElementCollisions(Element* element, std::vector<Collision>& c
         if (contactElem == 0 || contactElem == element)
             continue;
 
-        b2Vec2 posA = element->getBody()->GetPosition();
-        b2Vec2 posB = contactBody->GetPosition();
-        float contactAngle = alignedAngle( (core::vector2df(posB.x - posA.x, posB.y - posA.y).getAngleTrig()) /*+ 90.f*/ );
+        core::vector2df posA = element->getPosition() + element->getBoundingBox().getCenter();
+        core::vector2df posB = contactElem->getPosition() + contactElem->getBoundingBox().getCenter();
+        float contactAngle = alignedAngle( (posB - posA).getAngleTrig() );
 
         collisions.push_back({contactElem, contactAngle});
     }

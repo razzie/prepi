@@ -33,8 +33,6 @@ void TrapBehavior::update(uint32_t elapsedMs)
                 elemType != Element::Type::PARTICLE &&
                 elemType != Element::Type::PLAYER)
             {
-                std::cout << "something between player and trap, type: " << static_cast<unsigned>(elemType) << ", pos: "
-                          << elem->getPosition().X << ":" << elem->getPosition().Y << std::endl;
                 m_otherElementBlocks = true;
                 return false;
             }

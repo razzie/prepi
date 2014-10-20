@@ -28,6 +28,36 @@ static b2BodyType motionTypeToBodyType(Motion::Type motionType)
     }
 }
 
+static b2Filter elementTypeToFilter(Element::Type elemType)
+{
+    b2Filter filter;
+
+    switch (elemType)
+    {
+        case Element::Type::GROUND:
+        //case Element::Type::ENEMY:
+        case Element::Type::REWARD:
+        case Element::Type::PLAYER:
+        case Element::Type::FINISH:
+            filter.categoryBits = 0x0001;
+            filter.maskBits = 0x0003;
+            break;
+
+        case Element::Type::PARTICLE:
+            filter.categoryBits = 0x0002;
+            filter.maskBits = 0x0003;
+            break;
+
+        // type(s) below will never collide with blood
+        case Element::Type::ENEMY:
+            filter.categoryBits = 0x0001;
+            filter.maskBits = 0x0001;
+            break;
+    }
+
+    return filter;
+}
+
 Shape TileData::getBoundingShape(core::vector2di imgPosition) const
 {
     unsigned tileId = (tileDimension.X * imgPosition.Y) + imgPosition.X;
@@ -60,6 +90,9 @@ b2Body* TileData::createBody(Element* element) const
 
         body = element->getLevel()->getPhysics()->CreateBody(&bodyDef);
         shape.addToBody(body, scale);
+
+        b2Filter filter = elementTypeToFilter(elementType);
+        body->GetFixtureList()->SetFilterData(filter);
     }
 
     return body;

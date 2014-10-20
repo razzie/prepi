@@ -112,23 +112,23 @@ void PlayerElement::takeDamage(unsigned dmg)
 
 void PlayerElement::takeDamageFrom(EnemyElement* enemy)
 {
-    auto it = m_damageList.find(enemy);
-    if (it == m_damageList.end())
+    for (Damage& dmg : m_damageList)
     {
-        m_damageList.insert( std::make_pair(enemy, Timer()) );
-        takeDamage(enemy->getDamage());
+        // already damaged when touched this enemy first
+        if (dmg.m_enemy == enemy)
+        {
+            dmg.m_collided = true;
+            return;
+        }
     }
-    else if (it->second.peekElapsed() >= 500)
-    {
-        takeDamage(enemy->getDamage());
-        it->second.reset();
-    }
+
+    m_damageList.push_back({enemy, true});
+    takeDamage(enemy->getDamage());
 }
 
 void PlayerElement::die()
 {
     m_level->getEffectManager()->text("DEAD", this, {255, 255, 0, 0});
-    //std::cout << "Player died!" << std::endl;
 }
 
 void PlayerElement::setSpeed(f32 speed)
@@ -154,6 +154,12 @@ void PlayerElement::update(uint32_t elapsedMs)
     if (m_body->GetGravityScale() == 0.f)
     {
         m_body->SetGravityScale(1.f);
+    }
+
+    // reset enemy collisions so we can remove non-colliding enemies later
+    for (Damage& dmg : m_damageList)
+    {
+        dmg.m_collided = false;
     }
 
     bool cohesion = false; // if there is cohesion, the player can jump
@@ -186,7 +192,6 @@ void PlayerElement::update(uint32_t elapsedMs)
         }
 
         switch (collision.getOtherElementDirection())
-        //switch ( Collision::getDirectionFromAngle(collision.getOtherElementAngle(), 90.f - m_climbTreshold) )
         {
             case Collision::Direction::BOTTOM:
                 cohesion = true;
@@ -204,6 +209,7 @@ void PlayerElement::update(uint32_t elapsedMs)
                 break;
         }
 
+        // we can stick to elements if they have clmbing behavior
         if ((leftContact || rightContact) &&
             contactElem->getBehaviorType() == Behavior::Type::CLIMBING)
         {
@@ -211,6 +217,16 @@ void PlayerElement::update(uint32_t elapsedMs)
         }
     }
 
+    // removing those previos enemies that are not touching us anymore
+    for (auto it = m_damageList.begin(); it != m_damageList.end(); )
+    {
+        if (it->m_collided == false)
+            it = m_damageList.erase(it);
+        else
+            ++it;
+    }
+
+    // if player is stopped from a fast falling, make some smoke
     if (cohesion && m_lastVelocity.Y > 2.0f)
     {
         m_level->getEffectManager()->smoke(m_position + core::vector2df(m_scale / 2, m_scale), 0.25f);

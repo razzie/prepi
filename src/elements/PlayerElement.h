@@ -1,9 +1,8 @@
 #ifndef PLAYERELEMENT_H_INCLUDED
 #define PLAYERELEMENT_H_INCLUDED
 
-#include <map>
+#include <vector>
 #include "level\TileSet.h"
-#include "Timer.h"
 #include "elements\Element.h"
 
 class EnemyElement;
@@ -36,11 +35,17 @@ protected:
     friend class LadderBehavior;
     void onLadder();
 
+    struct Damage
+    {
+        EnemyElement* m_enemy;
+        bool m_collided;
+    };
+
     unsigned m_health;
     unsigned m_rewards;
     irr::f32 m_speed;
     irr::core::vector2df m_lastVelocity;
-    std::map<EnemyElement*, Timer> m_damageList;
+    std::vector<Damage> m_damageList;
     unsigned m_injury;
     uint32_t m_immortalLeft;
     TileData::Animation::Type m_lastAnimType;
