@@ -35,6 +35,11 @@ int main()
 
     gg::script_engine* se = g.app->get_script_engine();
 
+    se->add_function("debug", [&]()
+                     {
+                         level1.switchDebugMode();
+                     });
+
     se->add_function("loadLevel", [&](std::string level)
                      {
                          std::string file = "../levels/" + level + ".txt";

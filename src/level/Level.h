@@ -44,6 +44,7 @@ public:
     irr::core::vector2di getScreenPosition(Element*) const;
     irr::core::vector2di getScreenPosition(irr::core::vector2df) const;
     irr::core::vector2df getRealPosition(irr::core::vector2di screenPos) const;
+    void switchDebugMode();
     void update();
 
 protected:
@@ -73,6 +74,7 @@ private:
     PlayerElement* m_player;
     unsigned m_rewardSum;
     irr::core::vector2di m_camMovement;
+    bool m_debug;
 };
 
 #endif // LEVEL_H_INCLUDED

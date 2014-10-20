@@ -65,6 +65,7 @@ Level::Level(Globals* globals, std::string tileset)
  , m_player(nullptr)
  , m_rewardSum(0)
  , m_camMovement(0, 0)
+ , m_debug(false)
 {
 }
 
@@ -432,6 +433,11 @@ core::vector2df Level::getRealPosition(irr::core::vector2di screenPos) const
     return core::vector2df((float)screenPos.X / (float)m_unit, (float)screenPos.Y / (float)m_unit);
 }
 
+void Level::switchDebugMode()
+{
+    m_debug = !m_debug;
+}
+
 void Level::update()
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
@@ -469,7 +475,7 @@ void Level::update()
         if (isElementOnScreen(element))
         {
             element->draw();
-            //element->getShape().draw(this, element->getPosition());
+            if (m_debug) element->getShape().draw(this, element->getPosition());
         }
     }
 
