@@ -34,6 +34,9 @@ PlayerElement::PlayerElement(Level* level, unsigned id,
  , m_health(100)
  , m_rewards(0)
  , m_speed(2.f)
+ , m_checkpoint(false)
+ , m_checkpointPos(0.f, 0.f)
+ , m_checkpointHealth(0)
  , m_lastVelocity(0.f, 0.f)
  , m_injury(0)
  , m_immortalLeft(0)
@@ -128,7 +131,15 @@ void PlayerElement::takeDamageFrom(EnemyElement* enemy)
 
 void PlayerElement::die()
 {
-    m_level->getEffectManager()->text("DEAD", this, {255, 255, 0, 0});
+    if (m_checkpoint)
+    {
+        setPosition(m_checkpointPos);
+        m_health = m_checkpointHealth;
+    }
+    else
+    {
+        m_level->getEffectManager()->text("DEAD", this, {255, 255, 0, 0});
+    }
 }
 
 void PlayerElement::setSpeed(f32 speed)
@@ -139,6 +150,13 @@ void PlayerElement::setSpeed(f32 speed)
 void PlayerElement::setImmortal(uint32_t msec)
 {
     m_immortalLeft = msec;
+}
+
+void PlayerElement::checkpoint()
+{
+    m_checkpoint = true;
+    m_checkpointPos = m_position;
+    m_checkpointHealth = m_health;
 }
 
 void PlayerElement::onLadder()

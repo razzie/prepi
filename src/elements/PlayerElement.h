@@ -7,6 +7,7 @@
 
 class EnemyElement;
 class RewardElement;
+class CheckpointBehavior;
 class LadderBehavior;
 
 class PlayerElement : public Element
@@ -32,7 +33,9 @@ public:
 protected:
     ~PlayerElement();
 
+    friend class CheckpointBehavior;
     friend class LadderBehavior;
+    void checkpoint();
     void onLadder();
 
     struct Damage
@@ -44,6 +47,9 @@ protected:
     unsigned m_health;
     unsigned m_rewards;
     irr::f32 m_speed;
+    bool m_checkpoint;
+    irr::core::vector2df m_checkpointPos;
+    unsigned m_checkpointHealth;
     irr::core::vector2df m_lastVelocity;
     std::vector<Damage> m_damageList;
     unsigned m_injury;

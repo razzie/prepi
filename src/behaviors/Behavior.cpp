@@ -11,6 +11,7 @@
 #include "behaviors\LadderBehavior.h"
 #include "behaviors\TextBehavior.h"
 #include "behaviors\FanBehavior.h"
+#include "behaviors\CheckpointBehavior.h"
 
 Behavior::Behavior(Element* element, Type type)
  : m_type(type)
@@ -91,7 +92,7 @@ Behavior* CreateBehavior(Element* element, std::istream& stream)
             return new FanBehavior(element, stream);
 
         case Behavior::Type::CHECKPOINT:
-            return new Behavior(element, Behavior::Type::CHECKPOINT);
+            return new CheckpointBehavior(element);
 
         case Behavior::Type::NONE:
         default:
