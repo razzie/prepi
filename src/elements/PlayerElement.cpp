@@ -181,6 +181,7 @@ void PlayerElement::update(uint32_t elapsedMs)
     }
 
     bool cohesion = false; // if there is cohesion, the player can jump
+    bool climbing = false; // for animation only
     bool leftContact = false;
     bool rightContact = false;
 
@@ -232,6 +233,7 @@ void PlayerElement::update(uint32_t elapsedMs)
             contactElem->getBehaviorType() == Behavior::Type::CLIMBING)
         {
             cohesion = true;
+            climbing = true;
         }
     }
 
@@ -261,14 +263,17 @@ void PlayerElement::update(uint32_t elapsedMs)
         if (l->isUp())
         {
             movement.y = -m_speed;
+            m_lastAnimType = TileData::Animation::Type::LADDER_UP;
         }
         else if (l->isDown())
         {
             movement.y = m_speed;
+            m_lastAnimType = TileData::Animation::Type::LADDER_DOWN;
         }
         else
         {
             movement.y = 0.f;
+            m_lastAnimType = TileData::Animation::Type::LADDER_DOWN;
         }
     }
     else
@@ -276,10 +281,34 @@ void PlayerElement::update(uint32_t elapsedMs)
         if (l->isUp() && cohesion)
         {
             movement.y = -m_speed * 2.5f;
+            if (climbing)
+            {
+                if (l->isLeft())
+                    m_lastAnimType = TileData::Animation::Type::CLIMB_UP_LEFT;
+                else
+                    m_lastAnimType = TileData::Animation::Type::CLIMB_UP_RIGHT;
+            }
+            else
+            {
+                if (l->isLeft())
+                    m_lastAnimType = TileData::Animation::Type::JUMP_LEFT;
+                else
+                    m_lastAnimType = TileData::Animation::Type::JUMP_RIGHT;
+            }
         }
         else if (l->isDown())
         {
             movement.y += m_speed / 2.f;
+            if (climbing)
+            {
+                if (l->isLeft()) // m_lastAnimType == TileData::Animation::Type::LEFT
+                    m_lastAnimType = TileData::Animation::Type::CLIMB_DOWN_LEFT;
+                else
+                    m_lastAnimType = TileData::Animation::Type::CLIMB_DOWN_RIGHT;
+            }
+            /*else
+            {
+            }*/
         }
     }
 
@@ -287,18 +316,19 @@ void PlayerElement::update(uint32_t elapsedMs)
     {
         movement.x = -m_speed;
         m_lastAnimType = TileData::Animation::Type::LEFT;
-        m_standbyAnim = false;
     }
     else if (l->isRight() && (cohesion || !rightContact))
     {
         movement.x = m_speed;
         m_lastAnimType = TileData::Animation::Type::RIGHT;
-        m_standbyAnim = false;
     }
     else
     {
         movement.x = 0.f;
-        m_standbyAnim = true;
+        if (m_lastAnimType == TileData::Animation::Type::LEFT)
+            m_lastAnimType = TileData::Animation::Type::IDLE_LEFT;
+        else
+            m_lastAnimType = TileData::Animation::Type::IDLE_RIGHT;
     }
 
     m_body->SetLinearVelocity(movement);
@@ -313,7 +343,6 @@ void PlayerElement::update(uint32_t elapsedMs)
 
 void PlayerElement::draw()
 {
-    m_tileData->drawAnimation(m_lastAnimType, (unsigned)(m_animSpeed * 10), m_level, m_imgPosition,
-                              m_position, m_scale, m_standbyAnim,
+    m_tileData->drawAnimation(m_level, m_imgPosition, m_lastAnimType, m_animSpeed, m_position, m_scale,
                               video::SColor(255, 255, 255 - m_injury, 255 - m_injury));
 }

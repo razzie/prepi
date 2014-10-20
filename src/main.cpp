@@ -29,8 +29,8 @@ int main()
     Sound rofi(rofiBuf);
     rofi.play();*/
 
-    Level level1(&g, "tale");
-    level1.loadLevel("../levels/gabor_shit2ext.txt");
+    Level level1(&g, "volcano");
+    level1.loadLevel("../levels/volcano1.txt");
     GUI gui(&g, &level1);
 
     gg::script_engine* se = g.app->get_script_engine();

@@ -55,7 +55,6 @@ protected:
     unsigned m_injury;
     uint32_t m_immortalLeft;
     TileData::Animation::Type m_lastAnimType;
-    bool m_standbyAnim;
     bool m_onLadder;
 };
 

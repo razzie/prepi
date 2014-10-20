@@ -10,7 +10,7 @@ public:
     FinishElement(Level*, std::tuple<unsigned, irr::core::vector2di, irr::core::vector2df, float, float, BehaviorWrapper>);
     FinishElement(Level*, unsigned, irr::core::vector2di, irr::core::vector2df, float, float, Behavior*);
     //void update(uint32_t elapsedMs);
-    void draw();
+    //void draw();
 
 protected:
     ~FinishElement();

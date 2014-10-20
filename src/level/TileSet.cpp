@@ -58,11 +58,21 @@ static b2Filter elementTypeToFilter(Element::Type elemType)
     return filter;
 }
 
+const irr::video::ITexture* TileData::getTexture() const
+{
+    return m_texture;
+}
+
+unsigned TileData::getTileSize() const
+{
+    return m_tileSize;
+}
+
 Shape TileData::getBoundingShape(core::vector2di imgPosition) const
 {
-    unsigned tileId = (tileDimension.X * imgPosition.Y) + imgPosition.X;
-    auto it = boundings.find(tileId);
-    if (it == boundings.end())
+    unsigned tileId = (m_tileDimension.X * imgPosition.Y) + imgPosition.X;
+    auto it = m_boundings.find(tileId);
+    if (it == m_boundings.end())
         return {};
     else
         return it->second;
@@ -101,27 +111,51 @@ b2Body* TileData::createBody(Element* element) const
 core::vector2di TileData::getImagePosition(unsigned imgNum) const
 {
     core::vector2di imgPos(0, 0);
-    imgPos.Y = imgNum / tileDimension.X;
-    imgPos.X = imgNum % tileDimension.X;
+    imgPos.Y = imgNum / m_tileDimension.X;
+    imgPos.X = imgNum % m_tileDimension.X;
     return imgPos;
 }
 
-TileData::Animation* TileData::getAnimation(irr::core::vector2di imgPos)
+TileData::Animation* TileData::getAnimation(irr::core::vector2di imgPos, unsigned animType)
 {
-    auto it = animations.find(imgPos);
-    if (it != animations.end())
-        return &it->second;
+    auto tileIt = m_animations.find(imgPos);
+    if (tileIt != m_animations.end())
+    {
+        auto animIt = tileIt->second.find(animType);
+        if (animIt != tileIt->second.end())
+        {
+            return &animIt->second;
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
     else
+    {
         return nullptr;
+    }
 }
 
-const TileData::Animation* TileData::getAnimation(irr::core::vector2di imgPos) const
+const TileData::Animation* TileData::getAnimation(irr::core::vector2di imgPos, unsigned animType) const
 {
-    auto it = animations.find(imgPos);
-    if (it != animations.end())
-        return &it->second;
+    auto tileIt = m_animations.find(imgPos);
+    if (tileIt != m_animations.end())
+    {
+        auto animIt = tileIt->second.find(animType);
+        if (animIt != tileIt->second.end())
+        {
+            return &animIt->second;
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
     else
+    {
         return nullptr;
+    }
 }
 
 void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df pos, float scale, irr::video::SColor color) const
@@ -130,8 +164,8 @@ void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df po
     core::recti screen({0,0}, driver->getScreenSize());
 
     core::rect<s32> srcRect =
-        {(s32)(imgPos.X * tileSize), (s32)(imgPos.Y * tileSize),
-        (s32)((imgPos.X + 1) * tileSize), (s32)((imgPos.Y + 1) * tileSize)};
+        {(s32)(imgPos.X * m_tileSize), (s32)(imgPos.Y * m_tileSize),
+        (s32)((imgPos.X + 1) * m_tileSize), (s32)((imgPos.Y + 1) * m_tileSize)};
 
     unsigned unit = level->getUnitSize();
     core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
@@ -143,78 +177,28 @@ void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df po
 
     if (screen.isRectCollided(destRect))
     {
-        driver->draw2DImage(texture, destRect, srcRect, 0, colors, true);
+        driver->draw2DImage(m_texture, destRect, srcRect, 0, colors, true);
     }
 }
 
-void TileData::drawAnimation(AnimationType animType, unsigned animSpeed, Level* level, core::vector2di imgPos,
-                             core::vector2df pos, float scale, bool standby, irr::video::SColor color) const
+void TileData::drawAnimation(Level* level, core::vector2di imgPos, unsigned animType, float speed, core::vector2df pos,
+                             float scale, video::SColor color, unsigned startingFrame) const
 {
-    auto it = animations.find(imgPos);
-    if (it == animations.end())
+    const Animation* anim = getAnimation(imgPos, animType);
+    if (anim == nullptr)
     {
         drawTile(level, imgPos, pos, scale, color);
         return;
     }
 
-    const Animation* anim = &(it->second);
-    unsigned frame;
-
-    if (standby)
-    {
-        frame = 0;
-    }
-    else if (anim->animCount == 1)
-    {
-        uint32_t elapsedMs = level->getTileSet()->getAnimationTimer()->peekElapsed();
-        frame = ((elapsedMs / (1000 / animSpeed)) % (anim->frameCount));
-    }
-    else
-    {
-        uint32_t elapsedMs = level->getTileSet()->getAnimationTimer()->peekElapsed();
-        frame = ((elapsedMs / (1000 / animSpeed)) % (anim->frameCount - 1)) + 1;
-    }
-
-    core::rect<s32> srcRect =
-        {(s32)(frame * tileSize), (s32)((unsigned)animType * tileSize),
-         (s32)((frame + 1) * tileSize), (s32)(((unsigned)animType + 1) * tileSize)};
-
-    video::IVideoDriver* driver = level->getGlobals()->driver;
-    core::recti screen({0,0}, driver->getScreenSize());
-
-    unsigned unit = level->getUnitSize();
-    core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
-
-    video::SColor colors[4] = {color, color, color, color};
-    core::rect<s32> destRect = {0, 0, (s32)(scale * unit), (s32)(scale * unit)};
-    destRect += calcPos;
-    destRect -= level->getViewOffset();
-
-    if (screen.isRectCollided(destRect))
-    {
-        driver->draw2DImage(anim->texture, destRect, srcRect, 0, colors, true);
-    }
-}
-
-void TileData::drawContinuousAnimation(unsigned startPoint, unsigned animSpeed, Level* level, core::vector2di imgPos,
-                                       core::vector2df pos, float scale, irr::video::SColor color) const
-{
-    auto it = animations.find(imgPos);
-    if (it == animations.end())
-    {
-        drawTile(level, imgPos, pos, scale, color);
-        return;
-    }
-
-    const Animation* anim = &(it->second);
-    unsigned tileCount = anim->frameCount * anim->animCount;
+    unsigned animSpeed = (anim->m_speed ? anim->m_speed : 1) * speed;
     uint32_t elapsedMs = level->getTileSet()->getAnimationTimer()->peekElapsed();
-    unsigned frame = (elapsedMs / (1000 / animSpeed) + startPoint) % tileCount;
+    unsigned frame = (elapsedMs / (1000 / animSpeed) + startingFrame) % anim->m_frames;
 
-    core::vector2di tile(frame % anim->frameCount, frame / anim->frameCount);
+    core::vector2di tile(frame % anim->m_framesPerRow, frame / anim->m_framesPerRow);
     core::rect<s32> srcRect =
-        {(s32)(tile.X * tileSize), (s32)(tile.Y * tileSize),
-         (s32)((tile.X + 1) * tileSize), (s32)((tile.Y + 1) * tileSize)};
+        {(s32)(tile.X * m_tileSize), (s32)(tile.Y * m_tileSize),
+         (s32)((tile.X + 1) * m_tileSize), (s32)((tile.Y + 1) * m_tileSize)};
 
     video::IVideoDriver* driver = level->getGlobals()->driver;
     core::recti screen({0,0}, driver->getScreenSize());
@@ -229,7 +213,7 @@ void TileData::drawContinuousAnimation(unsigned startPoint, unsigned animSpeed, 
 
     if (screen.isRectCollided(destRect))
     {
-        driver->draw2DImage(anim->texture, destRect, srcRect, 0, colors, true);
+        driver->draw2DImage(anim->m_texture, destRect, srcRect, 0, colors, true);
     }
 }
 
@@ -266,211 +250,149 @@ const Timer* TileSet::getAnimationTimer() const
     return &m_animTimer;
 }
 
-irr::video::ITexture* TileSet::getBackground(unsigned id, SearchType search) const
+irr::video::ITexture* TileSet::getBackground(unsigned id) const
 {
-    if (search == SearchType::EXACT)
+    auto it = m_backgrounds.find(id);
+    if (it != m_backgrounds.end())
     {
-        auto it = m_backgrounds.find(id);
-        if (it != m_backgrounds.end())
-        {
-            BackgroundData* data = &(it->second);
-            return data->texture;
-        }
-        else
-            return nullptr;
+        BackgroundData* data = &(it->second);
+        return data->texture;
     }
     else
-    {
-        if (search == SearchType::NEXT) ++id;
-
-        for (auto& it : m_backgrounds)
-        {
-            if (it.first >= id) return it.second.texture;
-        }
-
         return nullptr;
-    }
 }
 
-const TileData* TileSet::getGroundData(unsigned id, SearchType search) const
+const TileData* TileSet::getGroundData(unsigned id) const
 {
-    if (search == SearchType::EXACT)
+    auto it = m_grounds.find(id);
+    if (it != m_grounds.end())
     {
-        auto it = m_grounds.find(id);
-        if (it != m_grounds.end())
-        {
-            TileData* data = &(it->second);
-            return data;
-        }
-        else
-            return nullptr;
+        TileData* data = &(it->second);
+        return data;
     }
     else
-    {
-        if (search == SearchType::NEXT) ++id;
-
-        for (auto& it : m_grounds)
-        {
-            if (it.first >= id) return &(it.second);
-        }
-
         return nullptr;
-    }
 }
 
-const TileData* TileSet::getEnemyData(unsigned id, SearchType search) const
+const TileData* TileSet::getEnemyData(unsigned id) const
 {
-    if (search == SearchType::EXACT)
+    auto it = m_enemies.find(id);
+    if (it != m_enemies.end())
     {
-        auto it = m_enemies.find(id);
-        if (it != m_enemies.end())
-        {
-            TileData* data = &(it->second);
-            return data;
-        }
-        else
-            return nullptr;
+        TileData* data = &(it->second);
+        return data;
     }
     else
-    {
-        if (search == SearchType::NEXT) ++id;
-
-        for (auto& it : m_enemies)
-        {
-            if (it.first >= id) return &(it.second);
-        }
-
         return nullptr;
-    }
 }
 
-const TileData* TileSet::getRewardData(unsigned id, SearchType search) const
+const TileData* TileSet::getRewardData(unsigned id) const
 {
-    if (search == SearchType::EXACT)
+    auto it = m_rewards.find(id);
+    if (it != m_rewards.end())
     {
-        auto it = m_rewards.find(id);
-        if (it != m_rewards.end())
-        {
-            TileData* data = &(it->second);
-            return data;
-        }
-        else
-            return nullptr;
+        TileData* data = &(it->second);
+        return data;
     }
     else
-    {
-        if (search == SearchType::NEXT) ++id;
-
-        for (auto& it : m_rewards)
-        {
-            if (it.first >= id) return &(it.second);
-        }
-
         return nullptr;
-    }
 }
 
-const TileData* TileSet::getPlayerData(unsigned id, SearchType search) const
+const TileData* TileSet::getPlayerData(unsigned id) const
 {
-    if (search == SearchType::EXACT)
+    auto it = m_players.find(id);
+    if (it != m_players.end())
     {
-        auto it = m_players.find(id);
-        if (it != m_players.end())
-        {
-            TileData* data = &(it->second);
-            return data;
-        }
-        else
-            return nullptr;
+        TileData* data = &(it->second);
+        return data;
     }
     else
-    {
-        if (search == SearchType::NEXT) ++id;
-
-        for (auto& it : m_players)
-        {
-            if (it.first >= id) return &(it.second);
-        }
-
         return nullptr;
-    }
 }
 
-const TileData* TileSet::getFinishData(unsigned id, SearchType search) const
+const TileData* TileSet::getFinishData(unsigned id) const
 {
-    if (search == SearchType::EXACT)
+    auto it = m_finishes.find(id);
+    if (it != m_finishes.end())
     {
-        auto it = m_finishes.find(id);
-        if (it != m_finishes.end())
-        {
-            TileData* data = &(it->second);
-            return data;
-        }
-        else
-            return nullptr;
+        TileData* data = &(it->second);
+        return data;
     }
     else
-    {
-        if (search == SearchType::NEXT) ++id;
-
-        for (auto& it : m_finishes)
-        {
-            if (it.first >= id) return &(it.second);
-        }
-
         return nullptr;
-    }
 }
 
-const TileData* TileSet::getParticleData(unsigned id, SearchType search) const
+const TileData* TileSet::getParticleData(unsigned id) const
 {
-    if (search == SearchType::EXACT)
+    auto it = m_particles.find(id);
+    if (it != m_particles.end())
     {
-        auto it = m_particles.find(id);
-        if (it != m_particles.end())
-        {
-            TileData* data = &(it->second);
-            return data;
-        }
-        else
-            return nullptr;
+        TileData* data = &(it->second);
+        return data;
     }
     else
-    {
-        if (search == SearchType::NEXT) ++id;
-
-        for (auto& it : m_particles)
-        {
-            if (it.first >= id) return &(it.second);
-        }
-
         return nullptr;
-    }
 }
 
-const TileData* TileSet::getData(Element::Type type, unsigned id, SearchType search) const
+const TileData* TileSet::getData(Element::Type type, unsigned id) const
 {
     switch (type)
     {
         case Element::Type::GROUND:
-            return getGroundData(id, search);
+            return getGroundData(id);
 
         case Element::Type::ENEMY:
-            return getEnemyData(id, search);
+            return getEnemyData(id);
 
         case Element::Type::REWARD:
-            return getRewardData(id, search);
+            return getRewardData(id);
 
         case Element::Type::PLAYER:
-            return getPlayerData(id, search);
+            return getPlayerData(id);
 
         case Element::Type::FINISH:
-            return getFinishData(id, search);
+            return getFinishData(id);
+
+        case Element::Type::PARTICLE:
+            return getParticleData(id);
 
         default:
             return nullptr;
     }
 }
+
+std::map<unsigned, BackgroundData>::const_iterator TileSet::getBackgroundIterator() const
+{
+    return m_backgrounds.begin();
+}
+
+std::map<unsigned, TileData>::const_iterator TileSet::getTileIterator(Element::Type type) const
+{
+    switch (type)
+    {
+        case Element::Type::GROUND:
+            return m_grounds.begin();
+
+        case Element::Type::ENEMY:
+            return m_enemies.begin();
+
+        case Element::Type::REWARD:
+            return m_rewards.begin();
+
+        case Element::Type::PLAYER:
+            return m_players.begin();
+
+        case Element::Type::FINISH:
+            return m_finishes.begin();
+
+        case Element::Type::PARTICLE:
+            return m_particles.begin();
+
+        default:
+            throw std::runtime_error("unknown element type");
+    }
+}
+
 
 bool TileSet::fillTileData(std::string dirName, std::string fileName, unsigned& id, TileData& data) const
 {
@@ -478,11 +400,11 @@ bool TileSet::fillTileData(std::string dirName, std::string fileName, unsigned& 
 
     try
     {
-        data.fileName = dirName + fileName;
-        data.texture = m_globals->driver->getTexture(data.fileName.c_str());
+        data.m_fileName = dirName + fileName;
+        data.m_texture = m_globals->driver->getTexture(data.m_fileName.c_str());
 
         Parser tileParser(fileName, '_');
-        std::tie(id, data.tileSize, data.tileDimension.X, data.tileDimension.Y, data.tileCount) =
+        std::tie(id, data.m_tileSize, data.m_tileDimension.X, data.m_tileDimension.Y, data.m_tileCount) =
             tileParser.getArgs<unsigned, unsigned, int, int, unsigned>();
 
         std::string txtname = dirName + fileName;
@@ -496,7 +418,7 @@ bool TileSet::fillTileData(std::string dirName, std::string fileName, unsigned& 
             // set up special bounding boxes
             do {
                 unsigned id = bbParser.getArg<unsigned>();
-                data.boundings[id] = bbParser.getArg<Shape>();
+                data.m_boundings[id] = bbParser.getArg<Shape>();
             }
             while (bbParser.nextLine());
         }
@@ -529,7 +451,7 @@ void TileSet::findTileData(std::string dirName, std::map<unsigned, TileData>& da
             {
                 TileData& savedtd = data[id];
                 savedtd = td;
-                for (auto& it : td.boundings) savedtd.boundings.insert(it);
+                for (auto& it : td.m_boundings) savedtd.m_boundings.insert(it);
             }
         }
         closedir(dir);
@@ -557,9 +479,12 @@ void TileSet::findAnimationData(std::string dirName) const
                 Element::Type tileType;
                 unsigned tileId;
                 core::vector2di imgPos;
+                unsigned animType;
+                unsigned speed;
                 Parser p(baseName, '_');
 
-                std::tie(tileType, tileId, imgPos.X, imgPos.Y) = p.getArgs<Element::Type, unsigned, unsigned, unsigned>();
+                std::tie(tileType, tileId, imgPos.X, imgPos.Y, animType, speed) =
+                    p.getArgs<Element::Type, unsigned, unsigned, unsigned, unsigned, unsigned>();
 
                 switch (tileType)
                 {
@@ -595,19 +520,24 @@ void TileSet::findAnimationData(std::string dirName) const
                 if (tileIter != elemTypeTiles->end())
                 {
                     irr::video::ITexture* animTexture = m_globals->driver->getTexture(fileName.c_str());
+                    core::dimension2du animTextureSize = animTexture->getSize();
 
                     if (animTexture)
                     {
                         TileData* td = &tileIter->second;
-                        TileData::Animation* anim = &td->animations[imgPos]; // this will do the insertion to the std::map also
 
-                        core::dimension2du animTextureSize = animTexture->getSize();
-                        anim->texture = animTexture;
-                        anim->animCount = animTextureSize.Height / td->tileSize;
-                        anim->frameCount = animTextureSize.Width / td->tileSize;
+                        if (animTextureSize.Width % td->m_tileSize != 0 ||
+                            animTextureSize.Height % td->m_tileSize)
+                        {
+                            throw std::runtime_error("tile and animation size mismatch");
+                        }
 
-                        //std::cout << "Animation loaded: " << baseName << "!" << std::endl;
-                        //std::cout << "animCount: " << anim->animCount << ", frameCount: " << anim->frameCount << std::endl;
+                        TileData::Animation* anim = &(td->m_animations[imgPos][animType]); // this will do the insertion to the std::map also
+                        anim->m_texture = animTexture;
+                        anim->m_speed = speed;
+                        anim->m_rows = animTextureSize.Height / td->m_tileSize;
+                        anim->m_framesPerRow = animTextureSize.Width / td->m_tileSize;
+                        anim->m_frames = anim->m_framesPerRow * anim->m_rows;
                     }
                 }
             }

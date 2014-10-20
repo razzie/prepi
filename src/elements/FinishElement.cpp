@@ -32,8 +32,3 @@ FinishElement::FinishElement(Level* level, unsigned id,
 FinishElement::~FinishElement()
 {
 }
-
-void FinishElement::draw()
-{
-    m_tileData->drawAnimation(TileData::Animation::Type::RIGHT, (unsigned)(m_animSpeed * 10), m_level, m_imgPosition, m_position);
-}

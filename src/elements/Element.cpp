@@ -363,7 +363,7 @@ void Element::draw()
 
     if (m_tileData != nullptr)
     {
-        m_tileData->drawTile(m_level, m_imgPosition, m_position, m_scale);
+        m_tileData->drawAnimation(m_level, m_imgPosition, 0, m_animSpeed, m_position, m_scale);
     }
     else
     {

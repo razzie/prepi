@@ -10,6 +10,7 @@
 
 class Globals;
 class b2Body;
+class TileSet;
 
 struct BackgroundData
 {
@@ -17,87 +18,79 @@ struct BackgroundData
     irr::video::ITexture* texture;
 };
 
-struct TileData
+class TileData
 {
+public:
     struct Animation
     {
-        enum class Type : unsigned
+        enum Type
         {
-            RIGHT = 0,
-            LEFT,
-            JUMP,
-            FRONT,
-            LEFT_TO_FRONT,
-            RIGHT_TO_FRONT,
-            BACK,
-            RIGHT_TO_BACK,
-            LEFT_TO_BACK
+            IDLE_RIGHT = 0,
+            IDLE_LEFT = 1,
+            RIGHT = 2,
+            LEFT = 3,
+            JUMP_RIGHT = 4,
+            JUMP_LEFT = 5,
+            LADDER_UP = 6,
+            LADDER_DOWN = 7,
+            CLIMB_UP_RIGHT = 8,
+            CLIMB_DOWN_RIGHT = 9,
+            CLIMB_UP_LEFT = 10,
+            CLIMB_DOWN_LEFT = 11,
+            APPEAR = 12,
+            DISAPPEAR = 13
         };
 
-        irr::video::ITexture* texture;
-        unsigned animCount;
-        unsigned frameCount;
+        irr::video::ITexture* m_texture;
+        unsigned m_speed;
+        unsigned m_frames;
+        unsigned m_framesPerRow;
+        unsigned m_rows;
     };
 
-    class AnimationType // helps conversion between unsigned and Animation::Type
-    {
-    private:
-        unsigned m_animType;
-
-    public:
-        AnimationType(unsigned animType) : m_animType(animType) {}
-        AnimationType(Animation::Type animType) : m_animType(static_cast<unsigned>(animType)) {}
-        operator unsigned() const { return m_animType; }
-        operator Animation::Type() const { return static_cast<Animation::Type>(m_animType); }
-    };
-
-    std::string fileName;
-    irr::video::ITexture* texture;
-    unsigned tileSize;
-    irr::core::vector2di tileDimension;
-    unsigned tileCount;
-    std::map<unsigned, Shape> boundings;
-    std::map<irr::core::vector2di, Animation> animations;
-
+    const irr::video::ITexture* getTexture() const;
+    unsigned getTileSize() const;
     Shape getBoundingShape(irr::core::vector2di imgPosition) const;
     b2Body* createBody(Element*) const;
     irr::core::vector2di getImagePosition(unsigned imgNum) const;
-    Animation* getAnimation(irr::core::vector2di imgPos);
-    const Animation* getAnimation(irr::core::vector2di imgPos) const;
+    Animation* getAnimation(irr::core::vector2di imgPos, unsigned animType);
+    const Animation* getAnimation(irr::core::vector2di imgPos, unsigned animType) const;
 
     void drawTile(Level* level, irr::core::vector2di imgPos, irr::core::vector2df pos,
                   float scale = 1.0f, irr::video::SColor = {255, 255, 255, 255}) const;
-    void drawAnimation(AnimationType animType, unsigned animSpeed, Level* level,
-                       irr::core::vector2di imgPos, irr::core::vector2df pos,
-                       float scale = 1.0f, bool standby = false, irr::video::SColor = {255, 255, 255, 255}) const;
-    void drawContinuousAnimation(unsigned startPoint, unsigned animSpeed, Level* level,
-                                 irr::core::vector2di imgPos, irr::core::vector2df pos,
-                                 float scale = 1.0f, irr::video::SColor = {255, 255, 255, 255}) const;
+    void drawAnimation(Level* level, irr::core::vector2di imgPos, unsigned animType, float speed, irr::core::vector2df pos,
+                       float scale = 1.0f, irr::video::SColor = {255, 255, 255, 255}, unsigned startingFrame = 0) const;
+
+private:
+    friend class TileSet;
+
+    std::string m_fileName;
+    irr::video::ITexture* m_texture;
+    unsigned m_tileSize;
+    irr::core::vector2di m_tileDimension;
+    unsigned m_tileCount;
+    std::map<unsigned, Shape> m_boundings;
+    std::map<irr::core::vector2di, std::map<unsigned, Animation>> m_animations;
 };
 
 class TileSet
 {
 public:
-    enum SearchType
-    {
-        EXACT,
-        BEST,
-        NEXT
-    };
-
     TileSet(Globals*, std::string name);
     ~TileSet();
 
     std::string getName() const;
     const Timer* getAnimationTimer() const;
-    irr::video::ITexture* getBackground(unsigned id, SearchType = SearchType::EXACT) const;
-    const TileData* getGroundData(unsigned id, SearchType = SearchType::EXACT) const;
-    const TileData* getEnemyData(unsigned id, SearchType = SearchType::EXACT) const;
-    const TileData* getRewardData(unsigned id, SearchType = SearchType::EXACT) const;
-    const TileData* getPlayerData(unsigned id, SearchType = SearchType::EXACT) const;
-    const TileData* getFinishData(unsigned id, SearchType = SearchType::EXACT) const;
-    const TileData* getParticleData(unsigned id, SearchType = SearchType::EXACT) const;
-    const TileData* getData(Element::Type type, unsigned id, SearchType = SearchType::EXACT) const;
+    irr::video::ITexture* getBackground(unsigned id) const;
+    const TileData* getGroundData(unsigned id) const;
+    const TileData* getEnemyData(unsigned id) const;
+    const TileData* getRewardData(unsigned id) const;
+    const TileData* getPlayerData(unsigned id) const;
+    const TileData* getFinishData(unsigned id) const;
+    const TileData* getParticleData(unsigned id) const;
+    const TileData* getData(Element::Type type, unsigned id) const;
+    std::map<unsigned, BackgroundData>::const_iterator getBackgroundIterator() const;
+    std::map<unsigned, TileData>::const_iterator getTileIterator(Element::Type type) const;
 
 private:
     Globals* m_globals;

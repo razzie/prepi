@@ -32,7 +32,7 @@ EnemyElement::EnemyElement(Level* level, unsigned id,
                            float scale, float animSpeed, Behavior* behavior, Motion* motion, unsigned damage)
  : Element(level, Type::ENEMY, id, imgPosition, position, scale, animSpeed, behavior, motion)
  , m_damage(damage)
- , m_lastAnimType(TileData::Animation::Type::RIGHT)
+ , m_lastAnimType(TileData::Animation::Type::IDLE_RIGHT) // IDLE_RIGHT : 0
 {
 }
 
@@ -51,18 +51,17 @@ void EnemyElement::update(uint32_t elapsedMs)
 {
     Element::update(elapsedMs);
 
-    if (!m_tileData || !m_body) return;
+    /*if (!m_tileData || !m_body) return;
 
     const TileData::Animation* anim = m_tileData->getAnimation(m_imgPosition);
     if (anim && anim->animCount > 1)
     {
         b2Vec2 velocity = m_body->GetLinearVelocity();
         m_lastAnimType = (velocity.x > 0) ? TileData::Animation::Type::RIGHT : TileData::Animation::Type::LEFT;
-    }
+    }*/
 }
 
 void EnemyElement::draw()
 {
-    m_tileData->drawAnimation(m_lastAnimType, (unsigned)(m_animSpeed * 10), m_level, m_imgPosition,
-                              m_position, m_scale);
+    m_tileData->drawAnimation(m_level, m_imgPosition, m_lastAnimType, m_animSpeed, m_position, m_scale);
 }
