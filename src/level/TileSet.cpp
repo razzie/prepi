@@ -58,7 +58,7 @@ static b2Filter elementTypeToFilter(Element::Type elemType)
     return filter;
 }
 
-const irr::video::ITexture* TileData::getTexture() const
+const video::ITexture* TileData::getTexture() const
 {
     return m_texture;
 }
@@ -116,7 +116,7 @@ core::vector2di TileData::getImagePosition(unsigned imgNum) const
     return imgPos;
 }
 
-TileData::Animation* TileData::getAnimation(irr::core::vector2di imgPos, unsigned animType)
+TileData::Animation* TileData::getAnimation(core::vector2di imgPos, unsigned animType)
 {
     auto tileIt = m_animations.find(imgPos);
     if (tileIt != m_animations.end())
@@ -137,7 +137,7 @@ TileData::Animation* TileData::getAnimation(irr::core::vector2di imgPos, unsigne
     }
 }
 
-const TileData::Animation* TileData::getAnimation(irr::core::vector2di imgPos, unsigned animType) const
+const TileData::Animation* TileData::getAnimation(core::vector2di imgPos, unsigned animType) const
 {
     auto tileIt = m_animations.find(imgPos);
     if (tileIt != m_animations.end())
@@ -158,10 +158,10 @@ const TileData::Animation* TileData::getAnimation(irr::core::vector2di imgPos, u
     }
 }
 
-void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df pos, float scale, irr::video::SColor color) const
+void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df pos, float scale, float rotation, video::SColor color) const
 {
-    video::IVideoDriver* driver = level->getGlobals()->driver;
-    core::recti screen({0,0}, driver->getScreenSize());
+    Globals* g = level->getGlobals();
+    core::recti screen({0,0}, g->driver->getScreenSize());
 
     core::rect<s32> srcRect =
         {(s32)(imgPos.X * m_tileSize), (s32)(imgPos.Y * m_tileSize),
@@ -170,24 +170,23 @@ void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df po
     unsigned unit = level->getUnitSize();
     core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
 
-    video::SColor colors[4] = {color, color, color, color};
     core::rect<s32> destRect = {0, 0, (s32)(scale * unit), (s32)(scale * unit)};
     destRect += calcPos;
     destRect -= level->getViewOffset();
 
     if (screen.isRectCollided(destRect))
     {
-        driver->draw2DImage(m_texture, destRect, srcRect, 0, colors, true);
+        g->drawImage(m_texture, srcRect, destRect, rotation, color);
     }
 }
 
 void TileData::drawAnimation(Level* level, core::vector2di imgPos, unsigned animType, float speed, core::vector2df pos,
-                             float scale, video::SColor color, unsigned startingFrame) const
+                             float scale, float rotation, video::SColor color, unsigned startingFrame) const
 {
     const Animation* anim = getAnimation(imgPos, animType);
     if (anim == nullptr)
     {
-        drawTile(level, imgPos, pos, scale, color);
+        drawTile(level, imgPos, pos, scale, rotation, color);
         return;
     }
 
@@ -200,20 +199,19 @@ void TileData::drawAnimation(Level* level, core::vector2di imgPos, unsigned anim
         {(s32)(tile.X * m_tileSize), (s32)(tile.Y * m_tileSize),
          (s32)((tile.X + 1) * m_tileSize), (s32)((tile.Y + 1) * m_tileSize)};
 
-    video::IVideoDriver* driver = level->getGlobals()->driver;
-    core::recti screen({0,0}, driver->getScreenSize());
+    Globals* g = level->getGlobals();
+    core::recti screen({0,0}, g->driver->getScreenSize());
 
     unsigned unit = level->getUnitSize();
     core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
 
-    video::SColor colors[4] = {color, color, color, color};
     core::rect<s32> destRect = {0, 0, (s32)(scale * unit), (s32)(scale * unit)};
     destRect += calcPos;
     destRect -= level->getViewOffset();
 
     if (screen.isRectCollided(destRect))
     {
-        driver->draw2DImage(anim->m_texture, destRect, srcRect, 0, colors, true);
+        g->drawImage(anim->m_texture, srcRect, destRect, rotation, color);
     }
 }
 
@@ -250,7 +248,7 @@ const Timer* TileSet::getAnimationTimer() const
     return &m_animTimer;
 }
 
-irr::video::ITexture* TileSet::getBackground(unsigned id) const
+video::ITexture* TileSet::getBackground(unsigned id) const
 {
     auto it = m_backgrounds.find(id);
     if (it != m_backgrounds.end())
@@ -519,7 +517,7 @@ void TileSet::findAnimationData(std::string dirName) const
                 auto tileIter = elemTypeTiles->find(tileId);
                 if (tileIter != elemTypeTiles->end())
                 {
-                    irr::video::ITexture* animTexture = m_globals->driver->getTexture(fileName.c_str());
+                    video::ITexture* animTexture = m_globals->driver->getTexture(fileName.c_str());
                     core::dimension2du animTextureSize = animTexture->getSize();
 
                     if (animTexture)

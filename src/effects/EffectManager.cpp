@@ -114,7 +114,7 @@ void EffectManager::fall(Element* element)
 
 void EffectManager::pickUp(Element* element)
 {
-    addEffect( new MoveElementEffect(element, core::vector2di(0, 0)) );
+    addEffect( new MoveElementEffect(element, core::vector2di(0, 0), 500) );
 }
 
 void EffectManager::leafs(core::rectf box, unsigned image, video::SColor color, core::vector2df velocity, float length)

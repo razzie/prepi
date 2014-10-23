@@ -29,9 +29,6 @@ void ElementEffect::drawTile(irr::core::vector2di screenPos, float scale, float 
     core::rect<s32> destRect = {0, 0, (s32)(scale * m_origScale * unit), (s32)(scale * m_origScale * unit)};
     destRect += screenPos;
 
-    const video::SColor color(alpha, 255, 255, 255);
-	const video::SColor tempColors[4] = {color, color, color, color};
-
-    video::IVideoDriver* driver = m_level->getGlobals()->driver;
-    driver->draw2DImage(m_tileData->getTexture(), destRect, srcRect, 0, tempColors, true);
+    Globals* g = m_level->getGlobals();
+    g->drawImage(m_tileData->getTexture(), srcRect, destRect, angle, {alpha, 255, 255, 255});
 }

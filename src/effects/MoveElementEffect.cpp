@@ -38,7 +38,7 @@ void MoveElementEffect::update(uint32_t elapsedMs)
     diffPos.X *= progress;
     diffPos.Y *= progress;
 
-    drawTile(m_beginPos + diffPos);
+    drawTile(m_beginPos + diffPos, 1.f, progress * 360.f);
 
     m_elapsed += elapsedMs;
 }

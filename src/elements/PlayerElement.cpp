@@ -343,6 +343,6 @@ void PlayerElement::update(uint32_t elapsedMs)
 
 void PlayerElement::draw()
 {
-    m_tileData->drawAnimation(m_level, m_imgPosition, m_lastAnimType, m_animSpeed, m_position, m_scale,
+    m_tileData->drawAnimation(m_level, m_imgPosition, m_lastAnimType, m_animSpeed, m_position, m_scale, 0.f,
                               video::SColor(255, 255, 255 - m_injury, 255 - m_injury));
 }

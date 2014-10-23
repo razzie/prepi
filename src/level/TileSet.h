@@ -57,9 +57,10 @@ public:
     const Animation* getAnimation(irr::core::vector2di imgPos, unsigned animType) const;
 
     void drawTile(Level* level, irr::core::vector2di imgPos, irr::core::vector2df pos,
-                  float scale = 1.0f, irr::video::SColor = {255, 255, 255, 255}) const;
+                  float scale = 1.0f, float rotation = 0.f, irr::video::SColor = {255, 255, 255, 255}) const;
     void drawAnimation(Level* level, irr::core::vector2di imgPos, unsigned animType, float speed, irr::core::vector2df pos,
-                       float scale = 1.0f, irr::video::SColor = {255, 255, 255, 255}, unsigned startingFrame = 0) const;
+                       float scale = 1.0f, float rotation = 0.f, irr::video::SColor = {255, 255, 255, 255},
+                       unsigned startingFrame = 0) const;
 
 private:
     friend class TileSet;

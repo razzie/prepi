@@ -51,6 +51,6 @@ void ParticleElement::draw()
 {
     if (m_tileData != nullptr)
     {
-        m_tileData->drawAnimation(m_level, m_imgPosition, 0, m_animSpeed, m_position, m_scale, m_color);
+        m_tileData->drawAnimation(m_level, m_imgPosition, 0, m_animSpeed, m_position, m_scale, 0.f, m_color);
     }
 }

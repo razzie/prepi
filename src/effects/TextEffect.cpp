@@ -5,19 +5,11 @@
 
 using namespace irr;
 
-gui::IGUIFont* TextEffect::m_font = nullptr;
-
 TextEffect::TextEffect(Level* level, irr::core::stringw text, core::vector2df pos, video::SColor color)
  : m_level(level)
  , m_position(pos)
  , m_elapsed(0)
 {
-    // load font bitmap if not loaded yet
-    if (m_font == nullptr)
-    {
-        m_font = m_level->getGlobals()->guienv->getFont("../media/font.png");
-    }
-
     // splitting the text by new line characters
     m_texts.push_back({{}, color, 0, 1000});
     for (unsigned i = 0, len = text.size(); i < len; ++i)
@@ -61,7 +53,8 @@ void TextEffect::update(uint32_t elapsedMs)
     core::vector2di pos = m_level->getScreenPosition(m_position);
     pos.Y += t.m_posDelta / 4;
 
-    m_font->draw(t.m_text, {pos, pos}, t.m_color, true, true);
+    gui::IGUIFont* font = m_level->getGlobals()->font;
+    font->draw(t.m_text, {pos, pos}, t.m_color, true, true);
 
     m_elapsed += elapsedMs;
 

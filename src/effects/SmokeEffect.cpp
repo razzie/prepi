@@ -42,8 +42,8 @@ SmokeEffect::~SmokeEffect()
 
 void SmokeEffect::update(uint32_t elapsedMs)
 {
-    video::IVideoDriver* driver = m_level->getGlobals()->driver;
-    core::recti screen({0,0}, driver->getScreenSize());
+    Globals* g = m_level->getGlobals();
+    core::recti screen({0,0}, g->driver->getScreenSize());
 
     for (auto& smoke : m_smokes)
     {
@@ -66,7 +66,6 @@ void SmokeEffect::update(uint32_t elapsedMs)
 
             // calculations for drawing
             unsigned scale = (m_elapsed - smoke.m_begin) / 5 * m_scale;
-            video::SColor colors[4] = {smoke.m_color, smoke.m_color, smoke.m_color, smoke.m_color};
             core::vector2di screenPos = m_level->getScreenPosition(smoke.m_position);
             core::recti box(-scale, -scale, scale, scale);
             box += screenPos;
@@ -74,7 +73,7 @@ void SmokeEffect::update(uint32_t elapsedMs)
             // drawing smoke
             if (screen.isPointInside(screenPos))
             {
-                driver->draw2DImage(m_texture, box, core::recti({0, 0}, m_texture->getSize()), 0, colors, true);
+                g->drawImage(m_texture, core::recti({0, 0}, m_texture->getSize()), box, (m_elapsed - smoke.m_begin) / 8, smoke.m_color);
             }
         }
     }

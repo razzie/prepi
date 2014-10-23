@@ -24,7 +24,6 @@ private:
         uint32_t m_duration;
     };
 
-    static irr::gui::IGUIFont* m_font;
     Level* m_level;
     std::vector<Text> m_texts;
     std::vector<Text>::iterator m_currText;

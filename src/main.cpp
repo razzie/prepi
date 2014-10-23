@@ -131,9 +131,9 @@ int main()
 
             g.device->setWindowCaption(str.c_str());
             frames=0;
-        }
 
-        Sleep(1); // windows api
+            Sleep(1); // windows api
+        }
     }
 
     con->drop();
