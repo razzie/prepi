@@ -34,22 +34,23 @@ int main()
     GUI gui(&g, &level1);
 
     gg::script_engine* se = g.app->get_script_engine();
+    level1.switchDebugMode();
 
     se->add_function("debug", [&]()
-                     {
-                         level1.switchDebugMode();
-                     });
+    {
+        level1.switchDebugMode();
+    });
 
     se->add_function("loadLevel", [&](std::string level)
-                     {
-                         std::string file = "../levels/" + level + ".txt";
-                         level1.loadLevel(file);
-                     });
+    {
+        std::string file = "../levels/" + level + ".txt";
+        level1.loadLevel(file);
+    });
 
     se->add_function("reloadLevel", [&]()
-                     {
-                         level1.reloadLevel();
-                     });
+    {
+        level1.reloadLevel();
+    });
 
     /*se->add_function("randomLevel", [&](unsigned columns, unsigned rows)
                      {
@@ -58,43 +59,47 @@ int main()
                      });*/
 
     se->add_function("setBackground", [&](unsigned id, unsigned mode)
-                     {
-                         level1.getBackground()->setId(id);
-                         level1.getBackground()->setDrawingMethod(static_cast<Background::DrawingMethod>(mode));
-                     });
+    {
+        level1.getBackground()->setId(id);
+        level1.getBackground()->setDrawingMethod(static_cast<Background::DrawingMethod>(mode));
+    });
 
     se->add_function("setDimension", [&](unsigned columns, unsigned rows)
-                     { level1.setDimension({columns, rows}); });
+    {
+        level1.setDimension({columns, rows});
+    });
 
     se->add_function("setUnitSize", [&](unsigned unit)
-                     { level1.setUnitSize(unit); });
+    {
+        level1.setUnitSize(unit);
+    });
 
     se->add_function("movePlayer", [&](float x, float y)
-                     {
-                         Element* player = level1.getPlayerElement();
-                         if (player) player->setPosition({x,y});
-                     });
+    {
+        Element* player = level1.getPlayerElement();
+        if (player) player->setPosition({x,y});
+    });
 
     se->add_function("color", [](unsigned R, unsigned G, unsigned B)
-                     {
-                         gg::console::output* o = gg::console::get_invoker_output();
-                         o->set_color( {(uint8_t)R, (uint8_t)G, (uint8_t)B} );
-                         std::cout << "(R: " << R << ", G: " << G << ", B: " << B << ")";
-                     });
+    {
+        gg::console::output* o = gg::console::get_invoker_output();
+        o->set_color( {(uint8_t)R, (uint8_t)G, (uint8_t)B} );
+        std::cout << "(R: " << R << ", G: " << G << ", B: " << B << ")";
+    });
 
     se->add_function("setSpeed", [&](float speed)
-                     {
-                         PlayerElement* player = level1.getPlayerElement();
-                         if (player) player->setSpeed(speed);
-                     });
+    {
+        PlayerElement* player = level1.getPlayerElement();
+        if (player) player->setSpeed(speed);
+    });
 
     se->add_function("GodMode", [&](unsigned sec)
-                     {
-                        PlayerElement* player = level1.getPlayerElement();
-                        if (player) player->setImmortal(sec * 1000);
-                     });
+    {
+        PlayerElement* player = level1.getPlayerElement();
+        if (player) player->setImmortal(sec * 1000);
+    });
 
-    se->add_function("exit", [&]{ quit = true; });
+    se->add_function("exit", [&] { quit = true; });
 
     gg::console* con = g.app->create_console();
     //con->open();
@@ -114,6 +119,9 @@ int main()
 
         if (g.eventListener->isKeyDown(KEY_KEY_O))
             con->open();
+
+        if (g.eventListener->isKeyDown(KEY_KEY_B))
+            level1.switchDebugMode();
 
         if (g.eventListener->isLeftMouseDown())
             new ParticleElement(&level1, 0, level1.getRealPosition(g.eventListener->getMousePosition()), 0.16f);
