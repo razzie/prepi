@@ -60,7 +60,7 @@ Level::Level(Globals* globals, std::string tileset)
  , m_physics(new b2World( {0.f, gravity} ))
  , m_effectMgr(new EffectManager(this))
  , m_offset(0, 0)
- , m_unit(64)
+ , m_unit(96)
  , m_bg(new Background(this))
  , m_player(nullptr)
  , m_rewardSum(0)
@@ -180,6 +180,12 @@ void Level::clearLevel()
     m_elements.clear();
 
     m_effectMgr->reset();
+}
+
+void Level::reloadTileSet()
+{
+    m_tileset->reload();
+    reloadLevel();
 }
 
 void Level::addElement(Element* element)
@@ -313,13 +319,13 @@ void Level::updateView(uint32_t elapsedMs)
     m_camMovement.Y += camSpeed * (offset.Y - m_offset.Y) + 1;
 
     // 'fast braking' if camera is too fast and left the target position behind
-    if ((m_camMovement.X > 0 && m_offset.X > offset.X) ||
-        (m_camMovement.X < 0 && m_offset.X < offset.X))
+    if ((m_camMovement.X > 1 && m_offset.X > offset.X) ||
+        (m_camMovement.X < 1 && m_offset.X < offset.X))
     {
         m_camMovement.X -= (m_camMovement.X / 8);
     }
-    if ((m_camMovement.Y > 0 && m_offset.Y > offset.Y) ||
-        (m_camMovement.Y < 0 && m_offset.Y < offset.Y))
+    if ((m_camMovement.Y > 1 && m_offset.Y > offset.Y) ||
+        (m_camMovement.Y < 1 && m_offset.Y < offset.Y))
     {
         m_camMovement.Y -= (m_camMovement.Y / 8);
     }

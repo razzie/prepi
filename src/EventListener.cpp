@@ -7,8 +7,11 @@ EventListener::EventListener()
  , m_middleMouseDown(false)
  , m_rightMouseDown(false)
 {
-     for (u32 i=0; i<KEY_KEY_CODES_COUNT; ++i)
-        m_keyDown[i] = false;
+     for (u32 i = 0; i < KEY_KEY_CODES_COUNT; ++i)
+     {
+         m_keyData[i].m_pressed = false;
+         m_keyData[i].m_state = KeyState::UP;
+     }
 }
 
 EventListener::~EventListener()
@@ -20,7 +23,15 @@ bool EventListener::OnEvent(const SEvent& event)
     switch (event.EventType)
     {
         case EET_KEY_INPUT_EVENT:
-            m_keyDown[event.KeyInput.Key] = event.KeyInput.PressedDown;
+            {
+                KeyData& key = m_keyData[event.KeyInput.Key];
+                key.m_pressed = event.KeyInput.PressedDown;
+
+                if (key.m_pressed)
+                    key.m_state = KeyState::DOWN;
+                else if (key.m_state == KeyState::DOWN)
+                    key.m_state = KeyState::RELEASED;
+            }
             break;
 
         case EET_MOUSE_INPUT_EVENT:
@@ -60,7 +71,22 @@ core::vector2di EventListener::getMousePosition() const
 
 bool EventListener::isKeyDown(EKEY_CODE keyCode) const
 {
-    return m_keyDown[keyCode];
+    return (m_keyData[keyCode].m_state == KeyState::DOWN);
+}
+
+bool EventListener::isKeyReleased(EKEY_CODE keyCode)
+{
+    KeyData& key = m_keyData[keyCode];
+    if (key.m_state == KeyState::RELEASED)
+    {
+        key.m_state = KeyState::UP;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    //return (m_keyData[keyCode].m_state == KeyState::RELEASED);
 }
 
 bool EventListener::isUp() const

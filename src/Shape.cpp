@@ -5,6 +5,8 @@
 #include "Parser.h"
 #include "Shape.h"
 
+#define PI 3.14159265358979323846
+
 using namespace irr;
 
 std::istream& operator>> (std::istream&, irr::core::vector2df&);
@@ -13,6 +15,27 @@ template<class T>
 static void copyContentTo(const T& src, T& dest)
 {
     dest.insert(dest.end(), src.begin(), src.end());
+}
+
+float polygonArea(const PointArray& points)
+{
+    float area = 0.f; // Accumulates area in the loop
+    unsigned j = points.size() - 1; // The last vertex is the 'previous' one to the first
+
+    for (unsigned i = 0, len = points.size(); i < len; ++i)
+    {
+        area += (points[j].X + points[i].X) * (points[j].Y - points[i].Y);
+        j = i; //j is previous vertex to i
+    }
+
+    return (area / -2.f);
+}
+
+static bool isPointRight(core::line2df l, core::vector2df p)
+{
+    l.end -= l.start;
+    float v = (l.end.Y * (p.X - l.start.X)) + (l.end.X * (l.start.Y - p.Y));
+    return (v <= 0);
 }
 
 Shape::Shape()
@@ -35,9 +58,9 @@ Shape::Shape(std::istream& stream)
             break;
 
         case Type::SPHERE:
-            std::tie(m_sphereData.center, m_sphereData.radius) = p.getArgs<core::vector2df, f32>();
-            m_boxData.UpperLeftCorner = m_sphereData.center - core::vector2df(m_sphereData.radius, m_sphereData.radius);
-            m_boxData.LowerRightCorner = m_sphereData.center + core::vector2df(m_sphereData.radius, m_sphereData.radius);
+            std::tie(m_sphereData.m_center, m_sphereData.m_radius) = p.getArgs<core::vector2df, f32>();
+            m_boxData.UpperLeftCorner = m_sphereData.m_center - core::vector2df(m_sphereData.m_radius, m_sphereData.m_radius);
+            m_boxData.LowerRightCorner = m_sphereData.m_center + core::vector2df(m_sphereData.m_radius, m_sphereData.m_radius);
             break;
 
         case Type::POLYGON:
@@ -90,9 +113,9 @@ Shape& Shape::operator= (const core::rectf& box)
 {
     m_type = Type::BOX;
     m_boxData = box;
-    //m_sphereData.center.X = box.UpperLeftCorner.X + box.getWidth()/2;
-    //m_sphereData.center.Y = box.UpperLeftCorner.Y + box.getHeight()/2;
-    //m_sphereData.radius = (box.getWidth() > box.getHeight()) ? (box.getWidth()/2) : (box.getHeight()/2);
+    //m_sphereData.m_center.X = box.UpperLeftCorner.X + box.getWidth()/2;
+    //m_sphereData.m_center.Y = box.UpperLeftCorner.Y + box.getHeight()/2;
+    //m_sphereData.m_radius = (box.getWidth() > box.getHeight()) ? (box.getWidth()/2) : (box.getHeight()/2);
     return *this;
 }
 
@@ -100,8 +123,8 @@ Shape& Shape::operator= (const SphereData& sphere)
 {
     m_type = Type::SPHERE;
     m_sphereData = sphere;
-    m_boxData.UpperLeftCorner = sphere.center - core::vector2df(sphere.radius, sphere.radius);
-    m_boxData.LowerRightCorner = sphere.center + core::vector2df(sphere.radius, sphere.radius);
+    m_boxData.UpperLeftCorner = sphere.m_center - core::vector2df(sphere.m_radius, sphere.m_radius);
+    m_boxData.LowerRightCorner = sphere.m_center + core::vector2df(sphere.m_radius, sphere.m_radius);
     return *this;
 }
 
@@ -137,9 +160,24 @@ Shape& Shape::operator= (Shape&& shape)
     return *this;
 }
 
+Shape Shape::operator+ (core::vector2df v) const
+{
+    Shape shape = *this;
+    shape += v;
+    return shape;
+}
+
+Shape& Shape::operator+= (core::vector2df v)
+{
+    m_boxData += v;
+    m_sphereData.m_center += v;
+    for (auto& p : m_polygonData) p += v;
+    return *this;
+}
+
 Shape Shape::operator* (float scale) const
 {
-    Shape shape;
+    Shape shape = *this;
     shape *= scale;
     return shape;
 }
@@ -148,8 +186,8 @@ Shape& Shape::operator*= (float scale)
 {
     m_boxData.UpperLeftCorner *= scale;
     m_boxData.LowerRightCorner *= scale;
-    m_sphereData.center *= scale;
-    m_sphereData.radius *= scale;
+    m_sphereData.m_center *= scale;
+    m_sphereData.m_radius *= scale;
     for (auto& p : m_polygonData) p *= scale;
     return *this;
 }
@@ -172,6 +210,44 @@ Shape::SphereData Shape::getSphereData() const
 const PointArray& Shape::getPolygonData() const
 {
     return m_polygonData;
+}
+
+float Shape::getArea() const
+{
+    switch (m_type)
+    {
+        case Type::BOX:
+            return m_boxData.getArea();
+
+        case Type::SPHERE:
+            return (4 * m_sphereData.m_radius * m_sphereData.m_radius * PI);
+
+        case Type::POLYGON:
+            return polygonArea(m_polygonData);
+    }
+
+    return 0.f;
+}
+
+bool Shape::isPointInside(core::vector2df p) const
+{
+    switch (m_type)
+    {
+        case Type::BOX:
+            return m_boxData.isPointInside(p);
+
+        case Type::SPHERE:
+            return (p.getDistanceFrom(m_sphereData.m_center) <= m_sphereData.m_radius);
+
+        case Type::POLYGON:
+            for (unsigned i = 0, len = m_polygonData.size(); i != len; ++i)
+            {
+                if (!isPointRight({m_polygonData[i], m_polygonData[(i+1)%len]}, p)) return false;
+            }
+            return true;
+    }
+
+    return false;
 }
 
 void Shape::addToBody(b2Body* body, float scale) const
@@ -202,12 +278,12 @@ void Shape::addToBody(b2Body* body, float scale) const
         case Type::SPHERE:
             {
                 Shape::SphereData boundingSphere = m_sphereData;
-                boundingSphere.radius *= scale;
-                boundingSphere.center *= scale;
+                boundingSphere.m_radius *= scale;
+                boundingSphere.m_center *= scale;
 
                 b2CircleShape circleShape;
-                circleShape.m_p.Set(boundingSphere.center.X - 1.f, boundingSphere.center.Y - 1.f);
-                circleShape.m_radius = boundingSphere.radius - 0.02f;
+                circleShape.m_p.Set(boundingSphere.m_center.X - 1.f, boundingSphere.m_center.Y - 1.f);
+                circleShape.m_radius = boundingSphere.m_radius - 0.02f;
 
                 fixtureDef.shape = &circleShape;
                 body->CreateFixture(&fixtureDef);
@@ -258,8 +334,8 @@ void Shape::draw(Level* level, core::vector2df pos) const
 
         case Type::SPHERE:
             {
-                core::vector2di center = level->getScreenPosition(m_sphereData.center + pos);
-                float radius = m_sphereData.radius * level->getUnitSize();
+                core::vector2di center = level->getScreenPosition(m_sphereData.m_center + pos);
+                float radius = m_sphereData.m_radius * level->getUnitSize();
                 level->getGlobals()->driver->draw2DPolygon(center, radius, {255, 255, 255, 255});
             }
             break;

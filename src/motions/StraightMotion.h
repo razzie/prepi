@@ -21,10 +21,11 @@ public:
 private:
     struct Path
     {
-        irr::core::vector2df startPoint;
-        irr::core::vector2df endPoint;
-        uint32_t startTime;
-        uint32_t endTime;
+        irr::core::vector2df m_startPoint;
+        irr::core::vector2df m_endPoint;
+        irr::core::vector2df m_velocity;
+        uint32_t m_startTime;
+        uint32_t m_endTime;
 
         irr::core::vector2df getPointByTime(uint32_t) const;
     };

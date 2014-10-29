@@ -42,6 +42,7 @@ PlayerElement::PlayerElement(Level* level, unsigned id,
  , m_immortalLeft(0)
  , m_lastAnimType(TileData::Animation::Type::RIGHT)
  , m_onLadder(false)
+ , m_lastDirectionLeft(false)
 {
 }
 
@@ -168,6 +169,9 @@ void PlayerElement::update(uint32_t elapsedMs)
 {
     Element::update(elapsedMs);
 
+    EventListener* l = m_level->getGlobals()->eventListener;
+    b2Vec2 movement = m_body->GetLinearVelocity();
+
     // restore gravity after a ladder
     if (m_body->GetGravityScale() == 0.f)
     {
@@ -182,6 +186,7 @@ void PlayerElement::update(uint32_t elapsedMs)
 
     bool cohesion = false; // if there is cohesion, the player can jump
     bool climbing = false; // for animation only
+    bool movingPlatform = false;
     bool leftContact = false;
     bool rightContact = false;
 
@@ -199,7 +204,8 @@ void PlayerElement::update(uint32_t elapsedMs)
 
             case Element::Type::REWARD:
                 takeRewardFrom(static_cast<RewardElement*>(contactElem));
-                m_body->SetLinearVelocity({m_lastVelocity.X, m_lastVelocity.Y});
+                //m_body->SetLinearVelocity({m_lastVelocity.X, m_lastVelocity.Y});
+                movement.Set(m_lastVelocity.X, m_lastVelocity.Y);
                 break;
 
             case Element::Type::PARTICLE:
@@ -213,7 +219,16 @@ void PlayerElement::update(uint32_t elapsedMs)
         switch (collision.getOtherElementDirection())
         {
             case Collision::Direction::BOTTOM:
-                cohesion = true;
+                if (contactElem->getType() != Element::Type::REWARD)
+                {
+                    cohesion = true;
+                    if (contactElem->getType() == Element::Type::GROUND &&
+                        contactElem->getMotionType() != Motion::Type::STATIC)
+                    {
+                        movingPlatform = true;
+                        movement.x = contactElem->getBody()->GetLinearVelocity().x * 500; // I don't why 500, but it works
+                    }
+                }
                 break;
 
             case Collision::Direction::RIGHT:
@@ -252,8 +267,29 @@ void PlayerElement::update(uint32_t elapsedMs)
         m_level->getEffectManager()->smoke(m_position + core::vector2df(m_scale / 2, m_scale), 0.25f);
     }
 
-    EventListener* l = m_level->getGlobals()->eventListener;
-    b2Vec2 movement = m_body->GetLinearVelocity();
+    if (l->isLeft() && (cohesion || !leftContact))
+    {
+        movement.x = -m_speed;
+        m_lastDirectionLeft = true;
+        if (cohesion) m_lastAnimType = TileData::Animation::Type::LEFT;
+    }
+    else if (l->isRight() && (cohesion || !rightContact))
+    {
+        movement.x = m_speed;
+        m_lastDirectionLeft = false;
+        if (cohesion) m_lastAnimType = TileData::Animation::Type::RIGHT;
+    }
+    else
+    {
+        if (!movingPlatform) movement.x = 0.f;
+        if (cohesion)
+        {
+            if (m_lastDirectionLeft)
+                m_lastAnimType = TileData::Animation::Type::IDLE_LEFT;
+            else
+                m_lastAnimType = TileData::Animation::Type::IDLE_RIGHT;
+        }
+    }
 
     if (m_onLadder)
     {
@@ -283,14 +319,14 @@ void PlayerElement::update(uint32_t elapsedMs)
             movement.y = -m_speed * 2.5f;
             if (climbing)
             {
-                if (l->isLeft())
+                if (m_lastDirectionLeft)
                     m_lastAnimType = TileData::Animation::Type::CLIMB_UP_LEFT;
                 else
                     m_lastAnimType = TileData::Animation::Type::CLIMB_UP_RIGHT;
             }
             else
             {
-                if (l->isLeft())
+                if (m_lastDirectionLeft)
                     m_lastAnimType = TileData::Animation::Type::JUMP_LEFT;
                 else
                     m_lastAnimType = TileData::Animation::Type::JUMP_RIGHT;
@@ -301,34 +337,19 @@ void PlayerElement::update(uint32_t elapsedMs)
             movement.y += m_speed / 2.f;
             if (climbing)
             {
-                if (l->isLeft()) // m_lastAnimType == TileData::Animation::Type::LEFT
+                if (m_lastDirectionLeft)
                     m_lastAnimType = TileData::Animation::Type::CLIMB_DOWN_LEFT;
                 else
                     m_lastAnimType = TileData::Animation::Type::CLIMB_DOWN_RIGHT;
             }
-            /*else
+            else
             {
-            }*/
+                if (m_lastDirectionLeft)
+                    m_lastAnimType = TileData::Animation::Type::JUMP_LEFT;
+                else
+                    m_lastAnimType = TileData::Animation::Type::JUMP_RIGHT;
+            }
         }
-    }
-
-    if (l->isLeft() && (cohesion || !leftContact))
-    {
-        movement.x = -m_speed;
-        m_lastAnimType = TileData::Animation::Type::LEFT;
-    }
-    else if (l->isRight() && (cohesion || !rightContact))
-    {
-        movement.x = m_speed;
-        m_lastAnimType = TileData::Animation::Type::RIGHT;
-    }
-    else
-    {
-        movement.x = 0.f;
-        if (m_lastAnimType == TileData::Animation::Type::LEFT)
-            m_lastAnimType = TileData::Animation::Type::IDLE_LEFT;
-        else
-            m_lastAnimType = TileData::Animation::Type::IDLE_RIGHT;
     }
 
     m_body->SetLinearVelocity(movement);

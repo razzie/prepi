@@ -72,8 +72,12 @@ void Collision::getElementCollisions(Element* element, std::vector<Collision>& c
         if (contactElem == 0 || contactElem == element)
             continue;
 
+        b2WorldManifold worldManifold;
+        edge->contact->GetWorldManifold(&worldManifold);
+        b2Vec2 contactPoint = worldManifold.points[0];
+
         core::vector2df posA = element->getPosition() + element->getBoundingBox().getCenter();
-        core::vector2df posB = contactElem->getPosition() + contactElem->getBoundingBox().getCenter();
+        core::vector2df posB = {contactPoint.x + 1.f, contactPoint.y + 1.f};
         float contactAngle = alignedAngle( (posB - posA).getAngleTrig() );
 
         collisions.push_back({contactElem, contactAngle});

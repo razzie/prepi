@@ -60,7 +60,7 @@ void StraightMotion::update(uint32_t elapsedMs)
 
     if (m_elapsed <= m_delay || m_element == nullptr) return;
 
-    uint32_t travelInterval = m_pathArray[m_pathArray.size()-1].endTime;
+    uint32_t travelInterval = m_pathArray[m_pathArray.size()-1].m_endTime;
     uint32_t alignedElapsedMs;
 
     if (m_circularMode)
@@ -77,14 +77,14 @@ void StraightMotion::update(uint32_t elapsedMs)
 
     for (auto& path : m_pathArray)
     {
-        if (path.startTime <= alignedElapsedMs &&
-            path.endTime > alignedElapsedMs)
+        if (path.m_startTime <= alignedElapsedMs &&
+            path.m_endTime > alignedElapsedMs)
         {
             core::vector2df pos = path.getPointByTime(alignedElapsedMs);
-            core::vector2df velocity = pos - m_element->getPosition();
+            //core::vector2df velocity = pos - m_element->getPosition();
 
             m_element->setPosition(pos);
-            m_element->getBody()->SetLinearVelocity({velocity.X, velocity.Y});
+            m_element->getBody()->SetLinearVelocity({path.m_velocity.X, path.m_velocity.Y});
 
             break;
         }
@@ -102,12 +102,14 @@ void StraightMotion::rebuildPathArray()
     {
         Path p;
 
-        p.startPoint = m_pointArray[i];
-        p.endPoint = m_pointArray[i+1];
-        float dist = p.startPoint.getDistanceFrom(p.endPoint); // distance in units
+        p.m_startPoint = m_pointArray[i];
+        p.m_endPoint = m_pointArray[i+1];
+        float dist = p.m_startPoint.getDistanceFrom(p.m_endPoint); // distance in units
 
-        p.startTime = ((i == 0) ? 0 : (m_pathArray[i-1].endTime));
-        p.endTime = p.startTime + (uint32_t)((1000.f * dist) / (float)m_speed); // x speed: x units / 1000 msec
+        p.m_startTime = ((i == 0) ? 0 : (m_pathArray[i-1].m_endTime));
+        p.m_endTime = p.m_startTime + (uint32_t)((1000.f * dist) / (float)m_speed); // x speed: x units / 1000 msec
+
+        p.m_velocity = (p.m_startPoint - p.m_endPoint) / ((float)p.m_endTime - (float)p.m_startTime);
 
         m_pathArray.push_back(p);
     }
@@ -115,17 +117,17 @@ void StraightMotion::rebuildPathArray()
 
 core::vector2df StraightMotion::Path::getPointByTime(uint32_t elapsedMs) const
 {
-    if (elapsedMs <= startTime)
-        return startPoint;
-    else if (elapsedMs >= endTime)
-        return endPoint;
+    if (elapsedMs <= m_startTime)
+        return m_startPoint;
+    else if (elapsedMs >= m_endTime)
+        return m_endPoint;
 
-    uint32_t duration = endTime - startTime;
-    uint32_t elapsed = elapsedMs - startTime;
+    uint32_t duration = m_endTime - m_startTime;
+    uint32_t elapsed = elapsedMs - m_startTime;
 
-    core::vector2df pathMovement = endPoint - startPoint;
+    core::vector2df pathMovement = m_endPoint - m_startPoint;
 
-    core::vector2df midPoint = startPoint;
+    core::vector2df midPoint = m_startPoint;
     midPoint += (pathMovement * ((float)elapsed / (float)duration));
 
     return midPoint;

@@ -58,6 +58,22 @@ static b2Filter elementTypeToFilter(Element::Type elemType)
     return filter;
 }
 
+TileData::Animation::Animation()
+{
+}
+
+TileData::Animation::~Animation()
+{
+}
+
+TileData::TileData()
+{
+}
+
+TileData::~TileData()
+{
+}
+
 const video::ITexture* TileData::getTexture() const
 {
     return m_texture;
@@ -220,9 +236,25 @@ TileSet::TileSet(Globals* globals, std::string name)
  : m_globals(globals)
  , m_name(name)
 {
+    reload();
+}
+
+TileSet::~TileSet()
+{
+}
+
+void TileSet::reload()
+{
     std::string basedir("../media/tilesets/");
-    basedir += name;
+    basedir += m_name;
     basedir += "/";
+
+    m_grounds.clear();
+    m_enemies.clear();
+    m_rewards.clear();
+    m_players.clear();
+    m_finishes.clear();
+    m_particles.clear();
 
     findBackgroundData(basedir + "background/", m_backgrounds);
     findTileData(basedir + "ground/", m_grounds);
@@ -232,10 +264,6 @@ TileSet::TileSet(Globals* globals, std::string name)
     findTileData(basedir + "finish/", m_finishes);
     findTileData(basedir + "particle/", m_particles);
     findAnimationData(basedir + "animations/");
-}
-
-TileSet::~TileSet()
-{
 }
 
 std::string TileSet::getName() const

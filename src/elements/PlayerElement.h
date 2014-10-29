@@ -56,6 +56,7 @@ protected:
     uint32_t m_immortalLeft;
     TileData::Animation::Type m_lastAnimType;
     bool m_onLadder;
+    bool m_lastDirectionLeft;
 };
 
 #endif // PLAYERELEMENT_H_INCLUDED

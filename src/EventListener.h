@@ -1,7 +1,7 @@
 #ifndef EVENTLISTENER_H
 #define EVENTLISTENER_H
 
-#include <irrlicht.h>
+#include "irrlicht.h"
 
 class EventListener : public irr::IEventReceiver
 {
@@ -14,6 +14,7 @@ class EventListener : public irr::IEventReceiver
         bool isRightMouseDown() const;
         irr::core::vector2di getMousePosition() const;
         bool isKeyDown(irr::EKEY_CODE) const;
+        bool isKeyReleased(irr::EKEY_CODE);
         bool isUp() const;
         bool isDown() const;
         bool isLeft() const;
@@ -21,7 +22,20 @@ class EventListener : public irr::IEventReceiver
 
     protected:
     private:
-        bool m_keyDown[irr::KEY_KEY_CODES_COUNT];
+        enum KeyState
+        {
+            UP,
+            DOWN,
+            RELEASED
+        };
+
+        struct KeyData
+        {
+            bool m_pressed;
+            KeyState m_state;
+        };
+
+        KeyData m_keyData[irr::KEY_KEY_CODES_COUNT];
         bool m_leftMouseDown;
         bool m_middleMouseDown;
         bool m_rightMouseDown;

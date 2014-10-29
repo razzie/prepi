@@ -1,6 +1,5 @@
 #include <iostream>
 #include <sstream>
-#include "windows.h"
 #include "Box2D\Box2D.h"
 #include "SFML\Audio.hpp"
 #include "gglib.hpp"
@@ -112,15 +111,16 @@ int main()
 
         //g.smgr->drawAll();
 
-        //tthread::this_thread::sleep_for(tthread::chrono::milliseconds(40));
-
-        if (g.eventListener->isKeyDown(KEY_KEY_R))
+        if (g.eventListener->isKeyReleased(KEY_KEY_R))
             level1.reloadLevel();
 
-        if (g.eventListener->isKeyDown(KEY_KEY_O))
+        if (g.eventListener->isKeyReleased(KEY_KEY_T))
+            level1.reloadTileSet();
+
+        if (g.eventListener->isKeyReleased(KEY_KEY_O))
             con->open();
 
-        if (g.eventListener->isKeyDown(KEY_KEY_B))
+        if (g.eventListener->isKeyReleased(KEY_KEY_B))
             level1.switchDebugMode();
 
         if (g.eventListener->isLeftMouseDown())
@@ -139,8 +139,6 @@ int main()
 
             g.device->setWindowCaption(str.c_str());
             frames=0;
-
-            Sleep(1); // windows api
         }
     }
 

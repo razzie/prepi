@@ -32,6 +32,7 @@ public:
     void loadLevel(std::string file);
     void reloadLevel();
     void clearLevel();
+    void reloadTileSet();
     Background* getBackground();
     PlayerElement* getPlayerElement();
     unsigned getRewardSum() const;

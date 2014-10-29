@@ -12,24 +12,39 @@
 
 using namespace irr;
 
-float rand_float(float f)
+static float randFloat(float f)
 {
     int rnd = rand() % (int)(f * 256);
     return ((float)rnd / 256.f);
 }
 
+static core::vector2df randPointInShape(const Shape& shape)
+{
+    core::vector2df p;
+    core::rectf box = shape.getBoxData();
+
+    do
+    {
+        p.X = box.UpperLeftCorner.X + randFloat(box.getWidth() - 0.18f) + 0.09f;
+        p.Y = box.UpperLeftCorner.Y + randFloat(box.getHeight() - 0.18f) + 0.09f;
+    }
+    while ( !shape.isPointInside(p) );
+
+    return p;
+}
+
 LeafEffect::LeafEffect(Element* element, unsigned image, video::SColor color, core::vector2df velocity, float length)
- : LeafEffect(element->getLevel(), element->getBoundingBox() + element->getPosition(), image, color, velocity, length)
+ : LeafEffect(element->getLevel(), element->getShape() + element->getPosition(), image, color, velocity, length)
 {
 }
 
-LeafEffect::LeafEffect(Level* level, irr::core::rectf box, unsigned image, video::SColor color, core::vector2df velocity, float length)
+LeafEffect::LeafEffect(Level* level, const Shape& shape, unsigned image, video::SColor color, core::vector2df velocity, float length)
  : m_level(level)
  , m_tileData(nullptr)
  , m_imgPos(0, 0)
  , m_color(color)
  , m_velocity(velocity)
- , m_box(box)
+ , m_shape(shape)
  , m_duration((1.f / MAX(velocity.getLength(), 0.1f)) * 500.f * length)
  , m_elapsed(0)
 {
@@ -39,13 +54,12 @@ LeafEffect::LeafEffect(Level* level, irr::core::rectf box, unsigned image, video
         m_imgPos = m_tileData->getImagePosition(image);
     }
 
-    const int leafNum = MAX(1, (float)DEFAULT_LEAF_NUM * std::sqrt(m_box.getArea()));
+    const int leafNum = MAX(1, (float)DEFAULT_LEAF_NUM * std::sqrt(m_shape.getArea()));
 
     for (int i = 0; i < leafNum; ++i)
     {
         Leaf leaf;
-        leaf.m_position.X = m_box.UpperLeftCorner.X + rand_float(m_box.getWidth() - 0.18f) + 0.08f;
-        leaf.m_position.Y = m_box.UpperLeftCorner.Y + rand_float(m_box.getHeight() - 0.18f) + 0.08f;
+        leaf.m_position = randPointInShape(m_shape);
         leaf.m_color = m_color;
         randomizeColor(leaf.m_color, 64);
         leaf.m_begin = rand() % 500;

@@ -22,8 +22,8 @@ public:
 
     struct SphereData
     {
-        irr::core::vector2df center;
-        irr::f32 radius;
+        irr::core::vector2df m_center;
+        irr::f32 m_radius;
     };
 
     Shape();
@@ -39,6 +39,8 @@ public:
     Shape& operator= (const PointArray&);
     Shape& operator= (const Shape&);
     Shape& operator= (Shape&&);
+    Shape  operator+ (irr::core::vector2df) const;
+    Shape& operator+=(irr::core::vector2df);
     Shape  operator* (float scale) const;
     Shape& operator*=(float scape);
 
@@ -46,6 +48,8 @@ public:
     irr::core::rectf getBoxData() const; // bounding box is generated for all types
     SphereData getSphereData() const;
     const PointArray& getPolygonData() const;
+    float getArea() const;
+    bool isPointInside(irr::core::vector2df) const;
     void addToBody(b2Body* body, float scale = 1.0f) const;
     void draw(Level*, irr::core::vector2df) const;
 

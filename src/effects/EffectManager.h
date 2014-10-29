@@ -4,6 +4,7 @@
 #include <vector>
 #include "irrlicht.h"
 #include "tinythread.h"
+#include "Shape.h"
 #include "effects\Effect.h"
 
 class Level;
@@ -27,7 +28,7 @@ public:
     void disappear(Element*);
     void fall(Element*);
     void pickUp(Element*);
-    void leafs(irr::core::rectf box, unsigned image, irr::video::SColor = {255, 0, 255, 0},
+    void leafs(const Shape& shape, unsigned image, irr::video::SColor = {255, 0, 255, 0},
                irr::core::vector2df velocity = {0.5f, 0.f}, float length = 5.f);
     void smoke(Element*);
     void smoke(irr::core::vector2df pos, float scale = 1.0f);

@@ -21,8 +21,9 @@ struct BackgroundData
 class TileData
 {
 public:
-    struct Animation
+    class Animation
     {
+    public:
         enum Type
         {
             IDLE_RIGHT = 0,
@@ -41,12 +42,18 @@ public:
             DISAPPEAR = 13
         };
 
+        Animation();
+        ~Animation();
+
         irr::video::ITexture* m_texture;
         unsigned m_speed;
         unsigned m_frames;
         unsigned m_framesPerRow;
         unsigned m_rows;
     };
+
+    TileData();
+    ~TileData();
 
     const irr::video::ITexture* getTexture() const;
     unsigned getTileSize() const;
@@ -92,6 +99,7 @@ public:
     const TileData* getData(Element::Type type, unsigned id) const;
     std::map<unsigned, BackgroundData>::const_iterator getBackgroundIterator() const;
     std::map<unsigned, TileData>::const_iterator getTileIterator(Element::Type type) const;
+    void reload();
 
 private:
     Globals* m_globals;

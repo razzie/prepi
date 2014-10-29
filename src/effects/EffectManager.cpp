@@ -117,9 +117,9 @@ void EffectManager::pickUp(Element* element)
     addEffect( new MoveElementEffect(element, core::vector2di(0, 0), 500) );
 }
 
-void EffectManager::leafs(core::rectf box, unsigned image, video::SColor color, core::vector2df velocity, float length)
+void EffectManager::leafs(const Shape& shape, unsigned image, video::SColor color, core::vector2df velocity, float length)
 {
-    addEffect( new LeafEffect(m_level, box, image, color, velocity, length) );
+    addEffect( new LeafEffect(m_level, shape, image, color, velocity, length) );
 }
 
 void EffectManager::smoke(Element* element)
