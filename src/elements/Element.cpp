@@ -267,7 +267,7 @@ b2Body* Element::getBody()
 void Element::updateCollisions()
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
-    Collision::getElementCollisions(this, m_collisions);
+    Collision::updateElementCollisions(this, m_collisions);
 }
 
 const std::vector<Collision>& Element::getCollisions() const

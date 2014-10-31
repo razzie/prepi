@@ -6,6 +6,7 @@
 #include "level\TileSet.h"
 #include "effects\EffectManager.h"
 #include "Parser.h"
+#include "Version.h"
 #include "level\Level.h"
 #include "level\Background.h"
 #include "elements\Element.h"
@@ -18,37 +19,6 @@
 #define ABS(a) (((a) < 0) ? -(a) : (a))
 
 using namespace irr;
-
-struct Version
-{
-    unsigned major;
-    unsigned minor;
-
-    inline friend std::istream& operator>> (std::istream& is, Version& ver)
-    {
-        is.ignore(); // skipping 'v'
-        is >> ver.major;
-        is.ignore(); // skipping '.'
-        is >> ver.minor;
-        return is;
-    }
-
-    inline friend std::ostream& operator<< (std::ostream& os, const Version& ver)
-    {
-        os << "v" << ver.major << "." << ver.minor;
-        return os;
-    }
-
-    bool operator== (const Version& ver)
-    {
-        return (major == ver.major && minor == ver.minor);
-    }
-
-    bool operator!= (const Version& ver)
-    {
-        return !(*this == ver);
-    }
-};
 
 static const Version prepiVersion {1, 5};
 

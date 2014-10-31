@@ -2,6 +2,7 @@
 #define TILESET_H_INCLUDED
 
 #include <string>
+#include <vector>
 #include <map>
 #include "irrlicht.h"
 #include "elements\Element.h"
@@ -32,14 +33,13 @@ public:
             LEFT = 3,
             JUMP_RIGHT = 4,
             JUMP_LEFT = 5,
-            LADDER_UP = 6,
-            LADDER_DOWN = 7,
-            CLIMB_UP_RIGHT = 8,
-            CLIMB_DOWN_RIGHT = 9,
-            CLIMB_UP_LEFT = 10,
-            CLIMB_DOWN_LEFT = 11,
-            APPEAR = 12,
-            DISAPPEAR = 13
+            LADDER = 6,
+            CLIMB_RIGHT = 7,
+            CLIMB_LEFT = 8,
+            APPEAR = 9,
+            DISAPPEAR = 10,
+
+            MAX_ANIM_NUMBER // do not use!
         };
 
         Animation();
@@ -50,24 +50,27 @@ public:
         unsigned m_frames;
         unsigned m_framesPerRow;
         unsigned m_rows;
+        bool m_enabled;
     };
 
     TileData();
+    TileData(TileData&&);
     ~TileData();
+    TileData& operator= (TileData&&);
 
     const irr::video::ITexture* getTexture() const;
     unsigned getTileSize() const;
-    Shape getBoundingShape(irr::core::vector2di imgPosition) const;
-    b2Body* createBody(Element*) const;
     irr::core::vector2di getImagePosition(unsigned imgNum) const;
-    Animation* getAnimation(irr::core::vector2di imgPos, unsigned animType);
+    unsigned getImageNumber(irr::core::vector2di imgPos) const;
+    Shape getBoundingShape(irr::core::vector2di imgPosition) const;
     const Animation* getAnimation(irr::core::vector2di imgPos, unsigned animType) const;
+    b2Body* createBody(Element*) const;
 
     void drawTile(Level* level, irr::core::vector2di imgPos, irr::core::vector2df pos,
                   float scale = 1.0f, float rotation = 0.f, irr::video::SColor = {255, 255, 255, 255}) const;
     void drawAnimation(Level* level, irr::core::vector2di imgPos, unsigned animType, float speed, irr::core::vector2df pos,
                        float scale = 1.0f, float rotation = 0.f, irr::video::SColor = {255, 255, 255, 255},
-                       unsigned startingFrame = 0) const;
+                       unsigned startingFrame = 0, unsigned* currentFrame = nullptr) const;
 
 private:
     friend class TileSet;
@@ -77,8 +80,8 @@ private:
     unsigned m_tileSize;
     irr::core::vector2di m_tileDimension;
     unsigned m_tileCount;
-    std::map<unsigned, Shape> m_boundings;
-    std::map<irr::core::vector2di, std::map<unsigned, Animation>> m_animations;
+    std::vector<Shape> m_boundings;
+    std::vector<std::vector<Animation>> m_animations;
 };
 
 class TileSet
@@ -113,11 +116,8 @@ private:
     mutable std::map<unsigned, TileData> m_finishes;
     mutable std::map<unsigned, TileData> m_particles;
 
-    bool fillTileData(std::string dirName, std::string fileName, unsigned& id, TileData&) const;
     void findTileData(std::string dirName, std::map<unsigned, TileData>&) const;
-    //bool fillAnimationData(std::string dirName, std::string fileName, const TileData&, TileData::Animation&) const;
     void findAnimationData(std::string dirName) const;
-    bool fillBackgroundData(std::string dirName, std::string fileName, unsigned& id, BackgroundData&) const;
     void findBackgroundData(std::string dirName, std::map<unsigned, BackgroundData>&) const;
 };
 

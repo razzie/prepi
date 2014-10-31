@@ -13,9 +13,11 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-pg" />
 					<Add option="-g" />
 				</Compiler>
 				<Linker>
+					<Add option="-pg -lgmon" />
 					<Add library="box2d_d" />
 					<Add library="sfml-audio-d" />
 					<Add library="sfml-system-d" />
@@ -75,6 +77,7 @@
 		<Unit filename="src/Shape.h" />
 		<Unit filename="src/Timer.cpp" />
 		<Unit filename="src/Timer.h" />
+		<Unit filename="src/Version.h" />
 		<Unit filename="src/behaviors/Behavior.cpp" />
 		<Unit filename="src/behaviors/Behavior.h" />
 		<Unit filename="src/behaviors/CheckpointBehavior.cpp" />

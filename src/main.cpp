@@ -33,7 +33,6 @@ int main()
     GUI gui(&g, &level1);
 
     gg::script_engine* se = g.app->get_script_engine();
-    level1.switchDebugMode();
 
     se->add_function("debug", [&]()
     {

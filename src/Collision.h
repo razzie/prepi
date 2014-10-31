@@ -2,6 +2,7 @@
 #define COLLISION_H_INCLUDED
 
 #include <vector>
+#include "irrlicht.h"
 
 class Element;
 
@@ -16,21 +17,24 @@ public:
         RIGHT
     };
 
-    Collision(Element*, float);
-    Collision(Element*, float, Direction);
+    Collision(Element*, irr::core::vector2df);
+    Collision(Element*, irr::core::vector2df, float);
+    Collision(Element*, irr::core::vector2df, float, Direction);
     Collision(const Collision&);
     ~Collision();
     Element*  getOtherElement() const;
     float     getOtherElementAngle() const;
     Direction getOtherElementDirection() const;
+    irr::core::vector2df getContactPoint() const;
 
-    static void getElementCollisions(Element*, std::vector<Collision>&, bool clearPrevious = true);
+    static void updateElementCollisions(Element*, std::vector<Collision>&, bool clearPrevious = true);
     static Direction getDirectionFromAngle(float angle, float leftRightThresholdAngle = 90.f);
 
 private:
     Element*  m_otherElement;
     float     m_otherElementAngle;
     Direction m_otherElementDirection;
+    irr::core::vector2df m_contactPoint;
 };
 
 #endif // COLLISION_H_INCLUDED

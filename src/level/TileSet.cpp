@@ -59,6 +59,12 @@ static b2Filter elementTypeToFilter(Element::Type elemType)
 }
 
 TileData::Animation::Animation()
+ : m_texture(nullptr)
+ , m_speed(0)
+ , m_frames(0)
+ , m_framesPerRow(0)
+ , m_rows(0)
+ , m_enabled(false)
 {
 }
 
@@ -67,11 +73,31 @@ TileData::Animation::~Animation()
 }
 
 TileData::TileData()
+ : m_texture(nullptr)
+ , m_tileSize(0)
+ , m_tileDimension(0, 0)
+ , m_tileCount(0)
 {
+}
+
+TileData::TileData(TileData&& td)
+{
+    *this = std::move(td);
 }
 
 TileData::~TileData()
 {
+}
+
+TileData& TileData::operator= (TileData&& td)
+{
+    m_texture = td.m_texture;
+    m_tileSize = td.m_tileSize;
+    m_tileDimension = td.m_tileDimension;
+    m_tileCount = td.m_tileCount;
+    std::swap(m_boundings, td.m_boundings);
+    std::swap(m_animations, td.m_animations);
+    return *this;
 }
 
 const video::ITexture* TileData::getTexture() const
@@ -84,14 +110,41 @@ unsigned TileData::getTileSize() const
     return m_tileSize;
 }
 
-Shape TileData::getBoundingShape(core::vector2di imgPosition) const
+core::vector2di TileData::getImagePosition(unsigned imgNum) const
 {
-    unsigned tileId = (m_tileDimension.X * imgPosition.Y) + imgPosition.X;
-    auto it = m_boundings.find(tileId);
-    if (it == m_boundings.end())
-        return {};
-    else
-        return it->second;
+    core::vector2di imgPos(0, 0);
+    imgPos.Y = imgNum / m_tileDimension.X;
+    imgPos.X = imgNum % m_tileDimension.X;
+    return imgPos;
+}
+
+unsigned TileData::getImageNumber(core::vector2di imgPos) const
+{
+    return (m_tileDimension.X * imgPos.Y) + imgPos.X;
+}
+
+Shape TileData::getBoundingShape(core::vector2di imgPos) const
+{
+    unsigned tileId = getImageNumber(imgPos);
+
+    if (tileId >= m_tileCount)
+        throw std::runtime_error("wrong tile number");
+
+    return m_boundings[tileId];
+}
+
+const TileData::Animation* TileData::getAnimation(core::vector2di imgPos, unsigned animType) const
+{
+    unsigned tileId = getImageNumber(imgPos);
+
+    if (tileId >= m_tileCount)
+        throw std::runtime_error("wrong tile number");
+
+    if (animType >= Animation::Type::MAX_ANIM_NUMBER)
+        throw std::runtime_error("wrong anim type");
+
+    const Animation* anim = &((m_animations[tileId])[animType]);
+    return (anim->m_enabled) ? anim : nullptr;
 }
 
 b2Body* TileData::createBody(Element* element) const
@@ -124,56 +177,6 @@ b2Body* TileData::createBody(Element* element) const
     return body;
 }
 
-core::vector2di TileData::getImagePosition(unsigned imgNum) const
-{
-    core::vector2di imgPos(0, 0);
-    imgPos.Y = imgNum / m_tileDimension.X;
-    imgPos.X = imgNum % m_tileDimension.X;
-    return imgPos;
-}
-
-TileData::Animation* TileData::getAnimation(core::vector2di imgPos, unsigned animType)
-{
-    auto tileIt = m_animations.find(imgPos);
-    if (tileIt != m_animations.end())
-    {
-        auto animIt = tileIt->second.find(animType);
-        if (animIt != tileIt->second.end())
-        {
-            return &animIt->second;
-        }
-        else
-        {
-            return nullptr;
-        }
-    }
-    else
-    {
-        return nullptr;
-    }
-}
-
-const TileData::Animation* TileData::getAnimation(core::vector2di imgPos, unsigned animType) const
-{
-    auto tileIt = m_animations.find(imgPos);
-    if (tileIt != m_animations.end())
-    {
-        auto animIt = tileIt->second.find(animType);
-        if (animIt != tileIt->second.end())
-        {
-            return &animIt->second;
-        }
-        else
-        {
-            return nullptr;
-        }
-    }
-    else
-    {
-        return nullptr;
-    }
-}
-
 void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df pos, float scale, float rotation, video::SColor color) const
 {
     Globals* g = level->getGlobals();
@@ -197,7 +200,7 @@ void TileData::drawTile(Level* level, core::vector2di imgPos, core::vector2df po
 }
 
 void TileData::drawAnimation(Level* level, core::vector2di imgPos, unsigned animType, float speed, core::vector2df pos,
-                             float scale, float rotation, video::SColor color, unsigned startingFrame) const
+                             float scale, float rotation, video::SColor color, unsigned startingFrame, unsigned* currentFrame) const
 {
     const Animation* anim = getAnimation(imgPos, animType);
     if (anim == nullptr)
@@ -208,7 +211,16 @@ void TileData::drawAnimation(Level* level, core::vector2di imgPos, unsigned anim
 
     unsigned animSpeed = (anim->m_speed ? anim->m_speed : 1) * speed;
     uint32_t elapsedMs = level->getTileSet()->getAnimationTimer()->peekElapsed();
-    unsigned frame = (elapsedMs / (1000 / animSpeed) + startingFrame) % anim->m_frames;
+    unsigned frame = 0;
+
+    if (animSpeed > 0)
+        frame = (elapsedMs / (1000 / animSpeed) + startingFrame) % anim->m_frames;
+    else if (animSpeed < 0)
+        frame = anim->m_frames - ((elapsedMs / (1000 / -animSpeed) + startingFrame) % anim->m_frames);
+    else
+        frame = startingFrame % anim->m_frames;
+
+    if (currentFrame != nullptr) *currentFrame = frame;
 
     core::vector2di tile(frame % anim->m_framesPerRow, frame / anim->m_framesPerRow);
     core::rect<s32> srcRect =
@@ -420,45 +432,6 @@ std::map<unsigned, TileData>::const_iterator TileSet::getTileIterator(Element::T
 }
 
 
-bool TileSet::fillTileData(std::string dirName, std::string fileName, unsigned& id, TileData& data) const
-{
-    if (fileName.rfind(".png") == std::string::npos) return false; // not png
-
-    try
-    {
-        data.m_fileName = dirName + fileName;
-        data.m_texture = m_globals->driver->getTexture(data.m_fileName.c_str());
-
-        Parser tileParser(fileName, '_');
-        std::tie(id, data.m_tileSize, data.m_tileDimension.X, data.m_tileDimension.Y, data.m_tileCount) =
-            tileParser.getArgs<unsigned, unsigned, int, int, unsigned>();
-
-        std::string txtname = dirName + fileName;
-        txtname.replace(txtname.end()-3, txtname.end(), "txt");
-
-        std::fstream f(txtname);
-        Parser bbParser(f, ',');
-
-        try
-        {
-            // set up special bounding boxes
-            do {
-                unsigned id = bbParser.getArg<unsigned>();
-                data.m_boundings[id] = bbParser.getArg<Shape>();
-            }
-            while (bbParser.nextLine());
-        }
-        catch (...) {}
-
-        return true;
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << "TileData error: " << fileName << " (" << e.what() << ")" << std::endl;
-        return false;
-    }
-}
-
 void TileSet::findTileData(std::string dirName, std::map<unsigned, TileData>& data) const
 {
     DIR *dir;
@@ -471,13 +444,55 @@ void TileSet::findTileData(std::string dirName, std::map<unsigned, TileData>& da
             if (ent->d_name[0] == '.')
                 continue;
 
-            unsigned id;
-            TileData td;
-            if (fillTileData(dirName, ent->d_name, id, td))
+            std::string fileName = ent->d_name;
+            if (fileName.rfind(".png") == std::string::npos) continue; // not png
+
+            try
             {
-                TileData& savedtd = data[id];
-                savedtd = td;
-                for (auto& it : td.m_boundings) savedtd.m_boundings.insert(it);
+                unsigned id;
+                TileData td;
+                td.m_fileName = dirName + fileName;
+                td.m_texture = m_globals->driver->getTexture(td.m_fileName.c_str());
+
+                // parse information from file name
+                Parser tileParser(fileName, '_');
+                std::tie(id, td.m_tileSize, td.m_tileDimension.X, td.m_tileDimension.Y, td.m_tileCount) =
+                    tileParser.getArgs<unsigned, unsigned, int, int, unsigned>();
+
+                // pre-construct boundings and animations to avoid segfaults
+                td.m_boundings.resize(td.m_tileCount);
+                td.m_animations.resize(td.m_tileCount);
+                for (auto& it : td.m_animations) it.resize(TileData::Animation::Type::MAX_ANIM_NUMBER);
+
+                std::string txtname = dirName + fileName;
+                txtname.replace(txtname.end()-3, txtname.end(), "txt");
+
+                std::fstream f(txtname);
+                Parser bbParser(f, ',');
+
+                try
+                {
+                    // set up special bounding boxes
+                    do {
+                        unsigned id = bbParser.getArg<unsigned>();
+
+                        if (id >= td.m_tileCount)
+                            throw std::runtime_error("wrong tile number");
+
+                        td.m_boundings[id] = bbParser.getArg<Shape>();
+                    }
+                    while (bbParser.nextLine());
+                }
+                catch (const std::exception& e)
+                {
+                    std::cout << "Bounding shape error: " << txtname << " (" << e.what() << ")" << std::endl;
+                }
+
+                data[id] = std::move(td);
+            }
+            catch (const std::exception& e)
+            {
+                std::cout << "TileData error: " << fileName << " (" << e.what() << ")" << std::endl;
             }
         }
         closedir(dir);
@@ -512,6 +527,9 @@ void TileSet::findAnimationData(std::string dirName) const
                 std::tie(tileType, tileId, imgPos.X, imgPos.Y, animType, speed) =
                     p.getArgs<Element::Type, unsigned, unsigned, unsigned, unsigned, unsigned>();
 
+                if (animType >= TileData::Animation::Type::MAX_ANIM_NUMBER)
+                    throw std::runtime_error("unknown anim type");
+
                 switch (tileType)
                 {
                     case Element::Type::GROUND:
@@ -545,25 +563,30 @@ void TileSet::findAnimationData(std::string dirName) const
                 auto tileIter = elemTypeTiles->find(tileId);
                 if (tileIter != elemTypeTiles->end())
                 {
+                    TileData* td = &tileIter->second;
+                    unsigned tileId = td->getImageNumber(imgPos);
+
+                    if (tileId >= td->m_tileCount)
+                        throw std::runtime_error("wrong tile number");
+
                     video::ITexture* animTexture = m_globals->driver->getTexture(fileName.c_str());
                     core::dimension2du animTextureSize = animTexture->getSize();
 
                     if (animTexture)
                     {
-                        TileData* td = &tileIter->second;
-
                         if (animTextureSize.Width % td->m_tileSize != 0 ||
                             animTextureSize.Height % td->m_tileSize)
                         {
                             throw std::runtime_error("tile and animation size mismatch");
                         }
 
-                        TileData::Animation* anim = &(td->m_animations[imgPos][animType]); // this will do the insertion to the std::map also
+                        TileData::Animation* anim = &(td->m_animations[tileId][animType]);
                         anim->m_texture = animTexture;
                         anim->m_speed = speed;
                         anim->m_rows = animTextureSize.Height / td->m_tileSize;
                         anim->m_framesPerRow = animTextureSize.Width / td->m_tileSize;
                         anim->m_frames = anim->m_framesPerRow * anim->m_rows;
+                        anim->m_enabled = true;
                     }
                 }
             }
@@ -574,25 +597,6 @@ void TileSet::findAnimationData(std::string dirName) const
         }
 
         closedir(dir);
-    }
-}
-
-bool TileSet::fillBackgroundData(std::string dirName, std::string fileName, unsigned& id, BackgroundData& data) const
-{
-    try
-    {
-        Parser p(fileName, '_');
-
-        data.fileName = dirName + fileName;
-        data.texture = m_globals->driver->getTexture(data.fileName.c_str());
-        id = p.getArg<unsigned>();
-
-        return true;
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << "BackgroundData error: " << fileName << " (" << e.what() << ")" << std::endl;
-        return false;
     }
 }
 
@@ -610,9 +614,21 @@ void TileSet::findBackgroundData(std::string dirName, std::map<unsigned, Backgro
             if (ent->d_name[0] == '.')
                 continue;
 
-            if (fillBackgroundData(dirName, ent->d_name, id, bd))
+            std::string fileName = ent->d_name;
+
+            try
             {
+                Parser p(fileName, '_');
+
+                bd.fileName = dirName + fileName;
+                bd.texture = m_globals->driver->getTexture(bd.fileName.c_str());
+                id = p.getArg<unsigned>();
+
                 data[id] = bd;
+            }
+            catch (const std::exception& e)
+            {
+                std::cout << "BackgroundData error: " << fileName << " (" << e.what() << ")" << std::endl;
             }
         }
         closedir(dir);

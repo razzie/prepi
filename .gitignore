@@ -3,4 +3,5 @@ prepi.depend
 prepi.layout
 bin/prepi.exe
 bin/prepi_d.exe
+bin/gmon.out
 levels/editor/
