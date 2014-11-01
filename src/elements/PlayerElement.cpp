@@ -129,7 +129,7 @@ void PlayerElement::takeDamageFrom(EnemyElement* enemy)
         }
     }
 
-    m_damageList.push_back({enemy, true});
+    m_damageList.push_back({enemy, 0, true});
     takeDamage(enemy->getDamage());
 }
 
@@ -260,7 +260,9 @@ void PlayerElement::update(uint32_t elapsedMs)
     // removing those previos enemies that are not touching us anymore
     for (auto it = m_damageList.begin(); it != m_damageList.end(); )
     {
-        if (it->m_collided == false)
+        it->m_timeout += elapsedMs;
+
+        if (it->m_collided == false && it->m_timeout >= 500)
             it = m_damageList.erase(it);
         else
             ++it;

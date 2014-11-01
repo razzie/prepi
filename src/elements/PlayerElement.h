@@ -41,6 +41,7 @@ protected:
     struct Damage
     {
         EnemyElement* m_enemy;
+        uint32_t m_timeout;
         bool m_collided;
     };
 
