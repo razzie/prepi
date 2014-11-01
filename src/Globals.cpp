@@ -53,7 +53,7 @@ Globals::~Globals()
 void Globals::drawImage(const video::ITexture* texture, core::rect<s32> sourceRect, core::rect<s32> destRect,
                         f32 rotation, video::SColor color)
 {
-    video::SMaterial material = driver->getMaterial2D();
+    video::SMaterial material;// = driver->getMaterial2D();
 
     // Store and clear the projection matrix
     core::matrix4 oldProjMat = driver->getTransform(video::ETS_PROJECTION);

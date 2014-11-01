@@ -17,15 +17,15 @@ static float alignedAngle(float angle)
 static float getAngleFromElementContact(Element* element, core::vector2df contactPos)
 {
     core::vector2df elemPos = element->getPosition() + element->getBoundingBox().getCenter();
-    return alignedAngle( (-contactPos + elemPos).getAngleTrig() );
+    return alignedAngle( (contactPos - elemPos).getAngleTrig() );
 }
 
 static core::vector2df getContactCenterPoint(b2Contact* contact)
 {
-    core::vector2df contactPos(0.f, 0.f);
     b2WorldManifold worldManifold;
-
     contact->GetWorldManifold(&worldManifold);
+
+    core::vector2df contactPos(0.f, 0.f);
     b2Vec2* points = worldManifold.points;
     unsigned pointCount = contact->GetManifold()->pointCount;
 
@@ -44,12 +44,8 @@ static core::vector2df getContactCenterPoint(b2Contact* contact)
 
         return contactPos;
     }
-}
 
-Collision::Collision(Element* otherElement, core::vector2df contactPoint)
- : Collision(otherElement, contactPoint,
-             getAngleFromElementContact(otherElement, contactPoint))
-{
+    //return {worldManifold.points[0].x + 1.f, worldManifold.points[0].y + 1.f};
 }
 
 Collision::Collision(Element* otherElement, core::vector2df contactPoint, float otherElementAngle)
@@ -116,7 +112,9 @@ void Collision::updateElementCollisions(Element* element, std::vector<Collision>
         if (contactElem == 0 || contactElem == element)
             continue;
 
-        collisions.push_back( {contactElem, getContactCenterPoint(edge->contact)} );
+        core::vector2df contactPoint = getContactCenterPoint(edge->contact);
+        float contactAngle = getAngleFromElementContact(element, contactPoint);
+        collisions.push_back( {contactElem, contactPoint, contactAngle} );
     }
 }
 

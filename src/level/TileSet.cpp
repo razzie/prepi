@@ -209,6 +209,19 @@ void TileData::drawAnimation(Level* level, core::vector2di imgPos, unsigned anim
         return;
     }
 
+    Globals* g = level->getGlobals();
+    core::recti screen({0,0}, g->driver->getScreenSize());
+
+    unsigned unit = level->getUnitSize();
+    core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
+
+    core::rect<s32> destRect = {0, 0, (s32)(scale * unit), (s32)(scale * unit)};
+    destRect += calcPos;
+    destRect -= level->getViewOffset();
+
+    if (!screen.isRectCollided(destRect))
+        return;
+
     unsigned animSpeed = (anim->m_speed ? anim->m_speed : 1) * speed;
     uint32_t elapsedMs = level->getTileSet()->getAnimationTimer()->peekElapsed();
     unsigned frame = 0;
@@ -227,20 +240,7 @@ void TileData::drawAnimation(Level* level, core::vector2di imgPos, unsigned anim
         {(s32)(tile.X * m_tileSize), (s32)(tile.Y * m_tileSize),
          (s32)((tile.X + 1) * m_tileSize), (s32)((tile.Y + 1) * m_tileSize)};
 
-    Globals* g = level->getGlobals();
-    core::recti screen({0,0}, g->driver->getScreenSize());
-
-    unsigned unit = level->getUnitSize();
-    core::vector2di calcPos = {(s32)(pos.X * unit), (s32)(pos.Y * unit)};
-
-    core::rect<s32> destRect = {0, 0, (s32)(scale * unit), (s32)(scale * unit)};
-    destRect += calcPos;
-    destRect -= level->getViewOffset();
-
-    if (screen.isRectCollided(destRect))
-    {
-        g->drawImage(anim->m_texture, srcRect, destRect, rotation, color);
-    }
+    g->drawImage(anim->m_texture, srcRect, destRect, rotation, color);
 }
 
 

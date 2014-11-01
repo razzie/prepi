@@ -158,6 +158,8 @@ void Element::setScale(float scale)
     {
         m_level->getPhysics()->DestroyBody(m_body);
         m_body = m_tileData->createBody(this);
+        m_shape = m_tileData->getBoundingShape(m_imgPosition);
+        m_shape *= scale;
     }
 }
 

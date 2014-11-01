@@ -17,9 +17,8 @@ public:
         RIGHT
     };
 
-    Collision(Element*, irr::core::vector2df);
-    Collision(Element*, irr::core::vector2df, float);
-    Collision(Element*, irr::core::vector2df, float, Direction);
+    Collision(Element* otherElement, irr::core::vector2df, float);
+    Collision(Element* otherElement, irr::core::vector2df, float, Direction);
     Collision(const Collision&);
     ~Collision();
     Element*  getOtherElement() const;

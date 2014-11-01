@@ -9,12 +9,26 @@
 
 using namespace irr;
 
-std::istream& operator>> (std::istream&, irr::core::vector2df&);
+std::istream& operator>> (std::istream&, core::vector2df&);
 
 template<class T>
 static void copyContentTo(const T& src, T& dest)
 {
     dest.insert(dest.end(), src.begin(), src.end());
+}
+
+static core::rectf getPointArrayBoundings(const PointArray& points)
+{
+    if (points.empty())
+    {
+        return {0.f, 0.f, 0.f, 0.f};
+    }
+    else
+    {
+        core::rectf box{points[0], points[0]};
+        for (auto p : points) box.addInternalPoint(p);
+        return box;
+    }
 }
 
 float polygonArea(const PointArray& points)
@@ -70,8 +84,8 @@ Shape::Shape(std::istream& stream)
                 {
                     core::vector2df pos = p.getArg<core::vector2df>();
                     m_polygonData.push_back(pos);
-                    m_boxData.addInternalPoint(pos);
                 }
+                m_boxData = getPointArrayBoundings(m_polygonData);
                 break;
             }
 
@@ -113,32 +127,24 @@ Shape& Shape::operator= (const core::rectf& box)
 {
     m_type = Type::BOX;
     m_boxData = box;
-    //m_sphereData.m_center.X = box.UpperLeftCorner.X + box.getWidth()/2;
-    //m_sphereData.m_center.Y = box.UpperLeftCorner.Y + box.getHeight()/2;
-    //m_sphereData.m_radius = (box.getWidth() > box.getHeight()) ? (box.getWidth()/2) : (box.getHeight()/2);
     return *this;
 }
 
 Shape& Shape::operator= (const SphereData& sphere)
 {
     m_type = Type::SPHERE;
-    m_sphereData = sphere;
     m_boxData.UpperLeftCorner = sphere.m_center - core::vector2df(sphere.m_radius, sphere.m_radius);
     m_boxData.LowerRightCorner = sphere.m_center + core::vector2df(sphere.m_radius, sphere.m_radius);
+    m_sphereData = sphere;
     return *this;
 }
 
 Shape& Shape::operator= (const PointArray& points)
 {
     m_type = Type::POLYGON;
-    m_boxData.UpperLeftCorner.set(0.f, 0.f);
-    m_boxData.LowerRightCorner.set(0.f, 0.f);
+    m_boxData = getPointArrayBoundings(points);
     m_polygonData.clear();
-    for (auto p : points)
-    {
-        m_polygonData.push_back(p);
-        m_boxData.addInternalPoint(p);
-    }
+    copyContentTo(points, m_polygonData);
     return *this;
 }
 
@@ -147,6 +153,7 @@ Shape& Shape::operator= (const Shape& shape)
     m_type = shape.m_type;
     m_boxData = shape.m_boxData;
     m_sphereData = shape.m_sphereData;
+    m_polygonData.clear();
     copyContentTo(shape.m_polygonData, m_polygonData);
     return *this;
 }
