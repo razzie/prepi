@@ -175,12 +175,6 @@ void PlayerElement::update(uint32_t elapsedMs)
     EventListener* l = m_level->getGlobals()->eventListener;
     b2Vec2 movement = m_body->GetLinearVelocity();
 
-    // restore gravity after a ladder
-    if (m_body->GetGravityScale() == 0.f)
-    {
-        m_body->SetGravityScale(1.f);
-    }
-
     // reset enemy collisions so we can remove non-colliding enemies later
     for (Damage& dmg : m_damageList)
     {
@@ -195,6 +189,13 @@ void PlayerElement::update(uint32_t elapsedMs)
     bool movingPlatform = false;
     bool leftContact = false;
     bool rightContact = false;
+
+    // restore gravity after a ladder
+    if (!m_onLadder && m_body->GetGravityScale() == 0.f)
+    {
+        cohesion = true; // enable jump from ladder
+        m_body->SetGravityScale(1.f);
+    }
 
     updateCollisions();
 
