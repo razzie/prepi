@@ -222,7 +222,7 @@ void TileData::drawAnimation(Level* level, core::vector2di imgPos, unsigned anim
     if (!screen.isRectCollided(destRect))
         return;
 
-    unsigned animSpeed = (anim->m_speed ? anim->m_speed : 1) * speed;
+    int animSpeed = speed * (float)anim->m_speed;
     uint32_t elapsedMs = level->getTileSet()->getAnimationTimer()->peekElapsed();
     unsigned frame = 0;
 

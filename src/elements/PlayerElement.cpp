@@ -299,6 +299,14 @@ void PlayerElement::update(uint32_t elapsedMs)
         }
     }
 
+    if (!m_onLadder && !cohesion)
+    {
+        if (m_lastDirectionLeft)
+            m_lastAnimType = TileData::Animation::Type::JUMP_LEFT;
+        else
+            m_lastAnimType = TileData::Animation::Type::JUMP_RIGHT;
+    }
+
     if (m_onLadder)
     {
         m_onLadder = false;
@@ -320,33 +328,37 @@ void PlayerElement::update(uint32_t elapsedMs)
             m_animStop = true;
         }
     }
-    else
+    else if (climbing)
     {
+        if (m_lastDirectionLeft)
+            m_lastAnimType = TileData::Animation::Type::CLIMB_LEFT;
+        else
+            m_lastAnimType = TileData::Animation::Type::CLIMB_RIGHT;
+
         if (l->isUp() && cohesion)
         {
-            movement.y = -m_speed * 2.5f;
-            if (m_lastDirectionLeft)
-                m_lastAnimType = TileData::Animation::Type::JUMP_LEFT;
-            else
-                m_lastAnimType = TileData::Animation::Type::JUMP_RIGHT;
+            movement.y = -m_speed;
         }
         else if (l->isDown())
         {
             movement.y += m_speed / 2.f;
             m_animRevert = true;
         }
-        else if (climbing)
+        else
         {
             m_animStop = true;
         }
     }
-
-    if (climbing)
+    else
     {
-        if (m_lastDirectionLeft)
-            m_lastAnimType = TileData::Animation::Type::CLIMB_LEFT;
-        else
-            m_lastAnimType = TileData::Animation::Type::CLIMB_RIGHT;
+        if (l->isUp() && cohesion)
+        {
+            movement.y = -m_speed * 2.5f;
+        }
+        else if (l->isDown())
+        {
+            movement.y += m_speed / 2.f;
+        }
     }
 
     m_body->SetLinearVelocity(movement);
@@ -362,17 +374,13 @@ void PlayerElement::update(uint32_t elapsedMs)
 void PlayerElement::draw()
 {
     float animSpeed = m_animSpeed;
-    unsigned lastFrame;
 
     if (m_animStop)
         animSpeed = 0.f;
     else if (m_animRevert)
         animSpeed *= -1.f;
 
-    m_tileData->drawAnimation(m_level, m_imgPosition, m_lastAnimType, m_animSpeed, m_position, m_scale, 0.f,
+    m_tileData->drawAnimation(m_level, m_imgPosition, m_lastAnimType, animSpeed, m_position, m_scale, 0.f,
                               video::SColor(255, 255, 255 - m_injury, 255 - m_injury),
-                              (m_animStop) ? m_lastAnimFrame : 0, &lastFrame);
-
-    if (!m_animStop)
-        m_lastAnimFrame = lastFrame;
+                              (m_animStop) ? m_lastAnimFrame : 0, &m_lastAnimFrame);
 }
