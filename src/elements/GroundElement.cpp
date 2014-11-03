@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "Parser.h"
 #include "level\Level.h"
+#include "effects\EffectManager.h"
 #include "elements\GroundElement.h"
 
 using namespace irr;
@@ -33,4 +34,5 @@ GroundElement::GroundElement(Level* level, unsigned id,
 
 GroundElement::~GroundElement()
 {
+    m_level->getEffectManager()->disappear(this);
 }

@@ -19,6 +19,8 @@ private:
 
     unsigned m_damage;
     TileData::Animation::Type m_lastAnimType;
+    bool m_lastDirectionLeft;
+    bool m_movementAnims;
 };
 
 #endif // ENEMYELEMENT_H_INCLUDED

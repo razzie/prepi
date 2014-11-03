@@ -51,6 +51,7 @@ PlayerElement::PlayerElement(Level* level, unsigned id,
 
 PlayerElement::~PlayerElement()
 {
+    m_level->getEffectManager()->fall(this);
 }
 
 unsigned PlayerElement::getHealth() const

@@ -2,6 +2,7 @@
 #include "Parser.h"
 #include "level\Level.h"
 #include "level\TileSet.h"
+#include "effects\EffectManager.h"
 #include "elements\FinishElement.h"
 
 using namespace irr;
@@ -31,4 +32,5 @@ FinishElement::FinishElement(Level* level, unsigned id,
 
 FinishElement::~FinishElement()
 {
+    m_level->getEffectManager()->disappear(this);
 }

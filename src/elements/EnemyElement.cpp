@@ -32,14 +32,23 @@ EnemyElement::EnemyElement(Level* level, unsigned id,
                            float scale, float animSpeed, Behavior* behavior, Motion* motion, unsigned damage)
  : Element(level, Type::ENEMY, id, imgPosition, position, scale, animSpeed, behavior, motion)
  , m_damage(damage)
- , m_lastAnimType(TileData::Animation::Type::IDLE_RIGHT) // IDLE_RIGHT : 0
+ , m_lastAnimType(TileData::Animation::Type::IDLE_RIGHT)
+ , m_lastDirectionLeft(false)
+ , m_movementAnims(false)
 {
+    if (m_tileData != nullptr &&
+        m_tileData->getAnimation(m_imgPosition, TileData::Animation::Type::IDLE_RIGHT) != nullptr &&
+        m_tileData->getAnimation(m_imgPosition, TileData::Animation::Type::IDLE_LEFT) != nullptr &&
+        m_tileData->getAnimation(m_imgPosition, TileData::Animation::Type::RIGHT) != nullptr &&
+        m_tileData->getAnimation(m_imgPosition, TileData::Animation::Type::LEFT) != nullptr)
+    {
+        m_movementAnims = true;
+    }
 }
 
 EnemyElement::~EnemyElement()
 {
-    //m_level->getEffectManager()->fall(this);
-    m_level->getEffectManager()->smoke(this);
+    m_level->getEffectManager()->disappear(this);
 }
 
 unsigned EnemyElement::getDamage() const
@@ -51,17 +60,31 @@ void EnemyElement::update(uint32_t elapsedMs)
 {
     Element::update(elapsedMs);
 
-    /*if (!m_tileData || !m_body) return;
+    if (m_tileData == nullptr || m_body == nullptr)
+        return;
 
-    const TileData::Animation* anim = m_tileData->getAnimation(m_imgPosition);
-    if (anim && anim->animCount > 1)
+    if (m_movementAnims)
     {
-        b2Vec2 velocity = m_body->GetLinearVelocity();
-        m_lastAnimType = (velocity.x > 0) ? TileData::Animation::Type::RIGHT : TileData::Animation::Type::LEFT;
-    }*/
+        if (m_lastDirectionLeft)
+            m_lastAnimType = TileData::Animation::Type::IDLE_LEFT;
+        else
+            m_lastAnimType = TileData::Animation::Type::IDLE_RIGHT;
+
+        b2Vec2 movement = m_body->GetLinearVelocity();
+        if (movement.x > 0.f) // right
+        {
+            m_lastDirectionLeft = false;
+            m_lastAnimType = TileData::Animation::Type::RIGHT;
+        }
+        else if (movement.x < 0.f) // left
+        {
+            m_lastDirectionLeft = true;
+            m_lastAnimType = TileData::Animation::Type::LEFT;
+        }
+    }
 }
 
 void EnemyElement::draw()
 {
-    m_tileData->drawAnimation(m_level, m_imgPosition, m_lastAnimType, m_animSpeed, m_position, m_scale);
+    m_tileData->drawAnimation(m_level, m_imgPosition, (m_movementAnims ? m_lastAnimType : 0), m_animSpeed, m_position, m_scale);
 }

@@ -227,9 +227,9 @@ void TileData::drawAnimation(Level* level, core::vector2di imgPos, unsigned anim
     unsigned frame = 0;
 
     if (animSpeed > 0)
-        frame = (elapsedMs / (1000 / animSpeed) + startingFrame) % anim->m_frames;
+        frame = (((elapsedMs * animSpeed) / 1000) + startingFrame) % anim->m_frames;
     else if (animSpeed < 0)
-        frame = anim->m_frames - ((elapsedMs / (1000 / -animSpeed) + startingFrame) % anim->m_frames);
+        frame = anim->m_frames - ((((elapsedMs * -animSpeed) / 1000) + startingFrame) % anim->m_frames);
     else
         frame = startingFrame % anim->m_frames;
 

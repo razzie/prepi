@@ -3,6 +3,7 @@
 #include "Parser.h"
 #include "level\Level.h"
 #include "level\TileSet.h"
+#include "effects\EffectManager.h"
 #include "elements\Element.h"
 #include "elements\GroundElement.h"
 #include "elements\EnemyElement.h"
@@ -71,6 +72,11 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
         m_shape = m_tileData->getBoundingShape(imgPosition);
         m_shape *= m_scale;
         m_body = m_tileData->createBody(this);
+
+        if (m_tileData->getAnimation(m_imgPosition, TileData::Animation::Type::APPEAR) != nullptr)
+        {
+            m_level->getEffectManager()->appear(this);
+        }
     }
 
     m_level->addElement(this);

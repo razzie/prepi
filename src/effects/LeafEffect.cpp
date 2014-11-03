@@ -54,6 +54,8 @@ LeafEffect::LeafEffect(Level* level, const Shape& shape, unsigned image, video::
         m_imgPos = m_tileData->getImagePosition(image);
     }
 
+    m_shape += -velocity / 2.f;
+
     const int leafNum = MAX(1, (float)DEFAULT_LEAF_NUM * std::sqrt(m_shape.getArea()));
 
     for (int i = 0; i < leafNum; ++i)
