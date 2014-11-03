@@ -31,21 +31,19 @@ static core::vector2df getContactCenterPoint(b2Contact* contact)
 
     if (pointCount == 1)
     {
-        return {points[0].x + 1.f, points[0].y + 1.f};
+        return {points[0].x, points[0].y};
     }
     else
     {
         for (unsigned i = 0; i < pointCount; ++i)
         {
-            contactPos.X += points[i].x + 1.f;
-            contactPos.Y += points[i].y + 1.f;
+            contactPos.X += points[i].x;
+            contactPos.Y += points[i].y;
         }
         contactPos /= pointCount;
 
         return contactPos;
     }
-
-    //return {worldManifold.points[0].x + 1.f, worldManifold.points[0].y + 1.f};
 }
 
 Collision::Collision(Element* otherElement, core::vector2df contactPoint, float otherElementAngle)

@@ -63,7 +63,7 @@ LeafEffect::LeafEffect(Level* level, const Shape& shape, unsigned image, video::
         leaf.m_color = m_color;
         randomizeColor(leaf.m_color, 64);
         leaf.m_begin = rand() % 500;
-        leaf.m_duration = m_duration + (rand() % 500);
+        leaf.m_duration = m_duration + (rand() % 1000) - 500;
         leaf.m_randomSeed = rand() % 1000;
         m_leafs.push_back(leaf);
     }

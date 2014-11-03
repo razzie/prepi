@@ -233,6 +233,7 @@ void PlayerElement::update(uint32_t elapsedMs)
                     {
                         movingPlatform = true;
                         movement.x = contactElem->getBody()->GetLinearVelocity().x * 500; // I don't why 500, but it works
+                        movement.y = 1.f;
                     }
                 }
                 break;

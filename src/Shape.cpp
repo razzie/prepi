@@ -2,6 +2,7 @@
 #include "Box2D\Box2D.h"
 #include "Globals.h"
 #include "level\Level.h"
+#include "elements\Element.h"
 #include "Parser.h"
 #include "Shape.h"
 
@@ -273,8 +274,8 @@ void Shape::addToBody(b2Body* body, float scale) const
 
                 b2PolygonShape boxShape;
                 boxShape.SetAsBox(boundingBox.getWidth()/2 - 0.01f, boundingBox.getHeight()/2 - 0.01f,
-                                   { boundingBox.getWidth()/2 - (1.f - boundingBox.UpperLeftCorner.X),
-                                     boundingBox.getHeight()/2 - (1.f - boundingBox.UpperLeftCorner.Y) },
+                                   { boundingBox.getWidth()/2 - boundingBox.UpperLeftCorner.X,
+                                     boundingBox.getHeight()/2 - boundingBox.UpperLeftCorner.Y },
                                    0.f);
 
                 fixtureDef.shape = &boxShape;
@@ -289,7 +290,7 @@ void Shape::addToBody(b2Body* body, float scale) const
                 boundingSphere.m_center *= scale;
 
                 b2CircleShape circleShape;
-                circleShape.m_p.Set(boundingSphere.m_center.X - 1.f, boundingSphere.m_center.Y - 1.f);
+                circleShape.m_p.Set(boundingSphere.m_center.X, boundingSphere.m_center.Y);
                 circleShape.m_radius = boundingSphere.m_radius - 0.02f;
 
                 fixtureDef.shape = &circleShape;
@@ -299,20 +300,36 @@ void Shape::addToBody(b2Body* body, float scale) const
 
         case Type::POLYGON:
             {
-                b2Vec2 vertices[b2_maxPolygonVertices];
-                int i = 0;
-                for (auto it = m_polygonData.begin(), end = m_polygonData.end(); it != end; ++it)
+                if ( !m_polygonData.empty() )
                 {
-                    core::vector2df p = *it;
-                    p *= scale;
-                    p -= core::vector2df(1.f, 1.f);
-                    vertices[i++].Set(p.X, p.Y);
-                }
-                b2PolygonShape polygonShape;
-                polygonShape.Set(vertices, m_polygonData.size());
+                    b2Vec2 lowestPoint = {m_polygonData[0].X, m_polygonData[0].Y};
+                    b2Vec2 vertices[b2_maxPolygonVertices];
+                    int i = 0;
+                    for (auto it = m_polygonData.begin(), end = m_polygonData.end(); it != end; ++it)
+                    {
+                        core::vector2df p = (*it) * scale;
+                        vertices[i++].Set(p.X, p.Y);
+                        if (p.Y > lowestPoint.y) lowestPoint.Set(p.X, p.Y);
+                    }
 
-                fixtureDef.shape = &polygonShape;
-                body->CreateFixture(&fixtureDef);
+                    b2PolygonShape polygonShape;
+                    polygonShape.Set(vertices, m_polygonData.size());
+
+                    fixtureDef.shape = &polygonShape;
+                    body->CreateFixture(&fixtureDef);
+
+                    // creating a little sphere for the lowest point for the player
+                    Element* element = static_cast<Element*>(body->GetUserData());
+                    if (element && element->getType() == Element::Type::PLAYER)
+                    {
+                        b2CircleShape circleShape;
+                        circleShape.m_p = lowestPoint;
+                        circleShape.m_radius = 0.02f;
+
+                        fixtureDef.shape = &circleShape;
+                        body->CreateFixture(&fixtureDef);
+                    }
+                }
                 break;
             }
     }
