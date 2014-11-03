@@ -43,8 +43,11 @@ public:
         };
 
         Animation();
+        Animation(Animation&&);
         ~Animation();
+        Animation& operator= (Animation&&);
 
+        TileData* m_tileData;
         irr::video::ITexture* m_texture;
         unsigned m_speed;
         unsigned m_frames;
@@ -75,6 +78,7 @@ public:
 private:
     friend class TileSet;
 
+    const TileSet* m_tileSet;
     std::string m_fileName;
     irr::video::ITexture* m_texture;
     unsigned m_tileSize;
@@ -105,6 +109,8 @@ public:
     void reload();
 
 private:
+    friend class TileData;
+
     Globals* m_globals;
     std::string m_name;
     Timer m_animTimer;

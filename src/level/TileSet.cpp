@@ -59,7 +59,8 @@ static b2Filter elementTypeToFilter(Element::Type elemType)
 }
 
 TileData::Animation::Animation()
- : m_texture(nullptr)
+ : m_tileData(nullptr)
+ , m_texture(nullptr)
  , m_speed(0)
  , m_frames(0)
  , m_framesPerRow(0)
@@ -68,12 +69,35 @@ TileData::Animation::Animation()
 {
 }
 
+TileData::Animation::Animation(Animation&& anim)
+{
+    *this = std::move(anim);
+}
+
 TileData::Animation::~Animation()
 {
+    if (m_tileData != nullptr)
+    {
+        m_tileData->m_tileSet->m_globals->driver->removeTexture(m_texture);
+        m_texture = nullptr;
+    }
+}
+
+TileData::Animation& TileData::Animation::operator= (Animation&& anim)
+{
+    m_tileData = anim.m_tileData;
+    std::swap(m_texture, anim.m_texture);
+    m_speed = anim.m_speed;
+    m_frames = anim.m_frames;
+    m_framesPerRow = anim.m_framesPerRow;
+    m_rows = anim.m_rows;
+    m_enabled = anim.m_enabled;
+    return *this;
 }
 
 TileData::TileData()
- : m_texture(nullptr)
+ : m_tileSet(nullptr)
+ , m_texture(nullptr)
  , m_tileSize(0)
  , m_tileDimension(0, 0)
  , m_tileCount(0)
@@ -87,11 +111,17 @@ TileData::TileData(TileData&& td)
 
 TileData::~TileData()
 {
+    if (m_tileSet != nullptr)
+    {
+        m_tileSet->m_globals->driver->removeTexture(m_texture);
+        m_texture = nullptr;
+    }
 }
 
 TileData& TileData::operator= (TileData&& td)
 {
-    m_texture = td.m_texture;
+    m_tileSet = td.m_tileSet;
+    std::swap(m_texture, td.m_texture);
     m_tileSize = td.m_tileSize;
     m_tileDimension = td.m_tileDimension;
     m_tileCount = td.m_tileCount;
@@ -276,6 +306,8 @@ void TileSet::reload()
     findTileData(basedir + "finish/", m_finishes);
     findTileData(basedir + "particle/", m_particles);
     findAnimationData(basedir + "animations/");
+
+    m_animTimer.reset();
 }
 
 std::string TileSet::getName() const
@@ -451,6 +483,7 @@ void TileSet::findTileData(std::string dirName, std::map<unsigned, TileData>& da
             {
                 unsigned id;
                 TileData td;
+                td.m_tileSet = this;
                 td.m_fileName = dirName + fileName;
                 td.m_texture = m_globals->driver->getTexture(td.m_fileName.c_str());
 
@@ -581,6 +614,7 @@ void TileSet::findAnimationData(std::string dirName) const
                         }
 
                         TileData::Animation* anim = &(td->m_animations[tileId][animType]);
+                        anim->m_tileData = td;
                         anim->m_texture = animTexture;
                         anim->m_speed = speed;
                         anim->m_rows = animTextureSize.Height / td->m_tileSize;

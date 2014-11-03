@@ -154,6 +154,7 @@ void Level::clearLevel()
 
 void Level::reloadTileSet()
 {
+    clearLevel();
     m_tileset->reload();
     reloadLevel();
 }
