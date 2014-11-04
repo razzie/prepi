@@ -84,21 +84,26 @@ void LeafEffect::update(uint32_t elapsedMs)
         // update parameters only when the leaf is visible
         if (m_elapsed >= leaf.m_begin && m_elapsed <= leaf.m_duration)
         {
-            // update leaf position
+            // calculate leaf movement
             float speed = (float)elapsedMs / 1000.f;
             core::vector2df movement = m_velocity;
             movement.X += m_velocity.X + (sin((leaf.m_randomSeed + m_elapsed) / 256) * 0.5f);
             movement.Y += m_velocity.Y + (cos((leaf.m_randomSeed + m_elapsed) / 256) * 0.5f);
-            leaf.m_position += movement * speed;
 
-            // update leaf alpha
+            // update leaf alpha and position
             if (m_elapsed < (leaf.m_begin + 255))
             {
                 leaf.m_color.setAlpha(m_elapsed - leaf.m_begin);
+                leaf.m_position += movement * speed * ((float)(m_elapsed - leaf.m_begin) / 255.f);
             }
             else if (m_elapsed > (leaf.m_duration - 255))
             {
                 leaf.m_color.setAlpha(leaf.m_duration - m_elapsed);
+                leaf.m_position += movement * speed;
+            }
+            else
+            {
+                leaf.m_position += movement * speed;
             }
 
             // drawing leaf

@@ -223,7 +223,8 @@ void PlayerElement::update(uint32_t elapsedMs)
                 break;
         }
 
-        switch (collision.getOtherElementDirection())
+        //switch (collision.getOtherElementDirection())
+        switch (Collision::getDirectionFromAngle(collision.getOtherElementAngle(), 130.f))
         {
             case Collision::Direction::BOTTOM:
                 if (contactElem->getType() != Element::Type::REWARD)
