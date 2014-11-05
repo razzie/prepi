@@ -359,7 +359,7 @@ void Shape::draw(Level* level, core::vector2df pos) const
         case Type::SPHERE:
             {
                 core::vector2di center = level->getScreenPosition(m_sphereData.m_center + pos);
-                float radius = m_sphereData.m_radius * level->getUnitSize();
+                float radius = m_sphereData.m_radius * unit;
                 level->getGlobals()->driver->draw2DPolygon(center, radius, {255, 255, 255, 255});
             }
             break;
