@@ -35,10 +35,10 @@ static b2Filter elementTypeToFilter(Element::Type elemType)
     switch (elemType)
     {
         case Element::Type::GROUND:
-        //case Element::Type::ENEMY:
+        case Element::Type::ENEMY:
         case Element::Type::REWARD:
         case Element::Type::PLAYER:
-        case Element::Type::FINISH:
+        //case Element::Type::FINISH:
             filter.categoryBits = 0x0001;
             filter.maskBits = 0x0003;
             break;
@@ -49,7 +49,7 @@ static b2Filter elementTypeToFilter(Element::Type elemType)
             break;
 
         // type(s) below will never collide with blood
-        case Element::Type::ENEMY:
+        case Element::Type::FINISH:
             filter.categoryBits = 0x0001;
             filter.maskBits = 0x0001;
             break;

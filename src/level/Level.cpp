@@ -3,6 +3,7 @@
 #include <exception>
 #include "Box2D\Box2D.h"
 #include "Globals.h"
+#include "EventListener.h"
 #include "level\TileSet.h"
 #include "effects\EffectManager.h"
 #include "Parser.h"
@@ -16,7 +17,7 @@
 #include "elements\PlayerElement.h"
 #include "elements\FinishElement.h"
 
-#define ABS(a) (((a) < 0) ? -(a) : (a))
+#define ABS(a) (unsigned)(((a) < 0) ? -(a) : (a))
 
 using namespace irr;
 
@@ -255,16 +256,21 @@ void Level::updateView(uint32_t elapsedMs)
     // let the camera follow the player
     if (m_player != nullptr)
     {
+        EventListener* l = m_globals->eventListener;
         core::vector2df playerPos = m_player->getPosition() + m_player->getBoundingBox().getCenter();
         core::vector2df playerMovement = m_player->getMovement();
 
         offset.X = (playerPos.X * m_unit) - (screenSize.Width / 2);
         offset.Y = (playerPos.Y * m_unit) - (screenSize.Height / 2);
 
-        if (playerMovement.X > 0.5f) offset.X += screenSize.Width / 3;
-        else if (playerMovement.X < -0.5f) offset.X -= screenSize.Width / 3;
-        if (playerMovement.Y > 0.5f) offset.Y += screenSize.Height / 3;
-        else if (playerMovement.Y < -0.5f) offset.Y -= screenSize.Height / 3;
+        if (l->isRight() || playerMovement.X > 0.5f)
+            offset.X += screenSize.Width / 4;
+        else if (l->isLeft() || playerMovement.X < -0.5f)
+            offset.X -= screenSize.Width / 4;
+        if (l->isDown() || playerMovement.Y > 0.5f)
+            offset.Y += screenSize.Height / 2;
+        else if (l->isUp() || playerMovement.Y < -0.5f)
+            offset.Y -= screenSize.Height / 4;
 
         //if (ABS(playerMovement.X) > 5.f || ABS(playerMovement.Y) > 5.f)
         if (playerMovement.Y > 5.f)
@@ -279,63 +285,33 @@ void Level::updateView(uint32_t elapsedMs)
 
     // resize level to fit screen if too small
     if (m_dimension.Width * m_unit < screenSize.Width)
-    {
         m_unit = ((float)screenSize.Width / (float)m_dimension.Width) + 1.f;
-        if (m_origUnit < m_unit) m_origUnit = m_unit;
-    }
     if (m_dimension.Height * m_unit < screenSize.Height)
-    {
         m_unit = ((float)screenSize.Height / (float)m_dimension.Height) + 1.f;
-        if (m_origUnit < m_unit) m_origUnit = m_unit;
-    }
 
     // change view according to the change in unit size (focus point: screen center)
-    if (startingUnit != m_unit)
+    if (ABS(startingUnit - m_unit) > 0.2f)
     {
         core::vector2di screenCenter(screenSize.Width / 2, screenSize.Height / 2);
-
-        core::vector2di center = m_offset + screenCenter; // current offset
-        center *= (unsigned)m_unit;
-        center /= (unsigned)startingUnit;
-        m_offset = center - screenCenter;
-
-        core::vector2di center2 = offset + screenCenter; // aim offset
-        center2 *= (unsigned)m_unit;
-        center2 /= (unsigned)startingUnit;
-        offset = center2 - screenCenter;
+        m_offset = (m_offset + screenCenter) * m_unit / startingUnit - screenCenter;
+        offset = (offset + screenCenter) * m_unit / startingUnit - screenCenter;
+        m_camMovement *= m_unit / startingUnit;
     }
 
-    if (ABS(offset.X - m_offset.X) < (int)m_unit * 2 &&
-        ABS(offset.Y - m_offset.Y) < (int)m_unit * 2)
-    {
-        m_camMovement.set(0.f, 0.f);
-    }
-    else
-    {
-        // speed up camera in the direction of the new target position
-        //const float camSpeed = (speed * m_unit) / 1024.f;
-        const float camSpeed = speed / 16.f;
-        m_camMovement.X += camSpeed * (offset.X - m_offset.X) * 2;
-        m_camMovement.Y += camSpeed * (offset.Y - m_offset.Y) * 2;
+    // speed up camera in the direction of the new target position
+    const float camSpeed = speed / 8.f;
+    m_camMovement.X += camSpeed * (offset.X - m_offset.X);
+    m_camMovement.Y += camSpeed * (offset.Y - m_offset.Y);
 
-        // 'fast braking' if camera is too fast and left the target position behind
-        if ((m_camMovement.X > 0.f && m_offset.X > offset.X) ||
-            (m_camMovement.X < 0.f && m_offset.X < offset.X))
-        {
-            //m_camMovement.X -= (m_camMovement.X / 8.f);
-            m_camMovement.X /= 2.f;
-        }
-        if ((m_camMovement.Y > 0.f && m_offset.Y > offset.Y) ||
-            (m_camMovement.Y < 0.f && m_offset.Y < offset.Y))
-        {
-            //m_camMovement.Y -= (m_camMovement.Y / 8.f);
-            m_camMovement.Y /= 2.f;
-        }
+    // 'fast braking' if camera is too fast and left the target position behind
+    if (ABS(offset.X - m_offset.X) < screenSize.Width / 8)
+        m_camMovement.X /= 1.2f;
+    if (ABS(offset.Y - m_offset.Y) < screenSize.Height / 8)
+        m_camMovement.Y /= 1.2f;
 
-        // actually moving the camera
-        m_offset.X += m_camMovement.X;
-        m_offset.Y += m_camMovement.Y;
-    }
+    // actually moving the camera
+    m_offset.X += m_camMovement.X;
+    m_offset.Y += m_camMovement.Y;
 
     core::dimension2du levelSize;
     levelSize.Width = m_dimension.Width * (unsigned)m_unit;
@@ -343,27 +319,15 @@ void Level::updateView(uint32_t elapsedMs)
 
     // align the level if an edge is out of the screen
     if (m_offset.X < 0)
-    {
         m_offset.X = 0;
-        m_camMovement.X = 0.f;
-    }
     else if (m_offset.X > (s32)(levelSize.Width - screenSize.Width))
-    {
         m_offset.X = (s32)(levelSize.Width - screenSize.Width);
-        m_camMovement.X = 0.f;
-    }
 
     // align the level if an edge is out of the screen
     if (m_offset.Y < 0)
-    {
         m_offset.Y = 0;
-        m_camMovement.Y = 0.f;
-    }
     else if (m_offset.Y > (s32)(levelSize.Height - screenSize.Height))
-    {
         m_offset.Y = (s32)(levelSize.Height - screenSize.Height);
-        m_camMovement.Y = 0.f;
-    }
 }
 
 bool Level::isElementOnScreen(Element* element)
