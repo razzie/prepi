@@ -66,7 +66,8 @@ private:
     std::string m_levelFile;
     irr::core::vector2di m_offset;
     irr::core::dimension2du m_dimension;
-    unsigned m_unit;
+    float m_unit;
+    unsigned m_origUnit;
     Background* m_bg;
     std::vector<Element*> m_elements;
     std::vector<Element*> m_elemInsertionQueue;
@@ -74,7 +75,7 @@ private:
     Timer m_timer;
     PlayerElement* m_player;
     unsigned m_rewardSum;
-    irr::core::vector2di m_camMovement;
+    irr::core::vector2df m_camMovement;
     bool m_debug;
 };
 
