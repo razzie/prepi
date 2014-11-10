@@ -73,7 +73,8 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
         m_shape *= m_scale;
         m_body = m_tileData->createBody(this);
 
-        if (m_tileData->getAnimation(m_imgPosition, TileData::Animation::Type::APPEAR) != nullptr)
+        if (m_tileData->getAnimation(m_imgPosition, TileData::Animation::Type::APPEAR) != nullptr &&
+            getBehaviorType() != Behavior::Type::TELEPORT)
         {
             m_level->getEffectManager()->appear(this);
         }
