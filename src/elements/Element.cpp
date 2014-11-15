@@ -173,9 +173,14 @@ void Element::setScale(float scale)
 void Element::setPosition(core::vector2df position)
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+
     m_position = position;
-    m_body->SetTransform({position.X, position.Y}, 0.f);
-    m_body->SetLinearVelocity({0.f, 0.f});
+
+    if (m_body != nullptr)
+    {
+        m_body->SetTransform({position.X, position.Y}, 0.f);
+        m_body->SetLinearVelocity({0.f, 0.f});
+    }
 }
 
 float Element::getAnimSpeed() const
@@ -242,15 +247,23 @@ core::vector2df Element::getMovement() const
 void Element::setMovementX(f32 xMov)
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
-    f32 y = m_body->GetLinearVelocity().y;
-    m_body->SetLinearVelocity({xMov, y});
+
+    if (m_body != nullptr)
+    {
+        f32 y = m_body->GetLinearVelocity().y;
+        m_body->SetLinearVelocity({xMov, y});
+    }
 }
 
 void Element::setMovementY(f32 yMov)
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
-    f32 x = m_body->GetLinearVelocity().x;
-    m_body->SetLinearVelocity({x, yMov});
+
+    if (m_body != nullptr)
+    {
+        f32 x = m_body->GetLinearVelocity().x;
+        m_body->SetLinearVelocity({x, yMov});
+    }
 }
 
 const TileData* Element::getTileData() const

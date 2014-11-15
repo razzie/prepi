@@ -84,7 +84,9 @@ void StraightMotion::update(uint32_t elapsedMs)
             //core::vector2df velocity = pos - m_element->getPosition();
 
             m_element->setPosition(pos);
-            m_element->getBody()->SetLinearVelocity({path.m_velocity.X, path.m_velocity.Y});
+            m_element->setMovementX(path.m_velocity.X);
+            m_element->setMovementY(path.m_velocity.Y);
+            //m_element->getBody()->SetLinearVelocity({path.m_velocity.X, path.m_velocity.Y});
 
             break;
         }
