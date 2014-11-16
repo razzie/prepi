@@ -273,8 +273,8 @@ void Level::updateView(uint32_t elapsedMs)
             offset.Y -= screenSize.Height / 4;
 
         //if (ABS(playerMovement.X) > 5.f || ABS(playerMovement.Y) > 5.f)
-        if (playerMovement.Y > 5.f)
-            desiredUnit -= 48.f;
+        /*if (playerMovement.Y > 5.f)
+            desiredUnit -= 48.f;*/
     }
 
     // dynamic change of unit size

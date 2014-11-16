@@ -262,7 +262,7 @@ void Shape::addToBody(b2Body* body, float scale) const
 {
     b2FixtureDef fixtureDef;
     fixtureDef.density = 1.0f;
-    fixtureDef.friction = 0.5f;
+    fixtureDef.friction = 0.1f;
 
     switch (m_type)
     {

@@ -29,7 +29,7 @@ int main()
     rofi.play();*/
 
     Level level1(&g, "volcano");
-    level1.loadLevel("../levels/volcano1.txt");
+    level1.loadLevel("../levels/volcano2.txt");
     GUI gui(&g, &level1);
 
     gg::script_engine* se = g.app->get_script_engine();
