@@ -392,7 +392,7 @@ void PlayerElement::update(uint32_t elapsedMs)
 
         if (l->isUp() && cohesion)
         {
-            movement.y = -m_speed * 2;
+            movement.y = -m_speed;
         }
         else if (l->isDown())
         {
