@@ -52,12 +52,11 @@ void AutoMotion::update(uint32_t elapsedMs)
     m_element->updateCollisions();
     for (const Collision& collision : m_element->getCollisions())
     {
-        Element* contactElem = collision.getOtherElement();
+        Element* contactElem = collision.getElementB();
 
         if (contactElem->getType() == Element::Type::PARTICLE) continue;
 
-        Collision::Direction direction = Collision::getDirectionFromAngle( collision.getOtherElementAngle(), 45.f );
-        switch (direction)
+        switch (collision.getDirection(45.f))
         {
             case Collision::Direction::LEFT:
                 m_direction = Direction::RIGHT;

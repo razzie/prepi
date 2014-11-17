@@ -52,15 +52,19 @@ protected:
     irr::core::vector2df m_checkpointPos;
     unsigned m_checkpointHealth;
     irr::core::vector2df m_lastVelocity;
+    irr::core::vector2df m_platformRelPosition;
+    Element* m_movingPlatform;
     std::vector<Damage> m_damageList;
     unsigned m_injury;
     uint32_t m_immortalLeft;
+    TileData::Animation::Type m_animType;
     TileData::Animation::Type m_lastAnimType;
-    unsigned m_lastAnimFrame;
+    unsigned m_animShiftTimeout;
+    unsigned m_animFrame;
     bool m_animStop;
     bool m_animRevert;
-    bool m_onLadder;
     bool m_lastDirectionLeft;
+    bool m_onLadder;
 };
 
 #endif // PLAYERELEMENT_H_INCLUDED

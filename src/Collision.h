@@ -17,23 +17,23 @@ public:
         RIGHT
     };
 
-    Collision(Element* otherElement, irr::core::vector2df, float);
-    Collision(Element* otherElement, irr::core::vector2df, float, Direction);
+    Collision(Element* A, Element* B, irr::core::vector2df contact);
+    Collision(Element* A, Element* B, irr::core::vector2df contact, float angle);
     Collision(const Collision&);
     ~Collision();
-    Element*  getOtherElement() const;
-    float     getOtherElementAngle() const;
-    Direction getOtherElementDirection() const;
+    Element* getElementA() const;
+    Element* getElementB() const;
     irr::core::vector2df getContactPoint() const;
+    float getAngle() const;
+    Direction getDirection(float leftRightThresholdAngle = 90.f) const;
 
     static void updateElementCollisions(Element*, std::vector<Collision>&, bool clearPrevious = true);
-    static Direction getDirectionFromAngle(float angle, float leftRightThresholdAngle = 90.f);
 
 private:
-    Element*  m_otherElement;
-    float     m_otherElementAngle;
-    Direction m_otherElementDirection;
-    irr::core::vector2df m_contactPoint;
+    Element* m_elementA;
+    Element* m_elementB;
+    irr::core::vector2df m_contact;
+    float m_angle;
 };
 
 #endif // COLLISION_H_INCLUDED

@@ -14,10 +14,57 @@ static float alignedAngle(float angle)
         return angle;
 }
 
-static float getAngleFromElementContact(Element* element, core::vector2df contactPos)
+
+static bool angleBetween(float angle, float minAngle, float maxAngle)
+{
+    angle = alignedAngle(angle);
+    minAngle = alignedAngle(minAngle);
+    maxAngle = alignedAngle(maxAngle);
+
+    if (maxAngle >= minAngle)
+    {
+        return (angle >= minAngle && angle <= maxAngle);
+    }
+    else
+    {
+        return ((angle >= minAngle && angle < 360) ||
+                (angle >= 0 && angle <= maxAngle));
+    }
+}
+
+static bool angleBetweenThreshold(float angle, float threshold)
+{
+    return angleBetween(angle, -threshold/2, threshold/2);
+}
+
+static Collision::Direction getDirectionFromAngle(float angle, float leftRightThresholdAngle)
+{
+    // left
+    if (angleBetweenThreshold(angle + 180, leftRightThresholdAngle))
+    {
+        return Collision::Direction::LEFT;
+    }
+    // right
+    else if (angleBetweenThreshold(angle, leftRightThresholdAngle))
+    {
+        return Collision::Direction::RIGHT;
+    }
+    // top
+    else if (angleBetweenThreshold(angle + 90, leftRightThresholdAngle))
+    {
+        return Collision::Direction::TOP;
+    }
+    // bottom
+    else// if (angleBetweenThreshold(angle + 90, leftRightThresholdAngle))
+    {
+        return Collision::Direction::BOTTOM;
+    }
+}
+
+static float getAngleFromElementContact(Element* element, core::vector2df contact)
 {
     core::vector2df elemPos = element->getPosition() + element->getBoundingBox().getCenter();
-    return alignedAngle( (contactPos - elemPos).getAngleTrig() );
+    return alignedAngle( (contact - elemPos).getAngleTrig() );
 }
 
 static core::vector2df getContactCenterPoint(b2Contact* contact)
@@ -46,25 +93,25 @@ static core::vector2df getContactCenterPoint(b2Contact* contact)
     }
 }
 
-Collision::Collision(Element* otherElement, core::vector2df contactPoint, float otherElementAngle)
- : Collision(otherElement, contactPoint, otherElementAngle,
-             getDirectionFromAngle(otherElementAngle))
+
+Collision::Collision(Element* A, Element* B, core::vector2df contact)
+ : Collision(A, B, contact, getAngleFromElementContact(A, contact))
 {
 }
 
-Collision::Collision(Element* otherElement, core::vector2df contactPoint, float otherElementAngle, Direction otherElementDirection)
- : m_otherElement(otherElement)
- , m_otherElementAngle(otherElementAngle)
- , m_otherElementDirection(otherElementDirection)
- , m_contactPoint(contactPoint)
+Collision::Collision(Element* A, Element* B, core::vector2df contact, float angle)
+ : m_elementA(A)
+ , m_elementB(B)
+ , m_contact(contact)
+ , m_angle(angle)
 {
 }
 
 Collision::Collision(const Collision& collision)
- : m_otherElement(collision.m_otherElement)
- , m_otherElementAngle(collision.m_otherElementAngle)
- , m_otherElementDirection(collision.m_otherElementDirection)
- , m_contactPoint(collision.m_contactPoint)
+ : m_elementA(collision.m_elementA)
+ , m_elementB(collision.m_elementB)
+ , m_contact(collision.m_contact)
+ , m_angle(collision.m_angle)
 {
 }
 
@@ -72,24 +119,29 @@ Collision::~Collision()
 {
 }
 
-Element* Collision::getOtherElement() const
+Element* Collision::getElementA() const
 {
-    return m_otherElement;
+    return m_elementA;
 }
 
-float Collision::getOtherElementAngle() const
+Element* Collision::getElementB() const
 {
-    return m_otherElementAngle;
-}
-
-Collision::Direction Collision::getOtherElementDirection() const
-{
-    return m_otherElementDirection;
+    return m_elementB;
 }
 
 core::vector2df Collision::getContactPoint() const
 {
-    return m_contactPoint;
+    return m_contact;
+}
+
+float Collision::getAngle() const
+{
+    return m_angle;
+}
+
+Collision::Direction Collision::getDirection(float leftRightThresholdAngle) const
+{
+    return getDirectionFromAngle(m_angle, leftRightThresholdAngle);
 }
 
 void Collision::updateElementCollisions(Element* element, std::vector<Collision>& collisions, bool clearPrevious)
@@ -110,54 +162,6 @@ void Collision::updateElementCollisions(Element* element, std::vector<Collision>
         if (contactElem == 0 || contactElem == element)
             continue;
 
-        core::vector2df contactPoint = getContactCenterPoint(edge->contact);
-        float contactAngle = getAngleFromElementContact(element, contactPoint);
-        collisions.push_back( {contactElem, contactPoint, contactAngle} );
-    }
-}
-
-static bool angleBetween(float angle, float minAngle, float maxAngle)
-{
-    angle = alignedAngle(angle);
-    minAngle = alignedAngle(minAngle);
-    maxAngle = alignedAngle(maxAngle);
-
-    if (maxAngle >= minAngle)
-    {
-        return (angle >= minAngle && angle <= maxAngle);
-    }
-    else
-    {
-        return ((angle >= minAngle && angle < 360) ||
-                (angle >= 0 && angle <= maxAngle));
-    }
-}
-
-static bool angleBetweenThreshold(float angle, float threshold)
-{
-    return angleBetween(angle, -threshold/2, threshold/2);
-}
-
-Collision::Direction Collision::getDirectionFromAngle(float angle, float leftRightThresholdAngle)
-{
-    // left
-    if (angleBetweenThreshold(angle + 180, leftRightThresholdAngle))
-    {
-        return Direction::LEFT;
-    }
-    // right
-    else if (angleBetweenThreshold(angle, leftRightThresholdAngle))
-    {
-        return Direction::RIGHT;
-    }
-    // top
-    else if (angleBetweenThreshold(angle + 90, leftRightThresholdAngle))
-    {
-        return Direction::TOP;
-    }
-    // bottom
-    else// if (angleBetweenThreshold(angle + 90, leftRightThresholdAngle))
-    {
-        return Direction::BOTTOM;
+        collisions.push_back( {element, contactElem, getContactCenterPoint(edge->contact)} );
     }
 }

@@ -326,7 +326,7 @@ bool Element::isPlayerCollided() const
     {
         for (auto collision : m_collisions)
         {
-            Element* contactElem = collision.getOtherElement();
+            Element* contactElem = collision.getElementB();
 
             if (contactElem->getType() == Element::Type::PLAYER)
             {
