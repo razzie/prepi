@@ -10,7 +10,7 @@ using namespace irr;
 static IrrlichtDevice* createIrrlichtDevice()
 {
     SIrrlichtCreationParameters params; // constructor sets the defaults
-    params.AntiAlias = 16;
+    params.AntiAlias = 1;//16;
     params.Bits = 32;
     params.DriverType = video::EDT_OPENGL;
     params.Fullscreen = false;
@@ -37,7 +37,8 @@ Globals::Globals()
     device->setWindowCaption(L"prepi");
     smgr->addCameraSceneNode(0, core::vector3df(0,-40,0), core::vector3df(0,0,0));
 
-    driver->setTextureCreationFlag(video::ETCF_OPTIMIZED_FOR_QUALITY);
+    driver->setTextureCreationFlag(video::ETCF_OPTIMIZED_FOR_QUALITY, true);
+    driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, false);
     driver->enableMaterial2D(true);
     driver->getMaterial2D().TextureLayer[0].BilinearFilter = true;
     driver->getMaterial2D().AntiAliasing = video::EAAM_FULL_BASIC;
