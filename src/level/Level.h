@@ -54,6 +54,7 @@ protected:
     PlayerElement* findPlayer();
     void processInsertionQueue();
     void processDeletionQueue();
+    unsigned getMinimalUnitSize() const;
     void updateView(uint32_t elapsedMs);
     bool isElementOnScreen(Element*);
 

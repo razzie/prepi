@@ -8,8 +8,6 @@
 #include "elements\Element.h"
 #include "behaviors\TeleportBehavior.h"
 
-#define ABS(x) ((x) < 0 ? -(x) : (x))
-
 using namespace irr;
 
 std::map<unsigned, std::vector<TeleportBehavior*>> TeleportBehavior::m_teleports;
@@ -113,8 +111,7 @@ void TeleportBehavior::activateNext()
 
         if (elem != nullptr && t->m_delay != 0)
         {
-            //elem->getLevel()->getEffectManager()->disappear(elem);
-            Effect* disappearEffect = new DelayEffect(ABS(m_delay), new DisappearEffect(elem));
+            Effect* disappearEffect = new DelayEffect(std::abs(m_delay), new DisappearEffect(elem));
             elem->getLevel()->getEffectManager()->addEffect(disappearEffect);
         }
     }
