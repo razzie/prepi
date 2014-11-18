@@ -33,7 +33,8 @@ TeleportBehavior::TeleportBehavior(Element* element, unsigned sequenceNum, float
  , m_randomness(randomness)
  , m_delay(delay)
  , m_touched(false)
- , m_nextActivated(false)
+ , m_collisionErrorCheck(false)
+ , m_collisionErrorTimeout(0)
 {
     m_teleports[m_sequenceNum].push_back(this);
 }
@@ -72,13 +73,27 @@ void TeleportBehavior::setElement(Element* element)
     }
 }
 
-void TeleportBehavior::update(uint32_t)
+void TeleportBehavior::update(uint32_t elapsedMs)
 {
     if (m_element == nullptr) return;
 
-    if (m_nextActivated) return;
+    bool playerCollision = m_element->isPlayerCollided();
+    if (playerCollision == m_collisionErrorCheck)
+    {
+        m_collisionErrorTimeout = 0;
+    }
+    else
+    {
+        if (m_collisionErrorTimeout > 20)
+        {
+            m_collisionErrorCheck = playerCollision;
+            m_collisionErrorTimeout = 0;
+        }
+        m_collisionErrorTimeout += elapsedMs;
+    }
 
-    if (m_element->isPlayerCollided())
+    //if (m_element->isPlayerCollided())
+    if (m_collisionErrorCheck)
     {
         if (m_delay <= 0) activateNext();
         m_touched = true;
@@ -91,8 +106,6 @@ void TeleportBehavior::update(uint32_t)
 
 void TeleportBehavior::activateNext()
 {
-    m_nextActivated = true;
-
     // hide elements in the current sequence
     for (TeleportBehavior* t : m_teleports[m_sequenceNum])
     {
@@ -122,4 +135,6 @@ void TeleportBehavior::activateNext()
             elem->getLevel()->getEffectManager()->appear(elem);
         }
     }
+
+    delete this;
 }
