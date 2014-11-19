@@ -40,13 +40,19 @@ TeleportBehavior::TeleportBehavior(Element* element, unsigned sequenceNum, float
 TeleportBehavior::~TeleportBehavior()
 {
     auto& vect = m_teleports[m_sequenceNum];
+
     for (auto it = vect.begin(), end = vect.end(); it != end; ++it)
     {
         if (*it == this)
         {
             vect.erase(it);
-            return;
+            break;
         }
+    }
+
+    if (vect.empty())
+    {
+        m_teleports.erase(m_sequenceNum);
     }
 }
 
