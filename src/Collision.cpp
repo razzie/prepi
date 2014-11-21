@@ -1,40 +1,13 @@
 #include "Box2D\Box2D.h"
+#include "Angle.h"
 #include "Collision.h"
 #include "elements\Element.h"
 
 using namespace irr;
 
-static float alignedAngle(float angle)
-{
-    if (angle < 0)
-        return (angle + 360);
-    else if (angle >= 360)
-        return (angle - 360);
-    else
-        return angle;
-}
-
-
-static bool angleBetween(float angle, float minAngle, float maxAngle)
-{
-    angle = alignedAngle(angle);
-    minAngle = alignedAngle(minAngle);
-    maxAngle = alignedAngle(maxAngle);
-
-    if (maxAngle >= minAngle)
-    {
-        return (angle >= minAngle && angle <= maxAngle);
-    }
-    else
-    {
-        return ((angle >= minAngle && angle < 360) ||
-                (angle >= 0 && angle <= maxAngle));
-    }
-}
-
 static bool angleBetweenThreshold(float angle, float threshold)
 {
-    return angleBetween(angle, -threshold/2, threshold/2);
+    return DegAngle(angle).isBetween(-threshold/2, threshold/2);
 }
 
 static Collision::Direction getDirectionFromAngle(float angle, float leftRightThresholdAngle)
@@ -64,7 +37,7 @@ static Collision::Direction getDirectionFromAngle(float angle, float leftRightTh
 static float getAngleFromElementContact(Element* element, core::vector2df contact)
 {
     core::vector2df elemPos = element->getPosition() + element->getBoundingBox().getCenter();
-    return alignedAngle( (contact - elemPos).getAngleTrig() );
+    return DegAngle( (contact - elemPos).getAngleTrig() );
 }
 
 static core::vector2df getContactCenterPoint(b2Contact* contact)

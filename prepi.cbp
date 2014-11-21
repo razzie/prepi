@@ -61,6 +61,8 @@
 			<Add library="tthread" />
 			<Add directory="lib" />
 		</Linker>
+		<Unit filename="src/Angle.cpp" />
+		<Unit filename="src/Angle.h" />
 		<Unit filename="src/Collision.cpp" />
 		<Unit filename="src/Collision.h" />
 		<Unit filename="src/Color.cpp" />

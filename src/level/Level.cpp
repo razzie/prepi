@@ -18,8 +18,23 @@
 #include "elements\FinishElement.h"
 
 #define AUTO_ZOOM 0
+#define MAX_PLAYER_MOVE_TIME 2000
 
 using namespace irr;
+
+static double magicFunction(float x)
+{
+    if (x < 0.f)
+        return 0.f;
+    else if (x > 1.f)
+        return 1.f;
+    else if (x < 0.5f)
+        return std::pow(x * 2.f, 3) / 2.f;
+    else if (x > 0.f)
+        return -((std::pow((1.f - x) * 2.f, 3) / 2.f) - 1.f);
+
+    return 0.5f;
+}
 
 static const Version prepiVersion {1, 5};
 
@@ -36,7 +51,9 @@ Level::Level(Globals* globals, std::string tileset)
  , m_bg(new Background(this))
  , m_player(nullptr)
  , m_rewardSum(0)
- , m_camMovement(0.f, 0.f)
+ , m_lastPlayerPos(0.f, 0.f)
+ , m_playerMovementTime(0)
+ , m_cameraOffset(0.f, 0.f)
  , m_debug(false)
 {
 }
@@ -137,7 +154,6 @@ void Level::clearLevel()
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
 
-    m_camMovement.set(0.f, 0.f);
     m_timer.reset();
     m_rewardSum = 0;
     m_player = nullptr;
@@ -251,10 +267,8 @@ unsigned Level::getMinimalUnitSize() const
     const core::dimension2du screenSize = m_globals->driver->getScreenSize();
     unsigned minUnitX = m_unit, minUnitY = m_unit;
 
-    if (m_dimension.Width * m_unit < screenSize.Width)
-        minUnitX = (unsigned)((float)screenSize.Width / (float)m_dimension.Width) + 1;
-    if (m_dimension.Height * m_unit < screenSize.Height)
-        minUnitY = (unsigned)((float)screenSize.Height / (float)m_dimension.Height) + 1;
+    minUnitX = (unsigned)((float)screenSize.Width / (float)m_dimension.Width) + 1;
+    minUnitY = (unsigned)((float)screenSize.Height / (float)m_dimension.Height) + 1;
 
     return (minUnitX > minUnitY) ? minUnitX : minUnitY;
 }
@@ -263,100 +277,97 @@ void Level::updateView(uint32_t elapsedMs)
 {
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
 
-    const float speed = (float)elapsedMs / 1000.f;
-    const float startingUnit = m_unit;
-    float desiredUnit = m_origUnit;
     const core::dimension2du screenSize = m_globals->driver->getScreenSize();
-    core::vector2di offset;
+    const unsigned minUnit = getMinimalUnitSize();
+    const unsigned origUnit = m_unit;
 
-    // let the camera follow the player
-    if (m_player != nullptr)
+    if (m_player == nullptr)
+    {
+        core::dimension2du levelSize;
+
+        m_unit = minUnit;
+        levelSize.Width = m_dimension.Width * (unsigned)m_unit;
+        levelSize.Height = m_dimension.Height * (unsigned)m_unit;
+        m_offset.X = (screenSize.Width - levelSize.Width) / 2;
+        m_offset.Y = (screenSize.Height - levelSize.Height) / 2;
+    }
+    else
     {
         const core::vector2df playerPos = m_player->getPosition() + m_player->getBoundingBox().getCenter();
         const core::vector2di playerScreenPos(playerPos.X * (unsigned)m_unit, playerPos.Y * (unsigned)m_unit);
-        const core::vector2df playerMovement = m_player->getMovement();
-        const float maxPlayerSpeedSq = 400.f;
-        const float playerSpeed = playerMovement.getLength();
+        const core::vector2df playerMovement = playerPos - m_lastPlayerPos;
+        const bool playerMoving = (playerMovement.getLength() > 0.01f);
+        const double rate = magicFunction((float)m_playerMovementTime / MAX_PLAYER_MOVE_TIME);
+        const float camOffset = rate * (screenSize.Width / 4);
+        core::dimension2du levelSize;
+        core::vector2di offset;
 
-        // in the ideal case the player should be in the screen center
+        m_lastPlayerPos = playerPos;
+        m_unit = m_origUnit + 0.5f;
         offset.X = playerScreenPos.X - (screenSize.Width / 2);
         offset.Y = playerScreenPos.Y - (screenSize.Height / 2);
+        m_cameraOffset -= m_cameraOffset * (float)elapsedMs / 1000.f;
 
-        // if the player is not evne visible, offset is corrected immediately
-        if (playerScreenPos.X - m_offset.X < 0)
-            m_offset.X = playerScreenPos.X;
-        else if (playerScreenPos.X - m_offset.X > (int)screenSize.Width)
-            m_offset.X = playerScreenPos.X - screenSize.Width;
-        if (playerScreenPos.Y - m_offset.Y < 0)
-            m_offset.Y = playerScreenPos.Y;
-        else if (playerScreenPos.Y - m_offset.Y > (int)screenSize.Height)
-            m_offset.Y = playerScreenPos.Y - screenSize.Height;
+        if (playerMoving)
+        {
+            core::vector2df oldCameraOffset = m_cameraOffset;
+            m_cameraOffset.X += (playerMovement.X / 2.f) * elapsedMs;
+            m_cameraOffset.Y += (playerMovement.Y / 16.f) * elapsedMs;
 
-        // shifting view according to player movement
-        if (playerMovement.X)
-            offset.X += (std::pow(playerMovement.X, 2) / maxPlayerSpeedSq) * screenSize.Width;
-        if (playerMovement.Y)
-            offset.X += (std::pow(playerMovement.Y, 2) / maxPlayerSpeedSq) * screenSize.Height;
+            if (oldCameraOffset.getAngleWith(m_cameraOffset) > 45.f)
+            {
+                m_playerMovementTime = 0;
+            }
 
-        // decreasing unit size when the player is moving quickly (makes more tiles visible)
-        if (AUTO_ZOOM && playerSpeed > 5.f)
-            desiredUnit -= std::pow(playerSpeed - 5.f, 2);
+            m_playerMovementTime += elapsedMs;
+            if (m_playerMovementTime > MAX_PLAYER_MOVE_TIME)
+                m_playerMovementTime = MAX_PLAYER_MOVE_TIME;
+        }
+        else
+        {
+            if (elapsedMs > m_playerMovementTime)
+                m_playerMovementTime = 0;
+            else
+                m_playerMovementTime -= elapsedMs;
+
+            if (m_playerMovementTime == 0)
+                m_cameraOffset.set(0.f, 0.f);
+        }
+
+        core::vector2df camVector = core::vector2df(m_cameraOffset).normalize() * camOffset;
+        offset.X += camVector.X;
+        offset.Y += camVector.Y;
+
+        if (AUTO_ZOOM) m_unit -= (rate * 16.f);
+
+        if (m_unit < minUnit) m_unit = minUnit;
+
+        // change view according to the change in unit size (focus point: screen center)
+        if (origUnit != (unsigned)m_unit)
+        {
+            core::vector2di screenCenter(screenSize.Width / 2, screenSize.Height / 2);
+            m_offset = (m_offset + screenCenter) * (unsigned)m_unit / origUnit - screenCenter;
+            offset = offset * (unsigned)m_unit / origUnit;
+        }
+
+        // moving camera towards desired position (m_offset -> offset)
+        m_offset += ((offset - m_offset) * elapsedMs) / 256;
+
+        levelSize.Width = m_dimension.Width * (unsigned)m_unit;
+        levelSize.Height = m_dimension.Height * (unsigned)m_unit;
+
+        // align the level if an edge is out of the screen
+        if (m_offset.X < 0)
+            m_offset.X = 0;
+        else if (m_offset.X > (s32)(levelSize.Width - screenSize.Width))
+            m_offset.X = (s32)(levelSize.Width - screenSize.Width);
+
+        // align the level if an edge is out of the screen
+        if (m_offset.Y < 0)
+            m_offset.Y = 0;
+        else if (m_offset.Y > (s32)(levelSize.Height - screenSize.Height))
+            m_offset.Y = (s32)(levelSize.Height - screenSize.Height);
     }
-
-    // dynamic change of unit size
-    if (m_unit < desiredUnit - 0.2f)
-        m_unit += (speed * m_unit) / 2.f;
-    else if (m_unit > desiredUnit + 0.2f)
-        m_unit -= (speed * m_unit) / 2.f;
-
-    // resize level to fit screen if too small
-    unsigned minUnit = getMinimalUnitSize();
-    if ((unsigned)m_unit < minUnit) m_unit = minUnit;
-
-    // change view according to the change in unit size (focus point: screen center)
-    if ((unsigned)startingUnit != (unsigned)m_unit)
-    {
-        core::vector2di screenCenter(screenSize.Width / 2, screenSize.Height / 2);
-        m_offset = (m_offset + screenCenter) * (unsigned)m_unit / (unsigned)startingUnit - screenCenter;
-        offset = offset * (unsigned)m_unit / (unsigned)startingUnit;
-        m_camMovement *= (unsigned)m_unit / (unsigned)startingUnit;
-    }
-
-    const float camSpeed = speed / 2.f;
-    const unsigned camThreshold = screenSize.Width / 16;
-    core::vector2di offsetDiff = offset - m_offset;
-
-    // speed up camera in the direction of the new target position
-    if ((unsigned)std::abs(offsetDiff.X) > camThreshold)
-        m_camMovement.X += camSpeed * (std::abs(offsetDiff.X) - camThreshold) * (offsetDiff.X > 0 ? 1 : -1);
-    if ((unsigned)std::abs(offsetDiff.Y) > camThreshold)
-        m_camMovement.Y += camSpeed * (std::abs(offsetDiff.Y) - camThreshold) * (offsetDiff.Y > 0 ? 1 : -1);
-
-    // 'fast braking' if camera is too fast and left the target position behind
-    if ((unsigned)std::abs(offsetDiff.X) < camThreshold)
-        m_camMovement.X /= 1.5f;
-    if ((unsigned)std::abs(offsetDiff.Y) < camThreshold)
-        m_camMovement.Y /= 1.5f;
-
-    // actually moving the camera
-    m_offset.X += m_camMovement.X;
-    m_offset.Y += m_camMovement.Y;
-
-    core::dimension2du levelSize;
-    levelSize.Width = m_dimension.Width * (unsigned)m_unit;
-    levelSize.Height = m_dimension.Height * (unsigned)m_unit;
-
-    // align the level if an edge is out of the screen
-    if (m_offset.X < 0)
-        m_offset.X = 0;
-    else if (m_offset.X > (s32)(levelSize.Width - screenSize.Width))
-        m_offset.X = (s32)(levelSize.Width - screenSize.Width);
-
-    // align the level if an edge is out of the screen
-    if (m_offset.Y < 0)
-        m_offset.Y = 0;
-    else if (m_offset.Y > (s32)(levelSize.Height - screenSize.Height))
-        m_offset.Y = (s32)(levelSize.Height - screenSize.Height);
 }
 
 bool Level::isElementOnScreen(Element* element)

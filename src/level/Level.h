@@ -76,7 +76,9 @@ private:
     Timer m_timer;
     PlayerElement* m_player;
     unsigned m_rewardSum;
-    irr::core::vector2df m_camMovement;
+    irr::core::vector2df m_lastPlayerPos;
+    unsigned m_playerMovementTime;
+    irr::core::vector2df m_cameraOffset;
     bool m_debug;
 };
 
