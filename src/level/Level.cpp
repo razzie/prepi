@@ -296,18 +296,8 @@ void Level::updateView(uint32_t elapsedMs)
         const core::vector2df playerPos = m_player->getPosition() + m_player->getBoundingBox().getCenter();
         const core::vector2di playerScreenPos(playerPos.X * (unsigned)m_unit, playerPos.Y * (unsigned)m_unit);
 
-        const core::vector2di margin(screenSize.Width / 4, screenSize.Height / 8);
-        core::recti desiredScreen = screen;
-        desiredScreen.UpperLeftCorner += margin;
-        desiredScreen.LowerRightCorner -= margin;
-        desiredScreen += m_destOffset;
-
-        if (!desiredScreen.isPointInside(playerScreenPos))
-        {
-            m_destOffset.X = playerScreenPos.X - (screenSize.Width / 2);
-            m_destOffset.Y = playerScreenPos.Y - (screenSize.Height / 2);
-            if (AUTO_ZOOM) desiredUnit -= 32;
-        }
+        m_destOffset.X = playerScreenPos.X - (screenSize.Width / 2);
+        m_destOffset.Y = playerScreenPos.Y - (screenSize.Height / 2);
 
         if ((unsigned)m_unit < desiredUnit) m_unit += speed * 32.f;
         else if ((unsigned)m_unit > desiredUnit) m_unit -= speed * 32.f;
@@ -323,7 +313,19 @@ void Level::updateView(uint32_t elapsedMs)
         }
 
         // moving camera towards desired position (m_offset -> m_destOffset)
-        m_offset += ((m_destOffset - m_offset) * elapsedMs) / 256;
+        unsigned offsetDist = m_offset.getDistanceFrom(m_destOffset);
+        if (offsetDist > screenSize.Width / 16)
+        {
+            if (offsetDist > screenSize.Width / 8)
+            {
+                m_offset += ((m_destOffset - m_offset) * elapsedMs) / 256;
+                if (AUTO_ZOOM) desiredUnit -= 32;
+            }
+            else
+            {
+                m_offset += ((m_destOffset - m_offset) * elapsedMs) / 512;
+            }
+        }
 
         core::dimension2du levelSize;
         levelSize.Width = m_dimension.Width * (unsigned)m_unit;
