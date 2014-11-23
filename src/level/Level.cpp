@@ -17,12 +17,11 @@
 #include "elements\PlayerElement.h"
 #include "elements\FinishElement.h"
 
-#define AUTO_ZOOM 0
-#define MAX_PLAYER_MOVE_TIME 2000
+#define AUTO_ZOOM 1
 
 using namespace irr;
 
-static double magicFunction(float x)
+/*static double magicFunction(float x)
 {
     if (x < 0.f)
         return 0.f;
@@ -34,7 +33,7 @@ static double magicFunction(float x)
         return -((std::pow((1.f - x) * 2.f, 3) / 2.f) - 1.f);
 
     return 0.5f;
-}
+}*/
 
 static const Version prepiVersion {1, 5};
 
@@ -46,14 +45,12 @@ Level::Level(Globals* globals, std::string tileset)
  , m_physics(new b2World( {0.f, gravity} ))
  , m_effectMgr(new EffectManager(this))
  , m_offset(0, 0)
- , m_unit(96.f)
- , m_origUnit(96)
+ , m_destOffset(0, 0)
+ , m_unit(64.f)
+ , m_origUnit(64)
  , m_bg(new Background(this))
  , m_player(nullptr)
  , m_rewardSum(0)
- , m_lastPlayerPos(0.f, 0.f)
- , m_playerMovementTime(0)
- , m_cameraOffset(0.f, 0.f)
  , m_debug(false)
 {
 }
@@ -279,7 +276,6 @@ void Level::updateView(uint32_t elapsedMs)
 
     const core::dimension2du screenSize = m_globals->driver->getScreenSize();
     const unsigned minUnit = getMinimalUnitSize();
-    const unsigned origUnit = m_unit;
 
     if (m_player == nullptr)
     {
@@ -293,52 +289,28 @@ void Level::updateView(uint32_t elapsedMs)
     }
     else
     {
+        const float speed = (float)elapsedMs / 1000.f;
+        const unsigned origUnit = m_unit;
+        float desiredUnit = m_origUnit;
+        const core::recti screen({0, 0}, screenSize);
         const core::vector2df playerPos = m_player->getPosition() + m_player->getBoundingBox().getCenter();
         const core::vector2di playerScreenPos(playerPos.X * (unsigned)m_unit, playerPos.Y * (unsigned)m_unit);
-        const core::vector2df playerMovement = playerPos - m_lastPlayerPos;
-        const bool playerMoving = (playerMovement.getLength() > 0.01f);
-        const double rate = magicFunction((float)m_playerMovementTime / MAX_PLAYER_MOVE_TIME);
-        const float camOffset = rate * (screenSize.Width / 4);
-        core::dimension2du levelSize;
-        core::vector2di offset;
 
-        m_lastPlayerPos = playerPos;
-        m_unit = m_origUnit + 0.5f;
-        offset.X = playerScreenPos.X - (screenSize.Width / 2);
-        offset.Y = playerScreenPos.Y - (screenSize.Height / 2);
-        m_cameraOffset -= m_cameraOffset * (float)elapsedMs / 1000.f;
+        const core::vector2di margin(screenSize.Width / 4, screenSize.Height / 8);
+        core::recti desiredScreen = screen;
+        desiredScreen.UpperLeftCorner += margin;
+        desiredScreen.LowerRightCorner -= margin;
+        desiredScreen += m_destOffset;
 
-        if (playerMoving)
+        if (!desiredScreen.isPointInside(playerScreenPos))
         {
-            core::vector2df oldCameraOffset = m_cameraOffset;
-            m_cameraOffset.X += (playerMovement.X / 2.f) * elapsedMs;
-            m_cameraOffset.Y += (playerMovement.Y / 16.f) * elapsedMs;
-
-            if (oldCameraOffset.getAngleWith(m_cameraOffset) > 45.f)
-            {
-                m_playerMovementTime = 0;
-            }
-
-            m_playerMovementTime += elapsedMs;
-            if (m_playerMovementTime > MAX_PLAYER_MOVE_TIME)
-                m_playerMovementTime = MAX_PLAYER_MOVE_TIME;
-        }
-        else
-        {
-            if (elapsedMs > m_playerMovementTime)
-                m_playerMovementTime = 0;
-            else
-                m_playerMovementTime -= elapsedMs;
-
-            if (m_playerMovementTime == 0)
-                m_cameraOffset.set(0.f, 0.f);
+            m_destOffset.X = playerScreenPos.X - (screenSize.Width / 2);
+            m_destOffset.Y = playerScreenPos.Y - (screenSize.Height / 2);
+            if (AUTO_ZOOM) desiredUnit -= 32;
         }
 
-        core::vector2df camVector = core::vector2df(m_cameraOffset).normalize() * camOffset;
-        offset.X += camVector.X;
-        offset.Y += camVector.Y;
-
-        if (AUTO_ZOOM) m_unit -= (rate * 16.f);
+        if ((unsigned)m_unit < desiredUnit) m_unit += speed * 32.f;
+        else if ((unsigned)m_unit > desiredUnit) m_unit -= speed * 32.f;
 
         if (m_unit < minUnit) m_unit = minUnit;
 
@@ -347,12 +319,13 @@ void Level::updateView(uint32_t elapsedMs)
         {
             core::vector2di screenCenter(screenSize.Width / 2, screenSize.Height / 2);
             m_offset = (m_offset + screenCenter) * (unsigned)m_unit / origUnit - screenCenter;
-            offset = offset * (unsigned)m_unit / origUnit;
+            m_destOffset = m_destOffset * (unsigned)m_unit / origUnit;
         }
 
-        // moving camera towards desired position (m_offset -> offset)
-        m_offset += ((offset - m_offset) * elapsedMs) / 256;
+        // moving camera towards desired position (m_offset -> m_destOffset)
+        m_offset += ((m_destOffset - m_offset) * elapsedMs) / 256;
 
+        core::dimension2du levelSize;
         levelSize.Width = m_dimension.Width * (unsigned)m_unit;
         levelSize.Height = m_dimension.Height * (unsigned)m_unit;
 

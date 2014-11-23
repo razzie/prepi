@@ -66,6 +66,7 @@ private:
     EffectManager* m_effectMgr;
     std::string m_levelFile;
     irr::core::vector2di m_offset;
+    irr::core::vector2di m_destOffset;
     irr::core::dimension2du m_dimension;
     float m_unit;
     unsigned m_origUnit;
@@ -76,9 +77,6 @@ private:
     Timer m_timer;
     PlayerElement* m_player;
     unsigned m_rewardSum;
-    irr::core::vector2df m_lastPlayerPos;
-    unsigned m_playerMovementTime;
-    irr::core::vector2df m_cameraOffset;
     bool m_debug;
 };
 
