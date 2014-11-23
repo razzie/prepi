@@ -23,8 +23,7 @@ protected:
     float m_randomness;
     int m_delay;
     bool m_touched;
-    bool m_collisionErrorCheck;
-    unsigned m_collisionErrorTimeout;
+    unsigned m_untouchTimer;
 };
 
 #endif // TELEPORTBEHAVIOR_H_INCLUDED

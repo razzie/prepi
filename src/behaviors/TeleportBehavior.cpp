@@ -31,8 +31,7 @@ TeleportBehavior::TeleportBehavior(Element* element, unsigned sequenceNum, float
  , m_randomness(randomness)
  , m_delay(delay)
  , m_touched(false)
- , m_collisionErrorCheck(false)
- , m_collisionErrorTimeout(0)
+ , m_untouchTimer(0)
 {
     m_teleports[m_sequenceNum].push_back(this);
 }
@@ -82,22 +81,13 @@ void TeleportBehavior::update(uint32_t elapsedMs)
     if (m_element == nullptr) return;
 
     bool playerCollision = m_element->isPlayerCollided();
-    if (playerCollision == m_collisionErrorCheck)
+    if (m_touched && !playerCollision)
     {
-        m_collisionErrorTimeout = 0;
-    }
-    else
-    {
-        if (m_collisionErrorTimeout > 20)
-        {
-            m_collisionErrorCheck = playerCollision;
-            m_collisionErrorTimeout = 0;
-        }
-        m_collisionErrorTimeout += elapsedMs;
+        if (m_untouchTimer < 50) playerCollision = true;
+        m_untouchTimer += elapsedMs;
     }
 
-    //if (m_element->isPlayerCollided())
-    if (m_collisionErrorCheck)
+    if (playerCollision)
     {
         if (m_delay <= 0) activateNext();
         m_touched = true;
