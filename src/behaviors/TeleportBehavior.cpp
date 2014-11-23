@@ -72,7 +72,7 @@ void TeleportBehavior::setElement(Element* element)
             element->setPosition(pos);
         }
 
-        if (m_sequenceNum > 0) element->enable(false);
+        if (m_sequenceNum > 0) element->setFlags(false);
     }
 }
 

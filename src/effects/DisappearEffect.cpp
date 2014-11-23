@@ -29,7 +29,7 @@ DisappearEffect::~DisappearEffect()
 
 void DisappearEffect::update(uint32_t elapsedMs)
 {
-    if (m_elapsed == 0) m_element->enable(false); // called first time
+    if (m_elapsed == 0) m_element->setFlags(false); // called first time
 
     if (m_animation)
     {

@@ -441,17 +441,15 @@ void Level::update()
     // updating and drawing each element
     for (Element* element : m_elements)
     {
-        // if the element is disabled, we skip it
-        if (!element->isEnabled())
+        // first update the elements (position sync, player moving, etc)
+        if (element->getFlag(Element::Flag::UPDATE))
         {
-            continue;
+            element->update(elapsedMs);
         }
 
-        // first update the elements (position sync, player moving, etc)
-        element->update(elapsedMs);
-
         // do not draw if outside of screen
-        if (isElementOnScreen(element))
+        if (isElementOnScreen(element) &&
+            element->getFlag(Element::Flag::DRAW))
         {
             element->draw();
             if (m_debug) element->getShape().draw(this, element->getPosition());

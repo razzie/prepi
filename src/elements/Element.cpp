@@ -65,8 +65,9 @@ Element::Element(Level* level, Type type, unsigned id, irr::core::vector2di imgP
  , m_motion(motion)
  , m_tileData(level->getTileSet()->getData(type, id))
  , m_body(nullptr)
- , m_enabled(true)
 {
+    m_flags.set();
+
     if (m_tileData != nullptr)
     {
         m_shape = m_tileData->getBoundingShape(imgPosition);
@@ -101,8 +102,9 @@ Element::Element(Level* level, Type type, core::vector2df position)
  , m_motion(nullptr)
  , m_tileData(nullptr)
  , m_body(nullptr)
- , m_enabled(true)
 {
+    m_flags.set();
+
     m_level->addElement(this);
 }
 
@@ -144,9 +146,54 @@ core::vector2di Element::getImagePosition() const
     return m_imgPosition;
 }
 
+bool Element::getFlag(Flag flag) const
+{
+    return m_flags.test(flag);
+}
+
+void Element::setFlag(Flag flag, bool value)
+{
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+
+    m_flags.set(flag, value);
+
+    if (flag == Flag::PHYSICS && m_body != nullptr)
+    {
+        m_body->SetActive(value);
+    }
+}
+
+void Element::setFlags(bool value)
+{
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+
+    if (value)
+        m_flags.set();
+    else
+        m_flags.reset();
+
+    if (m_body != nullptr)
+    {
+        m_body->SetActive(value);
+    }
+}
+
 core::vector2df Element::getPosition() const
 {
     return m_position;
+}
+
+void Element::setPosition(core::vector2df position)
+{
+    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
+
+    m_position = position;
+
+    if (m_body != nullptr)
+    {
+        m_body->SetTransform({position.X, position.Y}, 0.f);
+        m_body->SetLinearVelocity({0.f, 0.f});
+    }
 }
 
 float Element::getScale() const
@@ -167,19 +214,6 @@ void Element::setScale(float scale)
         m_body = m_tileData->createBody(this);
         m_shape = m_tileData->getBoundingShape(m_imgPosition);
         m_shape *= scale;
-    }
-}
-
-void Element::setPosition(core::vector2df position)
-{
-    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
-
-    m_position = position;
-
-    if (m_body != nullptr)
-    {
-        m_body->SetTransform({position.X, position.Y}, 0.f);
-        m_body->SetLinearVelocity({0.f, 0.f});
     }
 }
 
@@ -336,20 +370,6 @@ bool Element::isPlayerCollided() const
 
         return false;
     }
-}
-
-void Element::enable(bool enabled)
-{
-    //if (m_enabled == enabled) return;
-
-    tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
-    if (m_body != nullptr) m_body->SetActive(enabled);
-    m_enabled = enabled;
-}
-
-bool Element::isEnabled() const
-{
-    return m_enabled;
 }
 
 void Element::remove()

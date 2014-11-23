@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <tuple>
+#include <bitset>
 #include <vector>
 #include "irrlicht.h"
 #include "tinythread.h"
@@ -32,7 +33,14 @@ public:
         PARTICLE = 5
     };
 
-    //Element(Level*, std::istream&);
+    enum Flag
+    {
+        DRAW = 0,
+        PHYSICS = 1,
+        UPDATE = 2,
+        FLAG_COUNT = 3 // do not use!
+    };
+
     Element(Level*, Type, unsigned, irr::core::vector2di, irr::core::vector2df, float, float, Behavior*, Motion*);
 
     Level* getLevel();
@@ -41,6 +49,10 @@ public:
     Type getType() const;
     unsigned getId() const;
     irr::core::vector2di getImagePosition() const;
+
+    bool getFlag(Flag) const;
+    void setFlag(Flag, bool value = true);
+    void setFlags(bool value = true);
 
     irr::core::vector2df getPosition() const;
     void setPosition(irr::core::vector2df);
@@ -73,8 +85,6 @@ public:
     bool isPlayerCollided();
     bool isPlayerCollided() const;
 
-    void enable(bool enabled = true);
-    bool isEnabled() const;
     void remove();
 
     virtual void update(uint32_t elapsedMs);
@@ -90,6 +100,7 @@ protected:
     unsigned m_id;
     irr::core::vector2di m_imgPosition;
     irr::core::vector2df m_position;
+    std::bitset<Flag::FLAG_COUNT> m_flags;
     float m_scale;
     float m_animSpeed;
     Behavior* m_behavior;
@@ -98,7 +109,6 @@ protected:
     const TileData* m_tileData;
     b2Body* m_body;
     std::vector<Collision> m_collisions;
-    bool m_enabled;
 };
 
 Element* CreateElement(Level*, std::istream&);

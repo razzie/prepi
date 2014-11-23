@@ -29,13 +29,14 @@ AppearEffect::~AppearEffect()
 
 void AppearEffect::update(uint32_t elapsedMs)
 {
-    if (m_elapsed == 0)
+    if (m_elapsed == 0) // called first time
     {
-        m_element->enable(false); // called first time
+        m_element->setFlags(true);
+        m_element->setFlag(Element::Flag::DRAW, false);
     }
-    else if ((m_elapsed + elapsedMs) >= m_duration)
+    else if ((m_elapsed + elapsedMs) >= m_duration) // called last time
     {
-        m_element->enable(true); // called last time
+        m_element->setFlag(Element::Flag::DRAW, true);
     }
 
     if (m_animation)
