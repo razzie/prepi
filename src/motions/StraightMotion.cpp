@@ -10,11 +10,11 @@ using namespace irr;
 std::istream& operator>> (std::istream&, irr::core::vector2df&);
 
 StraightMotion::StraightMotion(Element* element, std::istream& stream)
- : StraightMotion(element, Parser(stream, ',').getArgs<uint32_t, uint32_t, bool, PointArray>())
+ : StraightMotion(element, Parser(stream, ',').getArgs<float, uint32_t, bool, PointArray>())
 {
 }
 
-StraightMotion::StraightMotion(Element* element, std::tuple<uint32_t, uint32_t, bool, PointArray> data)
+StraightMotion::StraightMotion(Element* element, std::tuple<float, uint32_t, bool, PointArray> data)
  : StraightMotion(element,
     std::get<0>(data),
     std::get<1>(data),
@@ -23,7 +23,7 @@ StraightMotion::StraightMotion(Element* element, std::tuple<uint32_t, uint32_t, 
 {
 }
 
-StraightMotion::StraightMotion(Element* element, uint32_t speed, uint32_t delay, bool ai, PointArray pointArray)
+StraightMotion::StraightMotion(Element* element, float speed, uint32_t delay, bool ai, PointArray pointArray)
  : ActiveMotion(element, Type::STRAIGHT, speed, delay, ai)
  , m_pointArray(pointArray)
 {

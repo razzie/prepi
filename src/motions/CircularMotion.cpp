@@ -12,11 +12,11 @@ using namespace irr;
 std::istream& operator>> (std::istream&, irr::core::vector2df&);
 
 CircularMotion::CircularMotion(Element* element, std::istream& stream)
- : CircularMotion(element, Parser(stream, ',').getArgs<uint32_t, uint32_t, bool, int, core::vector2df>())
+ : CircularMotion(element, Parser(stream, ',').getArgs<float, uint32_t, bool, int, core::vector2df>())
 {
 }
 
-CircularMotion::CircularMotion(Element* element, std::tuple<uint32_t, uint32_t, bool, int, core::vector2df> data)
+CircularMotion::CircularMotion(Element* element, std::tuple<float, uint32_t, bool, int, core::vector2df> data)
  : CircularMotion(element,
     std::get<0>(data),
     std::get<1>(data),
@@ -26,7 +26,7 @@ CircularMotion::CircularMotion(Element* element, std::tuple<uint32_t, uint32_t, 
 {
 }
 
-CircularMotion::CircularMotion(Element* element, uint32_t speed, uint32_t delay, bool ai, int angle, core::vector2df center)
+CircularMotion::CircularMotion(Element* element, float speed, uint32_t delay, bool ai, int angle, core::vector2df center)
  : ActiveMotion(element, Type::STRAIGHT, speed, delay, ai)
  , m_angle(angle)
  , m_radius(0.f)

@@ -10,8 +10,8 @@ class StraightMotion : public ActiveMotion
 {
 public:
     StraightMotion(Element*, std::istream&);
-    StraightMotion(Element*, std::tuple<uint32_t, uint32_t, bool, PointArray>);
-    StraightMotion(Element*, uint32_t speed, uint32_t delay, bool ai, PointArray);
+    StraightMotion(Element*, std::tuple<float, uint32_t, bool, PointArray>);
+    StraightMotion(Element*, float speed, uint32_t delay, bool ai, PointArray);
     ~StraightMotion();
     PointArray& getPointArray();
     const PointArray& getPointArray() const;

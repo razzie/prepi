@@ -8,8 +8,8 @@ class CircularMotion : public ActiveMotion
 {
 public:
     CircularMotion(Element*, std::istream&);
-    CircularMotion(Element*, std::tuple<uint32_t, uint32_t, bool, int, irr::core::vector2df>);
-    CircularMotion(Element*, uint32_t speed, uint32_t delay, bool ai, int angle, irr::core::vector2df center);
+    CircularMotion(Element*, std::tuple<float, uint32_t, bool, int, irr::core::vector2df>);
+    CircularMotion(Element*, float speed, uint32_t delay, bool ai, int angle, irr::core::vector2df center);
     ~CircularMotion();
     irr::core::vector2df getCenter() const;
     int getAngle() const;
