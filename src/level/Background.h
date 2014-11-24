@@ -4,6 +4,7 @@
 #include <iostream>
 #include "irrlicht.h"
 #include "tinythread.h"
+#include "Timer.h"
 
 class Level;
 
@@ -31,6 +32,10 @@ private:
     unsigned m_bgId;
     irr::video::ITexture* m_bg;
     DrawingMethod m_drawingMethod;
+    Timer m_timer;
+    irr::video::ITexture* m_randomBgs[2];
+    unsigned m_randomBg;
+    unsigned m_randomBgCounter;
 };
 
 std::istream& operator>> (std::istream&, Background::DrawingMethod&);
