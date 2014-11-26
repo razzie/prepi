@@ -140,14 +140,12 @@ void PlayerElement::takeDamageFrom(EnemyElement* enemy)
 
 void PlayerElement::die()
 {
+    m_level->getEffectManager()->text("DEAD", this, {255, 255, 0, 0});
+
     if (m_checkpoint)
     {
         setPosition(m_checkpointPos);
         m_health = m_checkpointHealth;
-    }
-    else
-    {
-        m_level->getEffectManager()->text("DEAD", this, {255, 255, 0, 0});
     }
 }
 
