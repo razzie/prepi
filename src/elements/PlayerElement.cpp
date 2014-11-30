@@ -144,7 +144,8 @@ void PlayerElement::die()
 
     if (m_checkpoint)
     {
-        setPosition(m_checkpointPos);
+        //setPosition(m_checkpointPos);
+        m_level->getEffectManager()->reappear(this, m_checkpointPos);
         m_health = m_checkpointHealth;
     }
 }

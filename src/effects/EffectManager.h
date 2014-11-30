@@ -26,6 +26,7 @@ public:
                    irr::video::SColor color = {255, 255, 0, 0});
     void appear(Element*);
     void disappear(Element*);
+    void reappear(Element*, irr::core::vector2df newPos);
     void fall(Element*);
     void pickUp(Element*);
     void leafs(const Shape& shape, unsigned image, irr::video::SColor = {255, 0, 255, 0},

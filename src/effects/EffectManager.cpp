@@ -10,7 +10,6 @@
 #include "effects\ExplosionEffect.h"
 #include "effects\MoveElementEffect.h"
 #include "effects\AppearEffect.h"
-#include "effects\DisappearEffect.h"
 #include "effects\LeafEffect.h"
 #include "effects\SmokeEffect.h"
 
@@ -102,6 +101,11 @@ void EffectManager::appear(Element* element)
 void EffectManager::disappear(Element* element)
 {
     addEffect( new DisappearEffect(element) );
+}
+
+void EffectManager::reappear(Element* element, core::vector2df newPos)
+{
+    addEffect( new ReappearEffect(element, newPos) );
 }
 
 void EffectManager::fall(Element* element)

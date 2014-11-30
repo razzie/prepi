@@ -110,8 +110,6 @@
 		<Unit filename="src/effects/DamageEffect.h" />
 		<Unit filename="src/effects/DelayEffect.cpp" />
 		<Unit filename="src/effects/DelayEffect.h" />
-		<Unit filename="src/effects/DisappearEffect.cpp" />
-		<Unit filename="src/effects/DisappearEffect.h" />
 		<Unit filename="src/effects/Effect.h" />
 		<Unit filename="src/effects/EffectManager.cpp" />
 		<Unit filename="src/effects/EffectManager.h" />
