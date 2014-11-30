@@ -4,7 +4,7 @@
 #include "level\Level.h"
 #include "effects\EffectManager.h"
 #include "effects\DelayEffect.h"
-#include "effects\DisappearEffect.h"
+#include "effects\AppearEffect.h"
 #include "elements\Element.h"
 #include "behaviors\TeleportBehavior.h"
 
