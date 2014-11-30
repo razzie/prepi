@@ -29,7 +29,7 @@ int main()
     rofi.play();*/
 
     Level level1(&g, "volcano");
-    level1.loadLevel("../levels/volcano2.txt");
+    level1.loadLevel("../levels/b_shit.txt");
     GUI gui(&g, &level1);
 
     gg::script_engine* se = g.app->get_script_engine();
@@ -122,8 +122,14 @@ int main()
         if (g.eventListener->isKeyReleased(KEY_KEY_B))
             level1.switchDebugMode();
 
-        if (g.eventListener->isLeftMouseDown())
-            new ParticleElement(&level1, 0, level1.getRealPosition(g.eventListener->getMousePosition()), 0.16f);
+        if (g.eventListener->isKeyReleased(KEY_KEY_X))
+        {
+            PlayerElement* player = level1.getPlayerElement();
+            if (player != nullptr) player->dropElement(Element::Type::GROUND, 1, {3, 3});
+        }
+
+        /*if (g.eventListener->isLeftMouseDown())
+            new ParticleElement(&level1, 0, level1.getRealPosition(g.eventListener->getMousePosition()), 0.16f);*/
 
         level1.update();
         gui.update();

@@ -212,11 +212,17 @@ core::rectf Shape::getBoxData() const
 
 Shape::SphereData Shape::getSphereData() const
 {
+    if (m_type != Type::SPHERE)
+        throw std::runtime_error("getting sphere data of non-sphere shape");
+
     return m_sphereData;
 }
 
 const PointArray& Shape::getPolygonData() const
 {
+    if (m_type != Type::SPHERE)
+        throw std::runtime_error("getting polygon data of non-polygon shape");
+
     return m_polygonData;
 }
 

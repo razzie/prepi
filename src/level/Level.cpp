@@ -450,11 +450,13 @@ void Level::update()
         }
 
         // do not draw if outside of screen
-        if (isElementOnScreen(element) &&
-            element->getFlag(Element::Flag::DRAW))
+        if (isElementOnScreen(element))
         {
-            element->draw();
-            if (m_debug) element->getShape().draw(this, element->getPosition());
+            if (element->getFlag(Element::Flag::DRAW))
+                element->draw();
+
+            if (m_debug)
+                element->getShape().draw(this, element->getPosition());
         }
     }
 

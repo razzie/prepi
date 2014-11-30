@@ -112,6 +112,7 @@ protected:
 };
 
 Element* CreateElement(Level*, std::istream&);
+Element* CreateElement(Level*, Element::Type, unsigned, irr::core::vector2di, irr::core::vector2df, bool dynamic = true);
 
 std::istream& operator>> (std::istream&, Element::Type&);
 std::istream& operator>> (std::istream&, irr::core::vector2di&);

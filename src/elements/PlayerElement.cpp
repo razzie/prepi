@@ -159,6 +159,60 @@ void PlayerElement::setImmortal(uint32_t msec)
     m_immortalLeft = msec;
 }
 
+bool PlayerElement::dropElement(Element::Type type, unsigned id, core::vector2di imgPos)
+{
+    struct Callback : public b2QueryCallback
+    {
+        bool m_overlap;
+
+        Callback() : m_overlap(false) {}
+        virtual bool ReportFixture(b2Fixture* fixture)
+        {
+            if (fixture->GetBody()->IsActive())
+            {
+                m_overlap = true;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+    };
+
+    Callback cb;
+    core::rectf bbox = getBoundingBox();
+    b2AABB aabb;
+    aabb.lowerBound.Set(
+        m_position.X + bbox.UpperLeftCorner.X + (m_lastDirectionLeft ? -1.0f : bbox.getWidth()) + 0.3f,
+        m_position.Y + bbox.LowerRightCorner.Y - 0.7f );
+    aabb.upperBound = aabb.lowerBound + b2Vec2(0.4f, 0.4f);
+
+    m_level->getPhysics()->QueryAABB(&cb, aabb);
+
+    if (cb.m_overlap)
+    {
+        m_level->getEffectManager()->smoke({aabb.lowerBound.x + 0.5f, aabb.lowerBound.y + 0.5f}, 0.8f);
+        m_level->getEffectManager()->text("BLOCKED", this);
+        return false;
+    }
+    else
+    {
+        try
+        {
+            core::vector2df pos(aabb.lowerBound.x, aabb.lowerBound.y);
+            CreateElement(m_level, type, id, imgPos, pos, true);
+        }
+        catch (std::exception& e)
+        {
+            std::cout << "Can't drop element (" << e.what() << ")" << std::endl;
+            return false;
+        }
+
+        return true;
+    }
+}
+
 void PlayerElement::checkpoint()
 {
     m_checkpoint = true;

@@ -10,6 +10,7 @@
 #include "elements\RewardElement.h"
 #include "elements\PlayerElement.h"
 #include "elements\FinishElement.h"
+#include "elements\ParticleElement.h"
 
 using namespace irr;
 
@@ -19,8 +20,6 @@ void getLine(std::istream& input, std::ostream& output)
     {
         output << (char)input.get();
     }
-
-    //output << std::endl;
 }
 
 Element* CreateElement(Level* level, std::istream& input)
@@ -46,6 +45,38 @@ Element* CreateElement(Level* level, std::istream& input)
 
         case Element::Type::FINISH:
             return new FinishElement(level, stream);
+
+        default:
+            return nullptr;
+    }
+}
+
+Element* CreateElement(Level* level, Element::Type type, unsigned id, core::vector2di imgPos, core::vector2df pos, bool dynamic)
+{
+    Motion* motion = nullptr;
+
+    switch (type)
+    {
+        case Element::Type::GROUND:
+            if (dynamic) motion = new Motion(nullptr, Motion::Type::DYNAMIC);
+            return new GroundElement(level, id, imgPos, pos, 1.f, 1.f, nullptr, motion);
+
+        case Element::Type::ENEMY:
+            if (dynamic) motion = new Motion(nullptr, Motion::Type::DYNAMIC);
+            return new EnemyElement(level, id, imgPos, pos, 1.f, 1.f, nullptr, motion, 10);
+
+        case Element::Type::REWARD:
+            if (dynamic) motion = new Motion(nullptr, Motion::Type::DYNAMIC);
+            return new RewardElement(level, id, imgPos, pos, 1.f, 1.f, nullptr, motion, 10);
+
+        case Element::Type::PLAYER:
+            return new PlayerElement(level, id, imgPos, pos, 1.f, 1.f, nullptr);
+
+        case Element::Type::FINISH:
+            return new FinishElement(level, id, imgPos, pos, 1.f, 1.f, nullptr);
+
+        case Element::Type::PARTICLE:
+            return new ParticleElement(level, id, pos, 1.f);
 
         default:
             return nullptr;

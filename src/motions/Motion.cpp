@@ -25,8 +25,17 @@ Motion::Type Motion::getType() const
 
 void Motion::setElement(Element* element)
 {
-    if (m_element != nullptr) m_element->m_motion = nullptr;
-    if (element != nullptr) element->m_motion = this;
+    if (m_element != nullptr)
+    {
+        m_element->m_motion = nullptr;
+    }
+
+    if (element != nullptr)
+    {
+        //if (element->m_motion != nullptr) delete element->m_motion;
+        element->m_motion = this;
+    }
+
     m_element = element;
 }
 

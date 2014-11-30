@@ -27,6 +27,7 @@ public:
     void die();
     void setSpeed(irr::f32);
     void setImmortal(uint32_t msec);
+    bool dropElement(Element::Type, unsigned, irr::core::vector2di);
     void update(uint32_t elapsedMs);
     void draw();
 
