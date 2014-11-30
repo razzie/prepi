@@ -491,7 +491,7 @@ void PlayerElement::draw()
     else if (m_animRevert)
         animSpeed *= -1.f;
 
-    m_tileData->drawAnimation(m_level, m_imgPosition, m_lastAnimType, animSpeed, m_position, m_scale, 0.f,
-                              video::SColor(255, 255, 255 - m_injury, 255 - m_injury),
+    m_tileData->drawAnimation(m_level, m_imgPosition, m_lastAnimType, animSpeed * m_level->getSpeed(), m_position,
+                              m_scale, 0.f, video::SColor(255, 255, 255 - m_injury, 255 - m_injury),
                               (m_animStop) ? m_animFrame : 0, &m_animFrame);
 }

@@ -105,7 +105,7 @@ void LeafEffect::update(uint32_t elapsedMs)
             }
 
             // drawing leaf
-            m_tileData->drawAnimation(m_level, m_imgPos, 0, 1.f, leaf.m_position, 0.25f, 0.f, leaf.m_color, leaf.m_randomSeed);
+            m_tileData->drawAnimation(m_level, m_imgPos, 0, m_level->getSpeed(), leaf.m_position, 0.25f, 0.f, leaf.m_color, leaf.m_randomSeed);
         }
     }
 

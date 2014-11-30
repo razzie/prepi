@@ -49,6 +49,7 @@ Level::Level(Globals* globals, std::string tileset)
  , m_unit(64.f)
  , m_origUnit(64)
  , m_bg(new Background(this))
+ , m_speed(1.f)
  , m_player(nullptr)
  , m_rewardSum(0)
  , m_debug(false)
@@ -414,6 +415,17 @@ core::vector2df Level::getRealPosition(irr::core::vector2di screenPos) const
     return core::vector2df((float)screenPos.X / (float)m_unit, (float)screenPos.Y / (float)m_unit);
 }
 
+void Level::setSpeed(float speed)
+{
+    m_speed = speed;
+    if (m_speed < 0.f) m_speed = 0.f;
+}
+
+float Level::getSpeed() const
+{
+    return m_speed;
+}
+
 void Level::switchDebugMode()
 {
     m_debug = !m_debug;
@@ -424,7 +436,7 @@ void Level::update()
     tthread::lock_guard<tthread::recursive_mutex> guard(m_mutex);
 
     // getting elapsed time since the last update
-    unsigned elapsedMs = m_timer.getElapsed();
+    unsigned elapsedMs = m_timer.getElapsed() * m_speed;
 
     // adding elements from insertion queue
     processInsertionQueue();
@@ -432,7 +444,7 @@ void Level::update()
     // updating physics
     static const int32 velocityIterations = 8;
     static const int32 positionIterations = 3;
-    m_physics->Step((float)elapsedMs/250, velocityIterations, positionIterations);
+    m_physics->Step((float)elapsedMs / 250.f, velocityIterations, positionIterations);
 
     // updating view
     updateView(elapsedMs);

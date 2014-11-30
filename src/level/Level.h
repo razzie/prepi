@@ -45,6 +45,8 @@ public:
     irr::core::vector2di getScreenPosition(Element*) const;
     irr::core::vector2di getScreenPosition(irr::core::vector2df) const;
     irr::core::vector2df getRealPosition(irr::core::vector2di screenPos) const;
+    void setSpeed(float);
+    float getSpeed() const;
     void switchDebugMode();
     void update();
 
@@ -75,6 +77,7 @@ private:
     std::vector<Element*> m_elemInsertionQueue;
     std::vector<Element*> m_elemDeletionQueue;
     Timer m_timer;
+    float m_speed;
     PlayerElement* m_player;
     unsigned m_rewardSum;
     bool m_debug;

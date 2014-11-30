@@ -87,6 +87,11 @@ int main()
 
     se->add_function("setSpeed", [&](float speed)
     {
+        level1.setSpeed(speed);
+    });
+
+    se->add_function("setPlayerSpeed", [&](float speed)
+    {
         PlayerElement* player = level1.getPlayerElement();
         if (player) player->setSpeed(speed);
     });
