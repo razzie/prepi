@@ -261,6 +261,7 @@ void PlayerElement::update(uint32_t elapsedMs)
     bool movingPlatform = false;
     bool leftContact = false;
     bool rightContact = false;
+    core::vector2df smokePoint = m_position + core::vector2df(m_scale / 2, m_scale);
 
     // restore gravity after a ladder
     if (!m_onLadder && m_body->GetGravityScale() == 0.f)
@@ -331,10 +332,12 @@ void PlayerElement::update(uint32_t elapsedMs)
 
             case Collision::Direction::RIGHT:
                 rightContact = true;
+                smokePoint = collision.getContactPoint();
                 break;
 
             case Collision::Direction::LEFT:
                 leftContact = true;
+                smokePoint = collision.getContactPoint();
                 break;
 
             default:
@@ -382,7 +385,10 @@ void PlayerElement::update(uint32_t elapsedMs)
     // if player is stopped from a fast falling, make some smoke
     if (cohesion && m_lastVelocity.Y > 2.0f)
     {
-        m_level->getEffectManager()->smoke(m_position + core::vector2df(m_scale / 2, m_scale), 0.25f);
+        m_level->getEffectManager()->smoke(smokePoint, 0.25f);
+
+        if (m_lastVelocity.Y > 8.0f)
+            takeDamage(m_lastVelocity.Y - 7.f);
     }
 
     if (l->isLeft() && (cohesion || !leftContact))
