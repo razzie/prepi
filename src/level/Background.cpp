@@ -21,14 +21,22 @@ Background::Background(Level* level)
  , m_bgId(0)
  , m_bg(nullptr)
  , m_drawingMethod(DrawingMethod::STRETCH)
- , m_randomBgs{nullptr, nullptr}
- , m_randomBg(0)
- , m_randomBgCounter(0)
+ , m_rndBgDim(0, 0)
+ , m_rndSwapTexture{nullptr, nullptr}
+ , m_rndBgIndex(0)
+ , m_rndBgAdvance(0)
 {
 }
 
 Background::~Background()
 {
+    video::IVideoDriver* driver = m_level->getGlobals()->driver;
+
+    if (m_rndSwapTexture[0] != nullptr)
+        driver->removeTexture(m_rndSwapTexture[0]);
+
+    if (m_rndSwapTexture[1] != nullptr)
+        driver->removeTexture(m_rndSwapTexture[1]);
 }
 
 void Background::setId(unsigned id)
@@ -53,6 +61,11 @@ void Background::draw()
     const irr::core::rect<irr::s32> view = m_level->getView();
     const core::dimension2du levelDim = m_level->getDimension();
     core::rect<s32> levelRect = {0, 0, (s32)(levelDim.Width * unit), (s32)(levelDim.Height * unit)};
+
+    if (levelDim.Width == 0 || levelDim.Height == 0)
+    {
+        return;
+    }
 
     if (m_bgId && m_bg == nullptr)
     {
@@ -116,31 +129,16 @@ void Background::draw()
     {
         const core::dimension2du bgDim = levelDim * 2;
 
-        if (m_randomBgs[0] == nullptr)
-            m_randomBgs[0] = driver->addRenderTargetTexture(bgDim, "rbg1");
-        if (m_randomBgs[1] == nullptr)
-            m_randomBgs[1] = driver->addRenderTargetTexture(bgDim, "rbg2");
+        if (bgDim != m_rndBgDim)
+        {
+            resetRandomBg();
+        }
 
         if (m_timer.peekElapsed() >= 512)
         {
-            video::ITexture* bg = m_randomBgs[m_randomBg];
-            driver->setRenderTarget(bg); // draw to this texture
-
-            for (unsigned w = 0; w < bgDim.Width; ++w)
-            {
-                for (unsigned h = 0; h < bgDim.Height; ++h)
-                {
-                    const float rate = 0.125f;
-                    float n = noise(rate * w, rate * h, rate * m_randomBgCounter);
-                    video::SColor color(255, n * 64, 0, 0);
-                    driver->drawPixel(w, h, color);
-                }
-            }
-
-            driver->setRenderTarget(video::ERT_FRAME_BUFFER); // restore render target
+            drawNextRandomBg(m_rndSwapTexture[m_rndBgIndex]);
             m_timer.reset();
-            m_randomBg = 1 - m_randomBg;
-            ++m_randomBgCounter;
+            m_rndBgIndex = 1 - m_rndBgIndex;
         }
 
         const core::rect<s32> srcRect({0, 0}, bgDim);
@@ -152,7 +150,59 @@ void Background::draw()
                                               {alpha, 255, 255, 255},
                                               {alpha, 255, 255, 255}};
 
-        if (alpha < 255) driver->draw2DImage(m_randomBgs[m_randomBg], destRect, srcRect);
-        driver->draw2DImage(m_randomBgs[1 - m_randomBg], destRect, srcRect, 0, alphaColors);
+        if (alpha < 255) driver->draw2DImage(m_rndSwapTexture[m_rndBgIndex], destRect, srcRect);
+        driver->draw2DImage(m_rndSwapTexture[1 - m_rndBgIndex], destRect, srcRect, 0, alphaColors);
     }
+}
+
+void Background::resetRandomBg()
+{
+    video::IVideoDriver* driver = m_level->getGlobals()->driver;
+
+    m_rndBgDim = m_level->getDimension() * 2;
+    m_rndBgIndex = 0;
+
+    if (m_rndSwapTexture[0] != nullptr)
+    {
+        driver->removeTexture(m_rndSwapTexture[0]);
+        m_rndSwapTexture[0] = nullptr;
+    }
+
+    if (m_rndSwapTexture[1] != nullptr)
+    {
+        driver->removeTexture(m_rndSwapTexture[1]);
+        m_rndSwapTexture[1] = nullptr;
+    }
+
+    if (m_rndBgDim.Width > 0 && m_rndBgDim.Height > 0)
+    {
+        m_rndSwapTexture[0] = driver->addRenderTargetTexture(m_rndBgDim, "rbg1");
+        m_rndSwapTexture[1] = driver->addRenderTargetTexture(m_rndBgDim, "rbg2");
+
+        drawNextRandomBg(m_rndSwapTexture[0]);
+        drawNextRandomBg(m_rndSwapTexture[1]);
+    }
+}
+
+void Background::drawNextRandomBg(irr::video::ITexture* bg)
+{
+    if (bg == nullptr) return;
+
+    video::IVideoDriver* driver = m_level->getGlobals()->driver;
+    driver->setRenderTarget(bg); // draw to this texture
+
+    for (unsigned w = 0; w < m_rndBgDim.Width; ++w)
+    {
+        for (unsigned h = 0; h < m_rndBgDim.Height; ++h)
+        {
+            const float rate = 0.125f;
+            float n = noise(rate * w, rate * h, rate * m_rndBgAdvance);
+            video::SColor color(255, n * 64, 0, 0);
+            driver->drawPixel(w, h, color);
+        }
+    }
+
+    driver->setRenderTarget(video::ERT_FRAME_BUFFER); // restore render target
+
+    ++m_rndBgAdvance;
 }

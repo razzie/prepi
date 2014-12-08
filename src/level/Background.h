@@ -27,15 +27,21 @@ public:
     void draw();
 
 private:
+    void resetRandomBg();
+    void drawNextRandomBg(irr::video::ITexture*);
+
     mutable tthread::mutex m_mutex;
     Level* m_level;
+    Timer m_timer;
+    // normal image background
     unsigned m_bgId;
     irr::video::ITexture* m_bg;
     DrawingMethod m_drawingMethod;
-    Timer m_timer;
-    irr::video::ITexture* m_randomBgs[2];
-    unsigned m_randomBg;
-    unsigned m_randomBgCounter;
+    // random background (if image is not set)
+    irr::core::dimension2du m_rndBgDim;
+    irr::video::ITexture* m_rndSwapTexture[2];
+    unsigned m_rndBgIndex;
+    unsigned m_rndBgAdvance;
 };
 
 std::istream& operator>> (std::istream&, Background::DrawingMethod&);
