@@ -405,7 +405,9 @@ bool Element::isPlayerCollided() const
 
 void Element::remove()
 {
-    m_level->getEffectManager()->disappear(this);
+    if (m_type != Type::PARTICLE)
+        m_level->getEffectManager()->disappear(this);
+
     m_level->removeElement(this);
 }
 

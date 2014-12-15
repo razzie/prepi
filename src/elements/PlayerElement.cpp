@@ -104,6 +104,8 @@ void PlayerElement::takeDamage(unsigned dmg)
 {
     if (m_immortalLeft > 0) return;
 
+    if (dmg == 0) return;
+
     m_level->getEffectManager()->playerDamage();
     m_injury = 255;
 

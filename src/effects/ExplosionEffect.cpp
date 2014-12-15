@@ -23,27 +23,30 @@ ExplosionEffect::~ExplosionEffect()
 
 void ExplosionEffect::update(uint32_t/* elapsedMs*/)
 {
-    const int angle = 90;
-    unsigned particles = ((10.f - (m_scale * 2)) < 0) ? 1 : (unsigned)(10.f - (m_scale * 2));
+    const float deg2rad = 180.f / PI;
+    const int angle = 60;
+    int step = 10.f - (m_scale * 2);
+    if (step < 1) step = 1;
 
-    for (int deg = -angle; deg <= angle; deg += particles)
+    for (int deg = -angle; deg <= angle; deg += step)
     {
-        float intensity = m_scale + (rand() % (unsigned)(m_scale + 1.f));
-        float brightness = (float)(rand() % 10) / 10.f;
+        unsigned rnd = rand();
+        float intensity = m_scale + (rnd % (unsigned)(m_scale + 1.f));
+        float brightness = (float)(rnd % 11) / 10.f;
         video::SColor particleColor(255,
-                        m_color.getRed() * brightness,
-                        m_color.getGreen() * brightness,
-                        m_color.getBlue() * brightness);
+            brightness * m_color.getRed(),
+            brightness * m_color.getGreen(),
+            brightness * m_color.getBlue());
 
-        float rad = (float)deg / (2 * PI);
+        float rad = deg2rad * deg;
 
         core::vector2df pos = m_pos;
-        pos.X += std::cos(rad) * 0.2f;
-        pos.Y += -std::sin(rad) * 0.2f;
+        pos.X += std::sin(rad) * 0.5f;
+        pos.Y += -std::cos(rad) * 0.5f;
 
-        Element* particle = new ParticleElement(m_level, m_image, pos, m_pSize, particleColor, 1000 + rand()%500);
-        particle->setMovementX( std::cos(rad) * intensity );
-        particle->setMovementY( -std::sin(rad) * intensity );
+        Element* particle = new ParticleElement(m_level, m_image, pos, m_pSize, particleColor, 1000 + (rnd % 500));
+        particle->setMovementX( std::sin(rad) * intensity );
+        particle->setMovementY( -std::cos(rad) * intensity );
     }
 }
 
