@@ -32,5 +32,4 @@ FinishElement::FinishElement(Level* level, unsigned id,
 
 FinishElement::~FinishElement()
 {
-    m_level->getEffectManager()->disappear(this);
 }

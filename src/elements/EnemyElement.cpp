@@ -48,7 +48,6 @@ EnemyElement::EnemyElement(Level* level, unsigned id,
 
 EnemyElement::~EnemyElement()
 {
-    m_level->getEffectManager()->disappear(this);
 }
 
 unsigned EnemyElement::getDamage() const

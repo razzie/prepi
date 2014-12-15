@@ -34,5 +34,4 @@ GroundElement::GroundElement(Level* level, unsigned id,
 
 GroundElement::~GroundElement()
 {
-    m_level->getEffectManager()->disappear(this);
 }
