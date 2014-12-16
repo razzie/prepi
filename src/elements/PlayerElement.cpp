@@ -193,13 +193,13 @@ bool PlayerElement::dropElement(Element::Type type, unsigned id, core::vector2di
 
     m_level->getPhysics()->QueryAABB(&cb, aabb);
 
-    if (cb.m_overlap)
-    {
-        m_level->getEffectManager()->smoke({aabb.lowerBound.x + 0.5f, aabb.lowerBound.y + 0.5f}, 0.8f);
-        m_level->getEffectManager()->text("BLOCKED", this);
-        return false;
-    }
-    else
+//    if (cb.m_overlap)
+//    {
+//        m_level->getEffectManager()->smoke({aabb.lowerBound.x + 0.5f, aabb.lowerBound.y + 0.5f}, 0.8f);
+//        m_level->getEffectManager()->text("BLOCKED", this);
+//        return false;
+//    }
+//    else
     {
         try
         {
