@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) Gábor Görzsöny <gabor@gorzsony.com> - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
+
 #include "Box2D\Box2D.h"
 #include "Angle.h"
 #include "Collision.h"

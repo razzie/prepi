@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) Gábor Görzsöny <gabor@gorzsony.com> - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
+
 #ifndef TEXTEFFECT_H_INCLUDED
 #define TEXTEFFECT_H_INCLUDED
 
