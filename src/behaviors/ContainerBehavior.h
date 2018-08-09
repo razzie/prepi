@@ -1,3 +1,9 @@
+/*
+ * Copyright (C) Gábor Görzsöny <gabor@gorzsony.com> - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ */
+
 #ifndef CONTAINERBEHAVIOR_H_INCLUDED
 #define CONTAINERBEHAVIOR_H_INCLUDED
 
